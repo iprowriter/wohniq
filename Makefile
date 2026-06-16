@@ -3,12 +3,13 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status dev test lint format frontend-dev
+.PHONY: help install migrate migrate-status seed dev test lint format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
 	@echo "migrate        Apply pending SQL migrations"
 	@echo "migrate-status List applied vs pending migrations"
+	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
@@ -23,6 +24,9 @@ migrate:
 
 migrate-status:
 	cd backend && uv run alembic current && uv run alembic history
+
+seed:
+	cd backend && uv run python -m data.seed_listings $(ARGS)
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload

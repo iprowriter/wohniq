@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T1.4 — Synthetic listing generator.** (T1.3 done. T1.2 CI still open, runnable in parallel. T1.4 is the critical path — it produces the data everything else reads.)
+➡️ **T1.5 — Image seeder.** (T1.4 done. T1.6 embeddings also unblocked; T1.2 CI still open. T1.5 assigns photos + seeds duplicate-photo scams, feeding the pHash signal.)
 
 ---
 
@@ -36,7 +36,7 @@
 - [x] **T1.1 — Repo scaffolding.** `backend/` + `frontend/` skeletons, `.gitignore`, `README.md`, `pyproject` (deps + Ruff/Black/pytest config), `.env.example`, `Makefile`, health endpoint + smoke test. _Depends: —_
 - [ ] **T1.2 — CI + Supabase keep-alive.** GitHub Actions: lint+test on push; cron ping to keep Supabase warm (ADR-0005). _Depends: T1.1_
 - [x] **T1.3 — DB schema + migrations.** SQLAlchemy 2.0 models (`data/models.py`) for all 6 tables (SPEC §7) + Alembic (ADR-0006); initial revision `0001_initial_schema`. pgvector enabled; `core/db.py` engine/session. _Depends: T1.1_
-- [ ] **T1.4 — Synthetic listing generator.** ~100 listings with realistic Berlin Kiez/rent/size distributions + labeled ~15% scam subset and hard negatives (ADR-0003). _Depends: T1.3_
+- [x] **T1.4 — Synthetic listing generator.** Pure stdlib generator (`data/synthetic.py`) + Kiez data (`data/kieze.py`) + DB seeder (`data/seed_listings.py`) + label manifest. Balanced 15% scams across 4 types, 8 hard negatives. Unit-tested (`tests/test_synthetic.py`). _Depends: T1.3_
 - [ ] **T1.5 — Image seeder (`seed_images.py`).** Pexels API → typed room pools → 5 coherent photos/listing; compute pHash; inject deliberate duplicate sets for scam listings (ADR-0003). _Depends: T1.3_
 - [ ] **T1.6 — Embedding backfill.** Gemini embeddings for each listing into pgvector (ADR-0004/0005). _Depends: T1.4_
 
