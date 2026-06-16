@@ -10,6 +10,7 @@ help:
 	@echo "migrate        Apply pending SQL migrations"
 	@echo "migrate-status List applied vs pending migrations"
 	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
+	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
@@ -27,6 +28,9 @@ migrate-status:
 
 seed:
 	cd backend && uv run python -m data.seed_listings $(ARGS)
+
+seed-images:
+	cd backend && uv run python -m data.seed_images $(ARGS)
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload
