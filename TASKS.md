@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T1.6 — Embedding backfill.** (T1.5 done. Last task in M1 — embed each listing into pgvector so semantic search works. T1.2 CI still open, runnable anytime.)
+➡️ **T2.2 — Query parser (F1).** (T2.1 done. Implement `parser.v1`: free text → validated `SearchCriteria` via the LLM client, with the keyword-extractor fallback.)
 
 ---
 
@@ -38,11 +38,11 @@
 - [x] **T1.3 — DB schema + migrations.** SQLAlchemy 2.0 models (`data/models.py`) for all 6 tables (SPEC §7) + Alembic (ADR-0006); initial revision `0001_initial_schema`. pgvector enabled; `core/db.py` engine/session. _Depends: T1.1_
 - [x] **T1.4 — Synthetic listing generator.** Pure stdlib generator (`data/synthetic.py`) + Kiez data (`data/kieze.py`) + DB seeder (`data/seed_listings.py`) + label manifest. Balanced 15% scams across 4 types, 8 hard negatives. Unit-tested (`tests/test_synthetic.py`). _Depends: T1.3_
 - [x] **T1.5 — Image seeder (`seed_images.py`).** Pexels client + pure assignment (`photo_assign.py`) + pHash (`imaging.py`); 5 coherent photos/listing, cached pool, duplicate sets via shared photo_set_id. Unit-tested. _Depends: T1.3_
-- [ ] **T1.6 — Embedding backfill.** Gemini embeddings for each listing into pgvector (ADR-0004/0005). _Depends: T1.4_
+- [x] **T1.6 — Embedding backfill.** Gemini embeddings client (`core/embeddings.py`, asymmetric task types, batched) + pure text builder (`data/embed_text.py`) + idempotent backfill (`data/embed_listings.py`) into pgvector. Unit-tested. _Depends: T1.4_
 
 ## M2 — Core spine (search end-to-end)
 *The headline demo: query → parsed → retrieved → ranked → explained.*
-- [ ] **T2.1 — Central LLM client.** Structured-output + Pydantic validation + re-prompt + fallback + token/latency logging (ADR-0004, AGENTS rule 2). _Depends: T1.1_
+- [x] **T2.1 — Central LLM client.** `core/llm.py`: structured-output Gemini call, Pydantic validation, one re-prompt, caller fallback, observability logging. Injectable transport → unit-tested without network. _Depends: T1.1_
 - [ ] **T2.2 — Query parser (F1).** Implement `parser.v1` → `SearchCriteria`. _AC: SPEC F1. Depends: T2.1_
 - [ ] **T2.3 — Parser eval harness.** 20 canonical queries; assert schema-valid + field-correct (SPEC §9). _Depends: T2.2_
 - [ ] **T2.4 — Retrieval (F2).** Hard filters (budget/rooms) + pgvector semantic search. _AC: SPEC F2. Depends: T1.6, T2.2_

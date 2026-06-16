@@ -11,6 +11,7 @@ help:
 	@echo "migrate-status List applied vs pending migrations"
 	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
 	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
+	@echo "embed          Backfill listing embeddings into pgvector"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
@@ -31,6 +32,9 @@ seed:
 
 seed-images:
 	cd backend && uv run python -m data.seed_images $(ARGS)
+
+embed:
+	cd backend && uv run python -m data.embed_listings $(ARGS)
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload

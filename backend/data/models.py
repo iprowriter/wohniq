@@ -129,7 +129,8 @@ class Photo(Base):
 
 
 class ListingEmbedding(Base):
-    """One semantic-search vector per listing. 768 dims = Gemini text-embedding-004."""
+    """One semantic-search vector per listing. 768 dims = Gemini gemini-embedding-001
+    truncated (Matryoshka) from its native 3072."""
 
     __tablename__ = "listing_embedding"
 
