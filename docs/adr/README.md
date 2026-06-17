@@ -12,3 +12,4 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0004](0004-gemini-structured-output.md) | Gemini Flash with validated structured output | Accepted |
 | [0005](0005-supabase-postgres-pgvector.md) | Supabase Postgres + pgvector for storage and search | Accepted |
 | [0006](0006-orm-sqlalchemy-alembic.md) | SQLAlchemy 2.0 + Alembic; raw SQL for vector/ranking | Accepted |
+| [0007](0007-direct-sdk-over-agent-framework.md) | Direct Gemini SDK over LangChain/LangGraph | Accepted |

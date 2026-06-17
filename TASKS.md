@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T2.2 — Query parser (F1).** (T2.1 done. Implement `parser.v1`: free text → validated `SearchCriteria` via the LLM client, with the keyword-extractor fallback.)
+➡️ **T2.3 — Parser eval harness.** (T2.2 done. Build the 20 canonical queries + assert schema-valid & field-correct — the senior-signaling eval, SPEC §9.)
 
 ---
 
@@ -43,7 +43,7 @@
 ## M2 — Core spine (search end-to-end)
 *The headline demo: query → parsed → retrieved → ranked → explained.*
 - [x] **T2.1 — Central LLM client.** `core/llm.py`: structured-output Gemini call, Pydantic validation, one re-prompt, caller fallback, observability logging. Injectable transport → unit-tested without network. _Depends: T1.1_
-- [ ] **T2.2 — Query parser (F1).** Implement `parser.v1` → `SearchCriteria`. _AC: SPEC F1. Depends: T2.1_
+- [x] **T2.2 — Query parser (F1).** `parser.v1` → `SearchCriteria` via the LLM client. `search/criteria.py` (schema + canonical-amenity validator), `search/parse_rules.py` (pure keyword fallback), `search/parser.py`. Unit-tested. _AC: SPEC F1. Depends: T2.1_
 - [ ] **T2.3 — Parser eval harness.** 20 canonical queries; assert schema-valid + field-correct (SPEC §9). _Depends: T2.2_
 - [ ] **T2.4 — Retrieval (F2).** Hard filters (budget/rooms) + pgvector semantic search. _AC: SPEC F2. Depends: T1.6, T2.2_
 - [ ] **T2.5 — Deterministic ranking (F3).** Pure scoring function, per-factor breakdown, configurable weights (ADR-0001). _AC: SPEC F3. Depends: T2.4_
