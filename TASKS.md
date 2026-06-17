@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T2.8 — `/search` API endpoint.** (T2.7 done. Wire parser → retrieval → ranking → explanation behind FastAPI — closes the M2 spine end to end.)
+➡️ **T3.1 — Deterministic scam signals.** (M2 spine complete! Begin the showpiece: price z-score vs Kiez median + metadata rules — pure, no API.)
 
 ---
 
@@ -49,7 +49,7 @@
 - [x] **T2.5 — Deterministic ranking (F3).** `search/ranking.py`: pure weighted scorer (relevance/budget/commute/quiet/amenities), per-factor breakdown, configurable `RankingWeights`, stable sort. Fully unit-tested (8 tests, verified offline). _AC: SPEC F3. Depends: T2.4_
 - [x] **T2.6 — Ranking sanity eval.** `evals/ranking_cases.py` (5 designed scenarios) + `evals/ranking_eval.py` (`make eval-ranking`). Pure/offline → runs in CI as a weight-regression guard. All 5 pass (verified). _Depends: T2.5_
 - [x] **T2.7 — Explanation layer (F4).** `search/explanation.py` (`explain.v1` from the breakdown + deterministic template fallback) + `search/explain_rules.py` (pure reason/caveat selection). Unit-tested. _AC: SPEC F4. Depends: T2.5_
-- [ ] **T2.8 — `/search` API endpoint.** Wire parser→retrieval→ranking→explanation behind FastAPI. _Depends: T2.7_
+- [x] **T2.8 — `/search` API endpoint.** `app/routers/search.py`: POST `/api/v1/search` runs parse→retrieve→rank→explain, returns criteria + ranked results (listing, score, factor breakdown, explanation, photos). `is_scam`/`scam_type` never serialized. Wiring test w/ overrides. _Depends: T2.7_
 
 ## M3 — Showpiece (scam detection)
 - [ ] **T3.1 — Deterministic signals.** Price z-score vs Kiez median + metadata rules (ADR-0002). _AC: SPEC F7 AC1. Depends: T1.4_

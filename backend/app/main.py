@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
 
+from app.routers import search as search_router
 from core.config import settings
 from core.logging import configure_logging, get_logger
 
@@ -21,8 +22,8 @@ async def lifespan(app: FastAPI):
     try:
         print("✓  Backend ready.")
     except Exception as exc:
-        # Just log errors for now.... Will update it as we go.
         print(f"⚠  Backend failed to initialise properly: {exc}")
+    yield
 
 
 app = FastAPI(
@@ -42,4 +43,5 @@ def health() -> dict[str, str]:
     return {"status": "ok", "environment": settings.environment}
 
 
+api_v1.include_router(search_router.router)
 app.include_router(api_v1)
