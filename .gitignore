@@ -31,3 +31,4 @@ Thumbs.db
 # --- Project data artifacts ---
 *.sqlite3
 backend/data/generated/
+backend/evals/results/

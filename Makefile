@@ -12,6 +12,7 @@ help:
 	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
 	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
 	@echo "embed          Backfill listing embeddings into pgvector"
+	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
@@ -35,6 +36,9 @@ seed-images:
 
 embed:
 	cd backend && uv run python -m data.embed_listings $(ARGS)
+
+eval-parser:
+	cd backend && uv run python -m evals.parser_eval $(ARGS)
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload
