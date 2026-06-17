@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T3.1 — Deterministic scam signals.** (M2 spine complete! Begin the showpiece: price z-score vs Kiez median + metadata rules — pure, no API.)
+➡️ **T3.2 — Image duplicate signal.** (T3.1 done. pHash comparison across the DB to catch reused photos.)
 
 ---
 
@@ -52,7 +52,7 @@
 - [x] **T2.8 — `/search` API endpoint.** `app/routers/search.py`: POST `/api/v1/search` runs parse→retrieve→rank→explain, returns criteria + ranked results (listing, score, factor breakdown, explanation, photos). `is_scam`/`scam_type` never serialized. Wiring test w/ overrides. _Depends: T2.7_
 
 ## M3 — Showpiece (scam detection)
-- [ ] **T3.1 — Deterministic signals.** Price z-score vs Kiez median + metadata rules (ADR-0002). _AC: SPEC F7 AC1. Depends: T1.4_
+- [x] **T3.1 — Deterministic signals.** `scam/signals.py`: shared `Signal` shape, Kiez price stats (median/MAD), price-below-market (% + robust z) and no-Anmeldung rules. Pure, unit-tested. _AC: SPEC F7 AC1. Depends: T1.4_
 - [ ] **T3.2 — Image duplicate signal.** pHash comparison across DB. _AC: SPEC F7 AC1. Depends: T1.5_
 - [ ] **T3.3 — Scam text pass.** `scam_text.v1` structured signals w/ evidence quotes. _AC: SPEC F7 AC2. Depends: T2.1_
 - [ ] **T3.4 — Risk fusion.** Weighted fusion → 0–100 score + band + contributing signals. _AC: SPEC F7 AC3. Depends: T3.1, T3.2, T3.3_
