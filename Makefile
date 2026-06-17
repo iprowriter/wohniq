@@ -13,6 +13,7 @@ help:
 	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
 	@echo "embed          Backfill listing embeddings into pgvector"
 	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
+	@echo "eval-ranking   Run the ranking sanity eval (offline)"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
@@ -39,6 +40,9 @@ embed:
 
 eval-parser:
 	cd backend && uv run python -m evals.parser_eval $(ARGS)
+
+eval-ranking:
+	cd backend && uv run python -m evals.ranking_eval
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload
