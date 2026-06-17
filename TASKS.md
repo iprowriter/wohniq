@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T2.4 — Retrieval (F2).** (T2.3 done. Implement hard filters (budget/rooms) + pgvector semantic search over the embeddings.)
+➡️ **T2.5 — Deterministic ranking (F3).** (T2.4 done. Pure scoring function over commute/budget/quiet/amenity fit, per-factor breakdown, configurable weights — no LLM, per ADR-0001.)
 
 ---
 
@@ -45,7 +45,7 @@
 - [x] **T2.1 — Central LLM client.** `core/llm.py`: structured-output Gemini call, Pydantic validation, one re-prompt, caller fallback, observability logging. Injectable transport → unit-tested without network. _Depends: T1.1_
 - [x] **T2.2 — Query parser (F1).** `parser.v1` → `SearchCriteria` via the LLM client. `search/criteria.py` (schema + canonical-amenity validator), `search/parse_rules.py` (pure keyword fallback), `search/parser.py`. Unit-tested. _AC: SPEC F1. Depends: T2.1_
 - [x] **T2.3 — Parser eval harness.** `evals/` package: 20 canonical cases (`parser_cases.py`), pure scorer (`scoring.py`), runner with report + threshold gate (`parser_eval.py`, `make eval-parser`). Scorer unit-tested. _Depends: T2.2_
-- [ ] **T2.4 — Retrieval (F2).** Hard filters (budget/rooms) + pgvector semantic search. _AC: SPEC F2. Depends: T1.6, T2.2_
+- [x] **T2.4 — Retrieval (F2).** `search/filters.py` (pure hard-filter spec) + `search/retrieval.py` (filters + pgvector cosine search via typed expression). Filter + mapping unit-tested. _AC: SPEC F2. Depends: T1.6, T2.2_
 - [ ] **T2.5 — Deterministic ranking (F3).** Pure scoring function, per-factor breakdown, configurable weights (ADR-0001). _AC: SPEC F3. Depends: T2.4_
 - [ ] **T2.6 — Ranking sanity eval.** Hand-labeled "should be top 5" basket (SPEC §9). _Depends: T2.5_
 - [ ] **T2.7 — Explanation layer (F4).** `explain.v1` from the score breakdown; grounded-claim check. _AC: SPEC F4. Depends: T2.5_
