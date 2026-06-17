@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T3.2 — Image duplicate signal.** (T3.1 done. pHash comparison across the DB to catch reused photos.)
+➡️ **T3.3 — Scam text pass.** (T3.2 done. `scam_text.v1`: LLM extracts fuzzy text signals (off-platform payment, landlord-abroad, urgency, no-Anmeldung) as validated structured output with evidence quotes.)
 
 ---
 
@@ -53,7 +53,7 @@
 
 ## M3 — Showpiece (scam detection)
 - [x] **T3.1 — Deterministic signals.** `scam/signals.py`: shared `Signal` shape, Kiez price stats (median/MAD), price-below-market (% + robust z) and no-Anmeldung rules. Pure, unit-tested. _AC: SPEC F7 AC1. Depends: T1.4_
-- [ ] **T3.2 — Image duplicate signal.** pHash comparison across DB. _AC: SPEC F7 AC1. Depends: T1.5_
+- [x] **T3.2 — Image duplicate signal.** `scam/photo_dups.py`: pure hex Hamming + cross-listing duplicate detection → `photo_reuse` Signal (severity scales with matched photos). Unit-tested. _AC: SPEC F7 AC1. Depends: T1.5_
 - [ ] **T3.3 — Scam text pass.** `scam_text.v1` structured signals w/ evidence quotes. _AC: SPEC F7 AC2. Depends: T2.1_
 - [ ] **T3.4 — Risk fusion.** Weighted fusion → 0–100 score + band + contributing signals. _AC: SPEC F7 AC3. Depends: T3.1, T3.2, T3.3_
 - [ ] **T3.5 — Scam eval + confusion matrix.** Precision/recall on labeled set; report in README (precision-prioritized). _AC: SPEC F7 AC4. Depends: T3.4_
