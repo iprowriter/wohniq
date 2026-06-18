@@ -60,6 +60,9 @@ def test_search_pipeline_wiring(monkeypatch):
         search_mod, "explain",
         lambda result, **kw: Explanation(summary="Fits well.", reasons=["€400 under budget"], caveats=[]),
     )
+    # Enrichment is network-bound; stub to None so factors stay inactive in the test.
+    monkeypatch.setattr(search_mod, "get_neighborhood", lambda *a, **kw: None)
+    monkeypatch.setattr(search_mod, "get_commute", lambda *a, **kw: None)
     app.dependency_overrides[get_session] = lambda: _FakeSession()
     try:
         client = TestClient(app)

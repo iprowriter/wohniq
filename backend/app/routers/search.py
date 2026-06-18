@@ -1,13 +1,13 @@
-"""/search — the end-to-end pipeline (T2.8): parse → retrieve → rank → explain.
+"""/search — the end-to-end pipeline (T2.8 + T4.3): parse → retrieve → rank → explain,
+now enriched with commute (F5) and neighborhood (F6).
 
-Wires the M2 spine behind one endpoint. The response carries the parsed criteria
-(so the UI can show "Understood as …"), and per result the listing, the score, the
-factor breakdown, and the grounded explanation.
+Enrichment strategy (enrich top-k): rank the candidate pool on the cheap factors first
+(relevance, budget, quiet-from-Kiez), take the page, then enrich *only* those listings
+with commute + neighborhood and re-rank — so we don't pay ~20 Overpass/transit lookups
+per search for listings we'll never show. (Neighborhood lookups can be pre-warmed into
+the cache; commute is per-query but cached per origin+destination.)
 
-Two deliberate notes:
-- `is_scam`/`scam_type` are NEVER serialized (ground-truth labels, AGENTS rule).
-- Commute and neighborhood-amenity factors arrive with M4; for now ranking uses
-  relevance + budget + quiet (nightlife comes from static Kiez data, no API).
+`is_scam`/`scam_type` are NEVER serialized (AGENTS rule).
 """
 
 from __future__ import annotations
@@ -24,6 +24,8 @@ from core.db import get_session
 from core.logging import get_logger
 from data.kieze import KIEZE
 from data.models import Listing, Photo
+from enrich.commute import get_commute
+from enrich.neighborhood import get_neighborhood
 from search.criteria import SearchCriteria
 from search.explanation import Explanation, explain
 from search.parser import parse_query
@@ -54,6 +56,17 @@ class FactorOut(BaseModel):
     detail: str
 
 
+class CommuteOut(BaseModel):
+    minutes: int
+    changes: int
+    walk_minutes: int | None = None
+
+
+class NeighborhoodOut(BaseModel):
+    summary: str | None = None
+    counts: dict[str, int] = Field(default_factory=dict)
+
+
 class ListingOut(BaseModel):
     id: str
     title: str
@@ -76,6 +89,8 @@ class SearchResultItem(BaseModel):
     score: float
     factors: list[FactorOut]
     explanation: Explanation
+    commute: CommuteOut | None = None
+    neighborhood: NeighborhoodOut | None = None
 
 
 class SearchResponse(BaseModel):
@@ -121,12 +136,18 @@ def _to_listing_out(listing: Listing, photos: list[Photo]) -> ListingOut:
 @router.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest, session: Session = Depends(get_session)) -> SearchResponse:
     criteria = parse_query(req.query)
+    rank_criteria = RankCriteria(
+        max_warm_rent=criteria.max_warm_rent,
+        quiet_priority=criteria.quiet_priority,
+        desired_amenities=tuple(criteria.desired_amenities),
+    )
 
-    # Retrieve a candidate pool larger than the page we return, then rank.
     pool = retrieve(session, criteria, req.query, limit=max(req.limit * 3, 20))
     listings_by_id = {str(r.listing.id): r.listing for r in pool}
+    distance_by_id = {str(r.listing.id): r.distance for r in pool}
 
-    inputs = [
+    # Pass 1 — cheap factors (relevance, budget, quiet-from-Kiez) to pick the page.
+    cheap_inputs = [
         RankingInput(
             warmmiete_eur=r.listing.warmmiete_eur,
             distance=r.distance,
@@ -135,12 +156,31 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
         )
         for r in pool
     ]
-    rank_criteria = RankCriteria(
-        max_warm_rent=criteria.max_warm_rent,
-        quiet_priority=criteria.quiet_priority,
-        desired_amenities=tuple(criteria.desired_amenities),
-    )
-    ranked = rank(inputs, rank_criteria)[: req.limit]
+    page = rank(cheap_inputs, rank_criteria)[: req.limit]
+
+    # Pass 2 — enrich just the page (commute + neighborhood), then re-rank.
+    commute_by_id = {}
+    neighborhood_by_id = {}
+    enriched_inputs: list[RankingInput] = []
+    for inp, _ in page:
+        listing = listings_by_id[inp.listing_id]
+        neighborhood = get_neighborhood(session, listing.lat, listing.lng)
+        commute = get_commute(session, listing.lat, listing.lng, criteria.work_location)
+        if neighborhood is not None:
+            neighborhood_by_id[inp.listing_id] = neighborhood
+        if commute is not None:
+            commute_by_id[inp.listing_id] = commute
+        enriched_inputs.append(
+            RankingInput(
+                warmmiete_eur=listing.warmmiete_eur,
+                distance=distance_by_id[inp.listing_id],
+                nightlife=_NIGHTLIFE.get(listing.kiez),
+                available_amenities=neighborhood.available_amenities if neighborhood else None,
+                commute_minutes=commute.minutes if commute else None,
+                listing_id=inp.listing_id,
+            )
+        )
+    ranked = rank(enriched_inputs, rank_criteria)
 
     photos_by_set = _load_photos(
         session, [listings_by_id[i.listing_id].photo_set_id for i, _ in ranked]
@@ -149,12 +189,28 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
     results: list[SearchResultItem] = []
     for inp, result in ranked:
         listing = listings_by_id[inp.listing_id]
+        commute = commute_by_id.get(inp.listing_id)
+        neighborhood = neighborhood_by_id.get(inp.listing_id)
         results.append(
             SearchResultItem(
                 listing=_to_listing_out(listing, photos_by_set.get(listing.photo_set_id, [])),
                 score=round(result.total, 4),
                 factors=[FactorOut(**vars(f)) for f in result.factors],
                 explanation=explain(result),
+                commute=(
+                    CommuteOut(
+                        minutes=commute.minutes,
+                        changes=commute.changes,
+                        walk_minutes=commute.walk_minutes,
+                    )
+                    if commute
+                    else None
+                ),
+                neighborhood=(
+                    NeighborhoodOut(summary=neighborhood.summary, counts=neighborhood.counts)
+                    if neighborhood
+                    else None
+                ),
             )
         )
 

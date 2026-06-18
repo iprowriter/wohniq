@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T4.3 — Enrich ranking.** (T4.2 done. Wire `get_commute` + `get_neighborhood` into `/search` so commute & amenity factors light up and results carry transit time + neighborhood tiles.)
+➡️ **T4.4 — Comparison tool (F8).** (T4.3 done. Side-by-side of 2–4 listings using the shared structured fields.)
 
 ---
 
@@ -61,7 +61,7 @@
 ## M4 — Depth
 - [x] **T4.1 — Commute analysis (F5).** `enrich/commute_parse.py` (pure journey→minutes/changes/walk) + `enrich/commute.py` (keyless BVG/VBB transport.rest client, `commute_cache`, graceful degrade). Parser unit-tested. _AC: SPEC F5. Depends: T1.3_
 - [x] **T4.2 — Neighborhood insights (F6).** `enrich/neighborhood_parse.py` (pure: Overpass query, parse → counts + per-POI list w/ coords + available set + summary) + `enrich/neighborhood.py` (Overpass client + cache). `pois` column added (migration 0002) for a future map. Parser unit-tested. _AC: SPEC F6. Depends: T1.3_
-- [ ] **T4.3 — Enrich ranking.** Feed commute + neighborhood into the scoring function. _Depends: T2.5, T4.1, T4.2_
+- [x] **T4.3 — Enrich ranking.** `/search` now enriches top-k with `get_commute` + `get_neighborhood`, re-ranks (commute + amenity factors active), and returns commute + neighborhood per result. Endpoint test updated. _Depends: T2.5, T4.1, T4.2_
 - [ ] **T4.4 — Comparison tool (F8).** Side-by-side of 2–4 listings using the shared structured fields. _AC: SPEC F8. Depends: T2.7, T3.4_
 
 ## M5 — Polish & deploy
