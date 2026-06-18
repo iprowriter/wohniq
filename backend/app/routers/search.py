@@ -23,7 +23,7 @@ from sqlalchemy.orm import Session
 from core.db import get_session
 from core.logging import get_logger
 from data.kieze import KIEZE
-from data.models import Listing, Photo
+from data.models import Listing, Photo, RiskAssessment
 from enrich.commute import get_commute
 from enrich.neighborhood import get_neighborhood
 from search.criteria import SearchCriteria
@@ -67,6 +67,19 @@ class NeighborhoodOut(BaseModel):
     counts: dict[str, int] = Field(default_factory=dict)
 
 
+class RiskSignalOut(BaseModel):
+    name: str
+    source: str
+    evidence: str
+    severity: float
+
+
+class RiskOut(BaseModel):
+    band: str  # low | caution | high
+    score: int
+    signals: list[RiskSignalOut] = Field(default_factory=list)
+
+
 class ListingOut(BaseModel):
     id: str
     title: str
@@ -91,6 +104,7 @@ class SearchResultItem(BaseModel):
     explanation: Explanation
     commute: CommuteOut | None = None
     neighborhood: NeighborhoodOut | None = None
+    risk: RiskOut | None = None
 
 
 class SearchResponse(BaseModel):
@@ -108,6 +122,30 @@ def _load_photos(session: Session, set_ids: list[uuid.UUID]) -> dict[uuid.UUID, 
     for photo in rows:
         by_set.setdefault(photo.photo_set_id, []).append(photo)
     return by_set
+
+
+def _load_risk(session: Session, listing_ids: list[uuid.UUID]) -> dict[str, RiskAssessment]:
+    if not listing_ids:
+        return {}
+    rows = session.scalars(
+        select(RiskAssessment).where(RiskAssessment.listing_id.in_(listing_ids))
+    )
+    return {str(r.listing_id): r for r in rows}
+
+
+def _to_risk_out(row: RiskAssessment | None) -> RiskOut | None:
+    if row is None:
+        return None
+    signals = [
+        RiskSignalOut(
+            name=s.get("name", ""),
+            source=s.get("source", ""),
+            evidence=s.get("evidence", ""),
+            severity=float(s.get("severity", 0.0)),
+        )
+        for s in (row.signals or [])
+    ]
+    return RiskOut(band=row.band, score=row.score, signals=signals)
 
 
 def _to_listing_out(listing: Listing, photos: list[Photo]) -> ListingOut:
@@ -182,9 +220,9 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
         )
     ranked = rank(enriched_inputs, rank_criteria)
 
-    photos_by_set = _load_photos(
-        session, [listings_by_id[i.listing_id].photo_set_id for i, _ in ranked]
-    )
+    page_listings = [listings_by_id[i.listing_id] for i, _ in ranked]
+    photos_by_set = _load_photos(session, [x.photo_set_id for x in page_listings])
+    risk_by_id = _load_risk(session, [x.id for x in page_listings])
 
     results: list[SearchResultItem] = []
     for inp, result in ranked:
@@ -197,6 +235,7 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
                 score=round(result.total, 4),
                 factors=[FactorOut(**vars(f)) for f in result.factors],
                 explanation=explain(result),
+                risk=_to_risk_out(risk_by_id.get(inp.listing_id)),
                 commute=(
                     CommuteOut(
                         minutes=commute.minutes,
@@ -241,6 +280,7 @@ class ComparisonItem(BaseModel):
     explanation: Explanation | None = None
     commute: CommuteOut | None = None
     neighborhood: NeighborhoodOut | None = None
+    risk: RiskOut | None = None
 
 
 class CompareResponse(BaseModel):
@@ -272,6 +312,7 @@ def compare(req: CompareRequest, session: Session = Depends(get_session)) -> Com
         else None
     )
     photos_by_set = _load_photos(session, [x.photo_set_id for x in ordered])
+    risk_by_id = _load_risk(session, [x.id for x in ordered])
 
     items: list[ComparisonItem] = []
     for listing in ordered:
@@ -321,6 +362,7 @@ def compare(req: CompareRequest, session: Session = Depends(get_session)) -> Com
                     if neighborhood
                     else None
                 ),
+                risk=_to_risk_out(risk_by_id.get(str(listing.id))),
             )
         )
 

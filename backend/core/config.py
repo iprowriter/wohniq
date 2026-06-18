@@ -30,9 +30,16 @@ class Settings(BaseSettings):
     # Pexels (image seeding)
     pexels_api_key: str = ""
 
+    # Comma-separated allowed origins for CORS (the frontend).
+    frontend_origins: str = "http://localhost:3000"
+
     @property
     def is_production(self) -> bool:
         return self.environment.lower() in {"prod", "production"}
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.frontend_origins.split(",") if o.strip()]
 
     @property
     def sqlalchemy_url(self) -> str:

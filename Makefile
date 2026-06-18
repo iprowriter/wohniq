@@ -12,6 +12,7 @@ help:
 	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
 	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
 	@echo "embed          Backfill listing embeddings into pgvector"
+	@echo "score          Score all listings into risk_assessment (ARGS='--no-llm')"
 	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
 	@echo "eval-ranking   Run the ranking sanity eval (offline)"
 	@echo "eval-scam      Run the scam-detection eval (DB; ARGS='--no-llm' to skip LLM)"
@@ -38,6 +39,9 @@ seed-images:
 
 embed:
 	cd backend && uv run python -m data.embed_listings $(ARGS)
+
+score:
+	cd backend && uv run python -m scam.score $(ARGS)
 
 eval-parser:
 	cd backend && uv run python -m evals.parser_eval $(ARGS)

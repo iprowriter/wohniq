@@ -7,6 +7,7 @@ listings) get mounted here as they're built in later milestones.
 from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import search as search_router
 from core.config import settings
@@ -31,6 +32,14 @@ app = FastAPI(
     description="WohnIQ is an AI-assisted apartment-search platform for Berlin.",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+# Allow the Next.js dev server (and the deployed frontend) to call the API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Feature routers (search, scam, listings) get included here as they're built.
