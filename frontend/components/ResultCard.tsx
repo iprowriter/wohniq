@@ -1,5 +1,8 @@
+import Link from "next/link";
 import type { SearchResultItem } from "@/lib/types";
 import { RiskBadge } from "./RiskBadge";
+
+const NAV_FLAG = "wohniq_navigating_to_listing";
 
 function euro(n: number) {
   return `€${n.toLocaleString("de-DE")}`;
@@ -16,7 +19,11 @@ export function ResultCard({ item }: { item: SearchResultItem }) {
         isHighRisk ? "border-red-200" : "border-gray-200"
       }`}
     >
-      <div className="flex gap-4 p-4">
+      <Link
+        href={`/listings/${listing.id}`}
+        className="flex gap-4 p-4 hover:bg-gray-50"
+        onClick={() => sessionStorage.setItem(NAV_FLAG, "1")}
+      >
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -50,7 +57,7 @@ export function ResultCard({ item }: { item: SearchResultItem }) {
             {neighborhood?.summary && <span>{neighborhood.summary}</span>}
           </div>
         </div>
-      </div>
+      </Link>
 
       <div
         className={`mx-4 mb-4 rounded-lg px-3 py-2.5 ${

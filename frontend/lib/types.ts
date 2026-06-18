@@ -89,3 +89,32 @@ export interface SearchResponse {
   criteria: SearchCriteria;
   results: SearchResultItem[];
 }
+
+// Detail page types
+export interface PoiOut {
+  category: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+export interface ListingDetailOut extends ListingOut {
+  description: string;
+  lat: number;
+  lng: number;
+  floor?: number | null;
+  total_floors?: number | null;
+  anmeldung_possible: boolean;
+}
+
+export interface NeighborhoodDetailOut {
+  summary?: string | null;
+  counts: Record<string, number>;
+  pois: PoiOut[];
+}
+
+export interface ListingDetailResponse {
+  listing: ListingDetailOut;
+  risk?: RiskOut | null;
+  neighborhood?: NeighborhoodDetailOut | null;
+}

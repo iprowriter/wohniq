@@ -17,7 +17,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from core.db import get_session
@@ -260,6 +260,124 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
         len(results),
     )
     return SearchResponse(criteria=criteria, results=results)
+
+
+# --- Listing detail (T5.1) ------------------------------------------------------
+
+
+class PoiOut(BaseModel):
+    category: str
+    name: str
+    lat: float
+    lng: float
+
+
+class ListingDetailOut(BaseModel):
+    id: str
+    title: str
+    description: str
+    address: str
+    kiez: str
+    district: str | None
+    lat: float
+    lng: float
+    rooms: float
+    size_m2: int
+    kaltmiete_eur: int
+    nebenkosten_eur: int
+    warmmiete_eur: int
+    deposit_eur: int | None
+    furnished: bool
+    available_from: date | None
+    floor: int | None
+    total_floors: int | None
+    anmeldung_possible: bool
+    photos: list[PhotoOut] = Field(default_factory=list)
+
+
+class NeighborhoodDetailOut(BaseModel):
+    summary: str | None = None
+    counts: dict[str, int] = Field(default_factory=dict)
+    pois: list[PoiOut] = Field(default_factory=list)
+
+
+class ListingDetailResponse(BaseModel):
+    listing: ListingDetailOut
+    risk: RiskOut | None = None
+    neighborhood: NeighborhoodDetailOut | None = None
+
+
+@router.get("/listings/random", response_model=list[ListingOut])
+def get_random_listings(n: int = 6, session: Session = Depends(get_session)) -> list[ListingOut]:
+    rows = session.scalars(select(Listing).order_by(func.random()).limit(n)).all()
+    if not rows:
+        return []
+    photos_by_set = _load_photos(session, [x.photo_set_id for x in rows])
+    return [_to_listing_out(listing, photos_by_set.get(listing.photo_set_id, [])) for listing in rows]
+
+
+@router.get("/listings/{listing_id}", response_model=ListingDetailResponse)
+def get_listing(listing_id: str, session: Session = Depends(get_session)) -> ListingDetailResponse:
+    try:
+        uid = uuid.UUID(listing_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid listing id") from None
+
+    listing = session.get(Listing, uid)
+    if listing is None:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    photos_by_set = _load_photos(session, [listing.photo_set_id])
+    photos = photos_by_set.get(listing.photo_set_id, [])
+    risk_by_id = _load_risk(session, [listing.id])
+    neighborhood = get_neighborhood(session, listing.lat, listing.lng)
+
+    neighborhood_detail: NeighborhoodDetailOut | None = None
+    if neighborhood is not None:
+        pois = [
+            PoiOut(
+                category=p.get("category", ""),
+                name=p.get("name", ""),
+                lat=float(p.get("lat", 0)),
+                lng=float(p.get("lng", 0)),
+            )
+            for p in neighborhood.pois
+        ]
+        neighborhood_detail = NeighborhoodDetailOut(
+            summary=neighborhood.summary,
+            counts=neighborhood.counts,
+            pois=pois,
+        )
+
+    return ListingDetailResponse(
+        listing=ListingDetailOut(
+            id=str(listing.id),
+            title=listing.title,
+            description=listing.description,
+            address=listing.address,
+            kiez=listing.kiez,
+            district=listing.district,
+            lat=listing.lat,
+            lng=listing.lng,
+            rooms=float(listing.rooms),
+            size_m2=listing.size_m2,
+            kaltmiete_eur=listing.kaltmiete_eur,
+            nebenkosten_eur=listing.nebenkosten_eur,
+            warmmiete_eur=listing.warmmiete_eur,
+            deposit_eur=listing.deposit_eur,
+            furnished=listing.furnished,
+            available_from=listing.available_from,
+            floor=listing.floor,
+            total_floors=listing.total_floors,
+            anmeldung_possible=listing.anmeldung_possible,
+            photos=[
+                PhotoOut(url=p.source_url, room_type=p.room_type, attribution=p.attribution)
+                for p in photos
+            ],
+        ),
+        risk=_to_risk_out(risk_by_id.get(str(listing.id))),
+        neighborhood=neighborhood_detail,
+    )
 
 
 # --- Comparison (F8) ------------------------------------------------------------
