@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T4.1 — Commute analysis (F5).** (M3 showpiece complete! Begin M4 depth: BVG/VBB transit times, cached per (origin,dest), graceful degrade.)
+➡️ **T4.2 — Neighborhood insights (F6).** (T4.1 done. OSM Overpass POI counts within a radius + qualitative summary, cached.)
 
 ---
 
@@ -59,7 +59,7 @@
 - [x] **T3.5 — Scam eval + confusion matrix.** `evals/metrics.py` (pure: confusion/precision/recall/F1/recall-by-group) + `scam/detector.py` (`assess_listing` orchestration) + `evals/scam_eval.py` (`make eval-scam`, writes JSON + Markdown, per-type recall + hard-negative clearance). Metrics + detector unit-tested. _AC: SPEC F7 AC4. Depends: T3.4_
 
 ## M4 — Depth
-- [ ] **T4.1 — Commute analysis (F5).** BVG/VBB `transport.rest`; cache per (origin,dest); graceful degrade. _AC: SPEC F5. Depends: T1.3_
+- [x] **T4.1 — Commute analysis (F5).** `enrich/commute_parse.py` (pure journey→minutes/changes/walk) + `enrich/commute.py` (keyless BVG/VBB transport.rest client, `commute_cache`, graceful degrade). Parser unit-tested. _AC: SPEC F5. Depends: T1.3_
 - [ ] **T4.2 — Neighborhood insights (F6).** OSM Overpass POI counts + qualitative summary; cache. _AC: SPEC F6. Depends: T1.3_
 - [ ] **T4.3 — Enrich ranking.** Feed commute + neighborhood into the scoring function. _Depends: T2.5, T4.1, T4.2_
 - [ ] **T4.4 — Comparison tool (F8).** Side-by-side of 2–4 listings using the shared structured fields. _AC: SPEC F8. Depends: T2.7, T3.4_
