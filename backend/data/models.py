@@ -163,6 +163,8 @@ class NeighborhoodCache(Base):
 
     location_key: Mapped[str] = mapped_column(Text, primary_key=True)
     poi_counts: Mapped[dict] = mapped_column(JSONB, server_default="{}")
+    # Each POI: {category, name, lat, lng} — retained so a future map view needs no re-fetch.
+    pois: Mapped[list] = mapped_column(JSONB, server_default="[]")
     summary: Mapped[str | None] = mapped_column(Text)
     fetched_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
