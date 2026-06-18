@@ -14,6 +14,7 @@ help:
 	@echo "embed          Backfill listing embeddings into pgvector"
 	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
 	@echo "eval-ranking   Run the ranking sanity eval (offline)"
+	@echo "eval-scam      Run the scam-detection eval (DB; ARGS='--no-llm' to skip LLM)"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
@@ -43,6 +44,9 @@ eval-parser:
 
 eval-ranking:
 	cd backend && uv run python -m evals.ranking_eval
+
+eval-scam:
+	cd backend && uv run python -m evals.scam_eval $(ARGS)
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload

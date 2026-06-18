@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T3.5 — Scam eval + confusion matrix.** (T3.4 done. Run the full detector over the labeled set; report precision/recall + confusion matrix, per-scam-type breakdown — the showpiece artifact.)
+➡️ **T4.1 — Commute analysis (F5).** (M3 showpiece complete! Begin M4 depth: BVG/VBB transit times, cached per (origin,dest), graceful degrade.)
 
 ---
 
@@ -56,7 +56,7 @@
 - [x] **T3.2 — Image duplicate signal.** `scam/photo_dups.py`: pure hex Hamming + cross-listing duplicate detection → `photo_reuse` Signal (severity scales with matched photos). Unit-tested. _AC: SPEC F7 AC1. Depends: T1.5_
 - [x] **T3.3 — Scam text pass.** `scam/text_signals.py`: `scam_text.v1` → `ScamTextSignals` (5 signals w/ quotes + confidence) via LLM client, empty fallback, `to_signals()` → shared Signal list (source="llm"). Unit-tested. _AC: SPEC F7 AC2. Depends: T2.1_
 - [x] **T3.4 — Risk fusion.** `scam/fusion.py`: weighted noisy-OR of signals → 0–100 score + Low/Caution/High band + contributing signals. Photo-reuse-alone capped at Caution. Pure, unit-tested. _AC: SPEC F7 AC3. Depends: T3.1, T3.2, T3.3_
-- [ ] **T3.5 — Scam eval + confusion matrix.** Precision/recall on labeled set; report in README (precision-prioritized). _AC: SPEC F7 AC4. Depends: T3.4_
+- [x] **T3.5 — Scam eval + confusion matrix.** `evals/metrics.py` (pure: confusion/precision/recall/F1/recall-by-group) + `scam/detector.py` (`assess_listing` orchestration) + `evals/scam_eval.py` (`make eval-scam`, writes JSON + Markdown, per-type recall + hard-negative clearance). Metrics + detector unit-tested. _AC: SPEC F7 AC4. Depends: T3.4_
 
 ## M4 — Depth
 - [ ] **T4.1 — Commute analysis (F5).** BVG/VBB `transport.rest`; cache per (origin,dest); graceful degrade. _AC: SPEC F5. Depends: T1.3_
