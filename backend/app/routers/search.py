@@ -15,7 +15,7 @@ from __future__ import annotations
 import uuid
 from datetime import date
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,7 +29,7 @@ from enrich.neighborhood import get_neighborhood
 from search.criteria import SearchCriteria
 from search.explanation import Explanation, explain
 from search.parser import parse_query
-from search.ranking import RankCriteria, RankingInput, rank
+from search.ranking import RankCriteria, RankingInput, rank, score_listing
 from search.retrieval import retrieve
 
 logger = get_logger(__name__)
@@ -221,3 +221,107 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
         len(results),
     )
     return SearchResponse(criteria=criteria, results=results)
+
+
+# --- Comparison (F8) ------------------------------------------------------------
+# Side-by-side of 2–4 listings. Reuses the exact same helpers as /search
+# (_to_listing_out, enrichment, score_listing, explain) so the compared fields can't
+# drift from what search shows (SPEC F8 AC1).
+
+
+class CompareRequest(BaseModel):
+    listing_ids: list[str] = Field(min_length=2, max_length=4)
+    query: str | None = None  # optional context for fit + commute
+
+
+class ComparisonItem(BaseModel):
+    listing: ListingOut
+    fit_score: float | None = None
+    factors: list[FactorOut] = Field(default_factory=list)
+    explanation: Explanation | None = None
+    commute: CommuteOut | None = None
+    neighborhood: NeighborhoodOut | None = None
+
+
+class CompareResponse(BaseModel):
+    criteria: SearchCriteria | None = None
+    items: list[ComparisonItem]
+
+
+@router.post("/compare", response_model=CompareResponse)
+def compare(req: CompareRequest, session: Session = Depends(get_session)) -> CompareResponse:
+    try:
+        ids = [uuid.UUID(x) for x in req.listing_ids]
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid listing id") from None
+
+    found = {str(x.id): x for x in session.scalars(select(Listing).where(Listing.id.in_(ids)))}
+    missing = [x for x in req.listing_ids if x not in found]
+    if missing:
+        raise HTTPException(status_code=404, detail=f"Listing(s) not found: {missing}")
+    ordered = [found[x] for x in req.listing_ids]  # preserve requested order
+
+    criteria = parse_query(req.query) if req.query else None
+    rank_criteria = (
+        RankCriteria(
+            max_warm_rent=criteria.max_warm_rent,
+            quiet_priority=criteria.quiet_priority,
+            desired_amenities=tuple(criteria.desired_amenities),
+        )
+        if criteria
+        else None
+    )
+    photos_by_set = _load_photos(session, [x.photo_set_id for x in ordered])
+
+    items: list[ComparisonItem] = []
+    for listing in ordered:
+        neighborhood = get_neighborhood(session, listing.lat, listing.lng)
+        commute = (
+            get_commute(session, listing.lat, listing.lng, criteria.work_location)
+            if criteria
+            else None
+        )
+
+        fit_score: float | None = None
+        factors: list[FactorOut] = []
+        explanation: Explanation | None = None
+        if rank_criteria is not None:
+            result = score_listing(
+                RankingInput(
+                    warmmiete_eur=listing.warmmiete_eur,
+                    distance=0.0,  # no per-listing query vector here; relevance is constant
+                    nightlife=_NIGHTLIFE.get(listing.kiez),
+                    available_amenities=neighborhood.available_amenities if neighborhood else None,
+                    commute_minutes=commute.minutes if commute else None,
+                    listing_id=str(listing.id),
+                ),
+                rank_criteria,
+            )
+            fit_score = round(result.total, 4)
+            factors = [FactorOut(**vars(f)) for f in result.factors]
+            explanation = explain(result)
+
+        items.append(
+            ComparisonItem(
+                listing=_to_listing_out(listing, photos_by_set.get(listing.photo_set_id, [])),
+                fit_score=fit_score,
+                factors=factors,
+                explanation=explanation,
+                commute=(
+                    CommuteOut(
+                        minutes=commute.minutes,
+                        changes=commute.changes,
+                        walk_minutes=commute.walk_minutes,
+                    )
+                    if commute
+                    else None
+                ),
+                neighborhood=(
+                    NeighborhoodOut(summary=neighborhood.summary, counts=neighborhood.counts)
+                    if neighborhood
+                    else None
+                ),
+            )
+        )
+
+    return CompareResponse(criteria=criteria, items=items)

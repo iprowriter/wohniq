@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T4.4 — Comparison tool (F8).** (T4.3 done. Side-by-side of 2–4 listings using the shared structured fields.)
+➡️ **T5.1 — Frontend.** (M4 complete! Begin M5: Next.js search box, result cards (explanation + risk badge), detail page, comparison, Leaflet map.)
 
 ---
 
@@ -62,7 +62,7 @@
 - [x] **T4.1 — Commute analysis (F5).** `enrich/commute_parse.py` (pure journey→minutes/changes/walk) + `enrich/commute.py` (keyless BVG/VBB transport.rest client, `commute_cache`, graceful degrade). Parser unit-tested. _AC: SPEC F5. Depends: T1.3_
 - [x] **T4.2 — Neighborhood insights (F6).** `enrich/neighborhood_parse.py` (pure: Overpass query, parse → counts + per-POI list w/ coords + available set + summary) + `enrich/neighborhood.py` (Overpass client + cache). `pois` column added (migration 0002) for a future map. Parser unit-tested. _AC: SPEC F6. Depends: T1.3_
 - [x] **T4.3 — Enrich ranking.** `/search` now enriches top-k with `get_commute` + `get_neighborhood`, re-ranks (commute + amenity factors active), and returns commute + neighborhood per result. Endpoint test updated. _Depends: T2.5, T4.1, T4.2_
-- [ ] **T4.4 — Comparison tool (F8).** Side-by-side of 2–4 listings using the shared structured fields. _AC: SPEC F8. Depends: T2.7, T3.4_
+- [x] **T4.4 — Comparison tool (F8).** `POST /api/v1/compare` for 2–4 listings, reusing the exact search helpers (listing/commute/neighborhood/fit/explanation) — no recomputation drift. Endpoint test (order, fit, 422/404, label-leak). _AC: SPEC F8. Depends: T2.7, T3.4_
 
 ## M5 — Polish & deploy
 - [ ] **T5.1 — Frontend.** Next.js: search box, result cards (explanation + risk badge), detail page, comparison, Leaflet map. _Depends: T2.8_
