@@ -33,7 +33,7 @@ The tempting shortcut is to hand the model a list of listings and ask it to rank
 
 This decision is load-bearing for everything else. Because ranking is deterministic, explanations are trustworthy (they're generated *from* the same numbers that produced the rank). Because the LLM is stateless, we don't need an agent framework. [→ ADR-0001](docs/adr/0001-deterministic-ranking.md)
 
-![WohnIQ Listings Page](./assets/wohniq-listing-page.png)
+![WohnIQ Listings Page](./assets/wohniq-listings.png)
 
 ### ADR-0002 — Scam detection is a hybrid rules + pHash + LLM engine
 
