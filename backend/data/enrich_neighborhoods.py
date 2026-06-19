@@ -1,6 +1,7 @@
 """One-off script: populate neighborhood_cache for all listings that don't have one yet."""
 
 import sys
+import time
 
 from core.db import get_sessionmaker
 from data.models import Listing, NeighborhoodCache
@@ -28,6 +29,7 @@ with session_factory() as session:
         else:
             hit += 1
             print(f"[{i}/{total}] OK    {listing.id} ({key}) — {result.counts}")
+        time.sleep(1.5)  # Overpass public API: max ~1 req/s
 
 print(f"\nDone. fetched={hit} skipped={skip} failed={fail}")
 sys.exit(1 if fail else 0)

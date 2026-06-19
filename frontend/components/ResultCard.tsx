@@ -8,7 +8,14 @@ function euro(n: number) {
   return `€${n.toLocaleString("de-DE")}`;
 }
 
-export function ResultCard({ item }: { item: SearchResultItem }) {
+interface Props {
+  item: SearchResultItem;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
+  selectionDisabled?: boolean;
+}
+
+export function ResultCard({ item, selected = false, onToggleSelect, selectionDisabled = false }: Props) {
   const { listing, explanation, commute, neighborhood, risk } = item;
   const cover = listing.photos[0];
   const isHighRisk = risk?.band === "high";
@@ -16,9 +23,23 @@ export function ResultCard({ item }: { item: SearchResultItem }) {
   return (
     <article
       className={`overflow-hidden rounded-xl border bg-white ${
-        isHighRisk ? "border-red-200" : "border-gray-200"
+        isHighRisk ? "border-red-200" : selected ? "border-indigo-400 ring-1 ring-indigo-400" : "border-gray-200"
       }`}
     >
+      {onToggleSelect && (
+        <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-2">
+          <label className="flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
+            <input
+              type="checkbox"
+              checked={selected}
+              disabled={selectionDisabled && !selected}
+              onChange={() => onToggleSelect(listing.id)}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-40"
+            />
+            {selected ? "Selected for comparison" : selectionDisabled ? "Max 4 selected" : "Add to comparison"}
+          </label>
+        </div>
+      )}
       <Link
         href={`/listings/${listing.id}`}
         className="flex gap-4 p-4 hover:bg-gray-50"

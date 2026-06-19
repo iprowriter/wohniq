@@ -25,6 +25,10 @@ from search.parse_rules import CANONICAL_AMENITIES
 logger = get_logger(__name__)
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+_OVERPASS_HEADERS = {
+    "User-Agent": "wohniq/1.0",
+    "Accept-Encoding": "identity",
+}
 
 
 def _location_key(lat: float, lng: float) -> str:
@@ -45,16 +49,28 @@ def get_neighborhood(
     lng: float,
     *,
     radius: int = DEFAULT_RADIUS_M,
+    cache_only: bool = False,
 ) -> NeighborhoodResult | None:
-    """Cached neighborhood insight for a coordinate, or None on failure."""
+    """Cached neighborhood insight for a coordinate, or None on failure.
+
+    Pass cache_only=True to skip the live Overpass lookup (returns None when not cached).
+    """
     location_key = _location_key(lat, lng)
 
     cached = session.get(NeighborhoodCache, location_key)
     if cached is not None:
         return _from_cache(cached)
 
+    if cache_only:
+        return None
+
     try:
-        resp = httpx.post(OVERPASS_URL, data={"data": build_overpass_query(lat, lng, radius)}, timeout=30)
+        resp = httpx.post(
+            OVERPASS_URL,
+            data={"data": build_overpass_query(lat, lng, radius)},
+            headers=_OVERPASS_HEADERS,
+            timeout=5,
+        )
         resp.raise_for_status()
         result = parse_overpass(resp.json())
     except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully

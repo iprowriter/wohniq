@@ -330,16 +330,16 @@ def get_listing(listing_id: str, session: Session = Depends(get_session)) -> Lis
     photos_by_set = _load_photos(session, [listing.photo_set_id])
     photos = photos_by_set.get(listing.photo_set_id, [])
     risk_by_id = _load_risk(session, [listing.id])
-    neighborhood = get_neighborhood(session, listing.lat, listing.lng)
+    neighborhood = get_neighborhood(session, listing.lat, listing.lng, cache_only=True)
 
     neighborhood_detail: NeighborhoodDetailOut | None = None
     if neighborhood is not None:
         pois = [
             PoiOut(
-                category=p.get("category", ""),
-                name=p.get("name", ""),
-                lat=float(p.get("lat", 0)),
-                lng=float(p.get("lng", 0)),
+                category=p.get("category") or "",
+                name=p.get("name") or "",
+                lat=float(p.get("lat") or 0),
+                lng=float(p.get("lng") or 0),
             )
             for p in neighborhood.pois
         ]
