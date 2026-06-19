@@ -33,6 +33,8 @@ The tempting shortcut is to hand the model a list of listings and ask it to rank
 
 This decision is load-bearing for everything else. Because ranking is deterministic, explanations are trustworthy (they're generated *from* the same numbers that produced the rank). Because the LLM is stateless, we don't need an agent framework. [→ ADR-0001](docs/adr/0001-deterministic-ranking.md)
 
+![WohnIQ Listings Page](./assets/wohniq-listing-page.png)
+
 ### ADR-0002 — Scam detection is a hybrid rules + pHash + LLM engine
 
 A pure LLM classifier ("is this a scam?") would be opaque, inconsistent, and unconvincing in a demo. Instead, the risk engine fuses three signal sources into an explained 0–100 score:
@@ -47,9 +49,13 @@ The fusion step emits contributing signals with their evidence, so the UI can sh
 
 Real listings drag in legal, privacy, and freshness problems irrelevant to a portfolio project — and, critically, don't give us ground-truth scam labels. We generate ~100 synthetic listings with realistic Berlin distributions (Kieze, rents per m², sizes), including a labeled ~15% scam subset spanning four scam types plus hard negatives (cheap-but-legit, landlord-travels-but-legit). Photos are sourced via the Pexels API by room type and hotlinked (zero storage). The seeder deliberately reuses photo sets across scam listings to create realistic duplicate-photo fraud. [→ ADR-0003](docs/adr/0003-synthetic-data-and-images.md)
 
+![WohnIQ Details Page](./assets/wohniq-details-page.png)
+
 ### ADR-0004 — Gemini Flash with validated structured output via a central LLM client
 
 Reliability risk with LLMs is not capability but *boundary integrity*: free-form text breaks downstream code. Every Gemini call goes through a central client (`core/llm.py`) that: requests JSON constrained to a Pydantic model, validates the response, re-prompts once on failure, then falls back to a deterministic path (keyword extractor for parsing, rules-only for scam, template for explanation). No unvalidated model text reaches business logic or the user. The client logs prompt id, token counts, latency, and validation result for observability. [→ ADR-0004](docs/adr/0004-gemini-structured-output.md)
+
+![WohnIQ Comparison Page](./assets/wohniq-comparison-page.png)
 
 ### ADR-0005 — Supabase Postgres + pgvector
 
