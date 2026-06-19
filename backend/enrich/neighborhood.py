@@ -54,7 +54,7 @@ def get_neighborhood(
         return _from_cache(cached)
 
     try:
-        resp = httpx.post(OVERPASS_URL, data=build_overpass_query(lat, lng, radius), timeout=30)
+        resp = httpx.post(OVERPASS_URL, data={"data": build_overpass_query(lat, lng, radius)}, timeout=30)
         resp.raise_for_status()
         result = parse_overpass(resp.json())
     except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully
