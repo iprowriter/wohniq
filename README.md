@@ -4,6 +4,7 @@
 
 > **Portfolio project.** Listings are synthetic by design — intentionally, so we hold ground-truth scam labels for measurable evals (see [ADR-0003](docs/adr/0003-synthetic-data-and-images.md)). The goal is to demonstrate production-grade AI engineering: reliable structured LLM output, clean language-vs-logic separation, a measurable scam detector, tests, evals, and a deployable system.
 
+Live: https://wohniq-plum.vercel.app
 ---
 ![WohnIQ Homepage](./assets/wohniq-homepage.png)
 
