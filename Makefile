@@ -22,6 +22,7 @@ help:
 	@echo "lint           Ruff check + Black --check"
 	@echo "format         Auto-format with Black + Ruff --fix"
 	@echo "frontend-dev   Run the Next.js dev server"
+	@echo "frontend-build   Run the Next.js build files "
 
 install:
 	cd backend && uv sync
@@ -54,7 +55,7 @@ eval-scam:
 	cd backend && uv run python -m evals.scam_eval $(ARGS)
 
 neighboorhood:
-    cd backend && .venv/bin/python data/enrich_neighborhoods.py
+	cd backend && .venv/bin/python data/enrich_neighborhoods.py
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload
@@ -70,3 +71,6 @@ format:
 
 frontend-dev:
 	cd frontend && npm run dev
+
+frontend-build:
+	cd frontend && npm run build
