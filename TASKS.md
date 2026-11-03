@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T5.1 — Frontend.** (M4 complete! Begin M5: Next.js search box, result cards (explanation + risk badge), detail page, comparison, Leaflet map.)
+➡️ **T1.2 — CI + Supabase keep-alive.** (M0–M5 shipped and live at https://wohniq-plum.vercel.app. Close out the last open foundation task, then start M6 — see [`ROADMAP.md`](ROADMAP.md).)
 
 ---
 
@@ -66,10 +66,23 @@
 - [x] **T4.4 — Comparison tool (F8).** `POST /api/v1/compare` for 2–4 listings, reusing the exact search helpers (listing/commute/neighborhood/fit/explanation) — no recomputation drift. Endpoint test (order, fit, 422/404, label-leak). _AC: SPEC F8. Depends: T2.7, T3.4_
 
 ## M5 — Polish & deploy
-- [ ] **T5.1 — Frontend.** Next.js: search box, result cards (explanation + risk badge), detail page, comparison, Leaflet map. _Depends: T2.8_
-- [ ] **T5.2 — Deploy.** Backend → Railway (Docker); frontend → Vercel; env/secrets wired. _Depends: T5.1, T1.2_
-- [ ] **T5.3 — Observability pass.** Confirm every LLM call logs id/version/tokens/latency/validation (SPEC §8). _Depends: T2.8, T3.4_
-- [ ] **T5.4 — README story.** Spec → decisions → evals → results, with synthetic-data note and confusion matrix. _Depends: T3.5_
+- [x] **T5.1 — Frontend.** Next.js: search box, criteria chips, result cards (explanation + risk badge), listing detail page, comparison modal, Leaflet neighborhood map. _Depends: T2.8_
+- [x] **T5.2 — Deploy.** Backend → Railway (`backend/Dockerfile`, `backend/railway.toml`); frontend → Vercel; env/secrets wired. Live. _Depends: T5.1_ (CI from T1.2 still to add.)
+- [x] **T5.3 — Observability pass.** Confirm every LLM call logs id/version/tokens/latency/validation (SPEC §8). _Depends: T2.8, T3.4_
+- [x] **T5.4 — README story.** Spec → decisions → evals → results, with synthetic-data note and confusion matrix. _Depends: T3.5_
+
+
+## M6 — Next iteration
+*Planned product work. Details, scope and estimates in [`ROADMAP.md`](ROADMAP.md).*
+- [ ] **T6.1 — Fix photo-reuse detection.** Store pHash at seed time; scam eval reads stored hashes (current recall 0/3). _Depends: T3.2_
+- [ ] **T6.2 — German-language queries.** Parser accepts German input; DE/EN UI toggle. _Depends: T2.2_
+- [ ] **T6.3 — Shareable searches.** Query + filters in the URL; recent searches in localStorage (no accounts). _Depends: T5.1_
+- [ ] **T6.4 — Results map view.** All ranked results on one Leaflet map, synced with the list. _Depends: T5.1_
+- [ ] **T6.5 — Multi-destination commute.** Up to 2 work/study locations + departure time. _Depends: T4.1_
+- [ ] **T6.6 — Cold-start & error UX.** Loading, retry and error states for a sleeping backend or failed enrichment. _Depends: T5.1_
+- [ ] **T6.7 — Mobile & accessibility pass.** Responsive cards/compare, keyboard nav, contrast, screen-reader labels. _Depends: T5.1_
+- [ ] **T6.8 — Frontend tests.** Playwright smoke: search → results → detail → compare, run in CI. _Depends: T1.2_
+- [ ] **T6.9 — Model & prompt upkeep.** Move off `gemini-2.0-flash`, bump prompt versions, re-run evals as regression check. _Depends: T2.3_
 
 ---
 
