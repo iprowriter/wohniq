@@ -1,0 +1,1462 @@
+[
+  {
+    "listing_id": "0123a348-638a-4df6-adf7-2cd3979aa051",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "04482a22-0308-4a5e-a94d-7b008d388327",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "3 photo(s) also appear on 3 other listings",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "07437c3b-dd20-43bf-9342-af080a8bb5b4",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "0bb401e7-69f7-43f1-901b-a8515ee68495",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "0d557b61-8a17-4dfe-bfc0-0dc804f64d86",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "0ea2622b-5048-47ba-bf7b-539b0f9aea4b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "0ff0a55c-6a70-4e2f-b746-d0ba8ae8905b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "15b02530-f020-4992-b576-255e98549f22",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "17efa621-081c-49d4-8274-37eba65f7b8a",
+    "score": 98,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_market",
+        "source": "rule",
+        "evidence": "53% below the Lichtenberg median (€6/m² vs €12/m², z=-8.2)",
+        "severity": 1.0
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "1d3ca5a4-929d-4377-9cfb-655f82c42e48",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "1dba1267-7e1c-45a1-bef5-18a64dead645",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "1ee34dc4-3b04-4a8b-805b-fdc94e7ed827",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "277eb0aa-a247-441d-88ad-0899b630794d",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "28a39779-9c1c-4517-85d2-d0a686295b5d",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "2a26f770-4ddb-4b36-a72c-058884a2576c",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "2a7dc57c-6d9c-4b50-a1fd-41879c3a1e0b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "2c33350c-73b9-41d8-92f5-131ada52d2ee",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "2cd2a404-a48e-40f1-9042-1dfa56ab087a",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "31d4ee09-8fd3-4afc-91fd-fa4f0d18ab95",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "389641dd-8570-459f-a903-ae67fc568b53",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "38d77b9a-e916-4a57-b248-23ab177a8a5f",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "39c6a1ca-9e50-4a42-8a6d-fda1989bc4da",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "3c835dc0-d944-4fa5-80e9-ab30ed2662e9",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "43b38eb4-0390-4c5d-a502-d6a2ca6a2224",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "45ff2c83-b495-4b4e-8245-6fb44ab7706e",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "497de16d-d4ea-420a-9e65-96540e9058b6",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "4b8c5bdc-e8dd-4e5a-9712-fb1621a4344f",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "4ee4334e-ce92-4136-ac3a-812f765e6cb5",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "5487fd4f-ebb7-4385-aa0b-7b14f2e9702d",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "550a1b46-ecab-4301-bc8f-7d292dea9493",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "550c2fe9-654c-41d9-b2e6-182801bb819c",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "553d2625-e833-4da5-9e95-d6953579c143",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "568cc69b-1064-405c-b985-c3cf3f76be1d",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "no_anmeldung",
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address",
+        "severity": 0.6
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "57311609-1375-4e90-96b3-61e43b6dca0d",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "66d06371-d8e8-4ebb-ba9e-8eefffa361be",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "69efafb1-3a7e-4e14-a359-eee173991a47",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 3 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "6e595ed3-a8b3-47fa-98d0-752b1825bc54",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "6f4cc69a-4b22-4308-9c8e-aee95715bd6f",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "6f962882-95d8-4980-bf37-d19c2e76128b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "6fdc0bad-5e36-4127-8ca1-b45c1fdd980a",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "7194eae2-19ba-47ae-9f61-5a5cb4323070",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "727716ec-59fe-4bbc-b1a3-fad2b0946d2a",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "749176f4-6090-4697-8b1e-3b9dc34b9fbb",
+    "score": 99,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_market",
+        "source": "rule",
+        "evidence": "57% below the Charlottenburg median (€7/m² vs €17/m², z=-5.9)",
+        "severity": 1.0
+      },
+      {
+        "name": "no_anmeldung",
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address",
+        "severity": 0.6
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "78ef7666-b7a4-4719-948e-1f6b69ce1e4e",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "7d024c6d-8bea-45c1-b866-77aa23d4526b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "7faeb748-7781-421e-83c5-01cbfef7d9ea",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "80a52e65-afa2-4559-a7c9-620428e333b6",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "84cfee39-bf31-429f-82bb-ad8438d5101f",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "84f2fd0f-7947-4bfa-8dd0-b4d4554227de",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "8b040f53-e639-49d4-87c6-8688ecf32053",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "8d38bbd8-fba6-4bf7-8dbc-c65377a7e8b7",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "8e485223-46b9-4991-a14e-b70db380c73a",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "92070158-f277-4f63-ada5-84175e2ad32d",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "92170475-3d95-4e3f-9a52-26e69d642932",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "935f2b0a-a138-4ddc-a2d9-de5d6a18ce4c",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "93676a02-4fdc-4e1b-adcb-8cb60692dc63",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "979c30cf-3326-4887-9058-81dfee9bf3e1",
+    "score": 89,
+    "band": "high",
+    "signals": [
+      {
+        "name": "no_anmeldung",
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address",
+        "severity": 0.6
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "9a36d1ec-2c6a-4e9a-b280-67a14187222b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "9b4e164b-5716-4c2e-b43a-da2a76e5ae78",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "9b4e2c24-9479-41e6-8927-7d9b6e0d2648",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "9d6b9b62-6b53-4a19-a902-b73fcf39f648",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "9e3d750d-f296-49f0-8d23-72c22bffe17b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "9e91a71c-7374-4cbf-978c-57d3508850d3",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "a6846099-f729-4951-8591-31d2bbda0242",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "a96b3c42-f6d2-4a7b-aec7-6a82148b4376",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "a974d079-716f-4a0a-85a8-882914e286e5",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "aab612c9-415d-474a-b5a6-69814104a8b5",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "abf3e3fc-2181-4d25-a552-38a643ff5011",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "b3f6fe0d-4860-4b32-b4fb-0eb949c13de7",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "b4bba73f-ac70-41d1-9051-267f2c2ac34b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "b8d49848-702b-449f-98fd-d2b979e5c9aa",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "b98f5dbe-15ae-4e0f-8777-a07f6346d4ef",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "bd17c5e8-d5ca-49ab-8a2e-6a93c5580bb2",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "be0f051b-1b66-45a9-a3c4-36571d8cbbac",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "be6033f7-28be-4288-a5af-6e39722764e6",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "bea29dfe-c73f-4e1b-af90-8e3cdd750e98",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "bf3c4c06-4343-48bc-89fa-6a688fb5d27b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "bf3c5140-7f54-4511-81fa-964e1eb74b56",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "c1a6423b-9f64-4eed-9c9d-927d84b871bb",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "cc530e36-addc-4e13-ab3b-4d37560c95ee",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ce88cb2d-d4e8-4839-bc3e-058be0f3eab0",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "d5c0244d-3735-462d-8184-3b0304dd7054",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ddcf8766-a93b-42cd-9c24-220e2cabd7e7",
+    "score": 99,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_market",
+        "source": "rule",
+        "evidence": "49% below the Spandau median (€6/m² vs €11/m², z=-3.5)",
+        "severity": 0.9868338142141744
+      },
+      {
+        "name": "no_anmeldung",
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address",
+        "severity": 0.6
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "de3b496f-6c45-46f6-8012-a0fff0ede303",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "de53790a-a34b-4cf6-a053-da42f1afdb65",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "def57689-68f4-4bce-a4e7-5e8eb8f21423",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "e5508ea2-6133-434d-8b0e-8eb1ad371d9e",
+    "score": 98,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_market",
+        "source": "rule",
+        "evidence": "43% below the Wedding median (€7/m² vs €13/m², z=-4.8)",
+        "severity": 0.8687793571877866
+      },
+      {
+        "name": "no_anmeldung",
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address",
+        "severity": 0.6
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "e5a4983b-a383-489a-9b2c-6ac89c678393",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ea2c7a51-7688-411f-8e47-58be24f43c62",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ead08c89-13fe-4a29-9c9d-eee0b42a0456",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ebe9e207-4f19-4ec0-832d-4526b3e4110a",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ec6a37ad-81b1-4db9-88cc-4d49669b29b8",
+    "score": 95,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_market",
+        "source": "rule",
+        "evidence": "39% below the Schöneberg median (€11/m² vs €18/m², z=-6.9)",
+        "severity": 0.7755102040816327
+      },
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "efc59738-2fb2-4e66-bed1-7aabc9b7c9bc",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 4 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "f1533ae8-670a-4c5c-b321-bf214dd8eb85",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "f1eedba3-1343-4e61-9ca3-c4480279b6a6",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "f2e6195f-732e-4016-add7-02c92747b93c",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "f7dc67e0-3097-4b2b-86a0-2a9b65ec7acd",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "f8d8b7f1-c86c-4544-a7d4-cf50f791f1e5",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "fb2ca025-adf4-462d-a651-529e8268690b",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "4 photo(s) also appear on 4 other listings",
+        "severity": 0.9
+      }
+    ],
+    "engine_version": "v1"
+  },
+  {
+    "listing_id": "ff84faef-5336-423b-8f96-468535145890",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 photo(s) also appear on 5 other listings",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v1"
+  }
+]
