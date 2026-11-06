@@ -72,8 +72,14 @@ def test_compare_two_listings(monkeypatch):
 
 
 def test_compare_rejects_single_listing():
-    client = TestClient(app)
-    resp = client.post("/api/v1/compare", json={"listing_ids": [str(uuid.uuid4())]})
+    # FastAPI resolves dependencies before reporting body validation errors,
+    # so the session must be faked even though the request never reaches the DB.
+    app.dependency_overrides[get_session] = lambda: _FakeSession([])
+    try:
+        client = TestClient(app)
+        resp = client.post("/api/v1/compare", json={"listing_ids": [str(uuid.uuid4())]})
+    finally:
+        app.dependency_overrides.clear()
     assert resp.status_code == 422  # min_length=2 violated
 
 
