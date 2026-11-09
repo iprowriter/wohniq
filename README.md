@@ -22,6 +22,14 @@ Berlin's rental market is scarce, fast-moving, and scam-prone. Traditional porta
 7. Results render as cards with a natural-language explanation grounded in the score breakdown, a risk badge, and a neighborhood map.
 8. Users can select 2–4 listings for a side-by-side comparison.
 
+### Lifestyle Match — find your Kiez, not just a flat
+
+Not everyone knows which neighbourhood to search in. **Lifestyle Match** (`/lifestyle`) asks a few playful questions (or starts from a preset like 🎓 Student or 🌳 Calm & green). It predicts your lifestyle persona, lets you confirm it, and ranks **all 143 Berlin areas** with a transparent, deterministic score built from official and open data: police crime statistics, the population register, the environmental atlas, IBB rents, the VBB timetable and OpenStreetMap. Every suggestion explains *why*, with the source of each number. You can re-weight factors, remove areas, update the ranking and open WohnIQ listings located in an area. **Your answers are never stored or logged.**
+
+![Lifestyle Match results](./assets/lifestyle-results.png)
+
+→ Full write-up, data sources, scoring, evaluation and privacy guarantees: [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md)
+
 ---
 
 ## Key architectural decisions
@@ -69,6 +77,18 @@ Typed `Mapped[...]` models are the single source of truth for the schema; Alembi
 ### ADR-0007 — Direct provider SDK over LangChain / LangGraph
 
 WohnIQ's LLM usage is three stateless, single-shot calls. LangGraph is an orchestration framework for stateful, cyclic, multi-actor agent workflows — using it here would be over-engineering. We call the Gemini SDK directly, behind a thin injectable client. Provider portability is achieved by an injectable `transport` boundary in ~10 lines — no framework dependency, readable reliability logic, and easy to swap later. [→ ADR-0007](docs/adr/0007-direct-sdk-over-agent-framework.md)
+
+### ADR-0010 — Lifestyle Match profiles come from official data, with provenance on every number
+
+Lifestyle Match scores the 143 LOR *Bezirksregionen*, the level where the crime atlas and population register join without estimation. Environmental classes, OSM amenities and VBB transit are aggregated from where residents actually live. Every figure carries `{source, year, method}`. Scores use fixed Berlin-wide reference points, so removing an area never changes another's score. The bundle is rebuilt reproducibly from the raw files (`make lifestyle-data`). [→ ADR-0010](docs/adr/0010-lifestyle-match-data-model.md)
+
+### ADR-0011 — Answers → weights → deterministic, explained ranking (no LLM)
+
+Fixed-choice answers map to 0–5 weights ("max level", explainable per answer). Weights × area scores give the total; over-budget areas are shown but ranked lower. Commute times to 13 fixed destinations are precomputed over the VBB timetable. Explanations and the persona are templates over the same numbers. [→ ADR-0011](docs/adr/0011-lifestyle-match-scoring.md)
+
+### ADR-0012 — Privacy by design
+
+Lifestyle answers are bounded choices (no free text, no addresses). The matching endpoints never touch the database. Logs hold counts only, and answers travel only in POST bodies (`no-store`). The browser keeps them in `sessionStorage` for the tab. The same change redacted user input from `/search`, commute and LLM logs. Tests inject distinctive answers and assert they appear in no log. [→ ADR-0012](docs/adr/0012-privacy-by-design.md)
 
 ---
 
@@ -128,6 +148,20 @@ Evaluated against the labeled synthetic set. Precision was the tuning target —
 
 Photo-reuse recall is 0% because pHash matching against hotlinked Pexels URLs requires fetching image bytes, which the test environment does not do. The signal works in production (the seeder fetches bytes at seed time); the eval isolates this as a known gap.
 
+### Lifestyle Match (F9)
+
+Offline and deterministic (`make eval-lifestyle`, also part of `pytest`): **38 / 38 checks pass.**
+
+| Check | Result |
+|---|---|
+| **Definition of Done:** student preset → area ≤ 20 min from TU Berlin, 30 m² ≤ €700 warm, in the top 3, with reasons | ✅ Schöneberg Nordwest (19 min, ≈ €577) · Otto-Suhr-Allee/Kantstraße (15 min, ≈ €678) |
+| 6 more scenarios (HTW student, family, calm & green, remote/creative, young professional, night owl) | ✅ 6 / 6 |
+| Determinism · exclusion invariance · budget ordering · grounded explanations (per preset) | ✅ 20 / 20 |
+| Monotonicity (raising a weight never demotes the best area for it) | ✅ 7 / 7 |
+| Privacy by construction (no free text, unknown fields rejected, fixed destinations, no protected characteristics) | ✅ 4 / 4 |
+
+Plus the log-leak privacy tests, 34 frontend logic tests, and a Playwright end-to-end suite (5 journeys × desktop/mobile). Details: [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md#5-evaluation--tests).
+
 ---
 
 ## Repo map
@@ -145,6 +179,12 @@ Photo-reuse recall is 0% because pHash matching against hotlinked Pexels URLs re
 | `backend/enrich/` | Commute (BVG/VBB) and neighborhood (OSM) enrichment, both cached |
 | `backend/evals/` | Parser eval harness, ranking sanity eval, scam eval + confusion matrix |
 | `frontend/` | Next.js app — search box, result cards, risk badge, comparison, Leaflet map |
+| [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md) | Lifestyle Match — flow, factors, scoring, privacy, evaluation, DoD checklist |
+| `backend/lifestyle/` | Lifestyle Match engine: questionnaire, weights, scoring, explanations, persona (pure) |
+| `backend/data/lifestyle/` | Region profile build from official data (`make lifestyle-data`) + shipped `regions.json` |
+| `backend/app/routers/lifestyle.py` | `/api/v1/lifestyle/*` — catalog, profile, match, listings, region outlines |
+| `frontend/app/lifestyle/` | Questionnaire (`/lifestyle`) and results (`/lifestyle/results`) |
+| `frontend/tests/`, `frontend/e2e/` | Frontend logic tests (`npm test`) and Playwright journeys (`npm run test:e2e`) |
 
 ---
 
@@ -174,6 +214,12 @@ cd backend
 uv run python -m evals.parser_eval   # or: make eval-parser
 uv run python -m evals.ranking_eval  # or: make eval-ranking
 uv run python -m evals.scam_eval     # or: make eval-scam
+uv run python -m evals.lifestyle_eval  # or: make eval-lifestyle (offline)
+
+# Lifestyle Match
+make lifestyle-data                  # rebuild region profiles from the raw official files (~4 min)
+cd frontend && npm test              # frontend logic tests (no extra deps)
+cd frontend && npm run test:e2e      # Playwright journeys (first: npx playwright install chromium)
 ```
 
 From the repo root: `make install`, `make dev`, `make test`, `make lint`.
@@ -229,3 +275,5 @@ plus the deterministic seed-42 generator, so it matches the live database. In of
 ## License / attribution
 
 Apartment photos sourced via the Pexels API; attribution shown in-app per their terms.
+
+Lifestyle Match uses derived figures from: Polizei Berlin (Kriminalitätsatlas); Amt für Statistik Berlin-Brandenburg (Einwohnerregisterstatistik, CC BY 3.0 DE; LOR 2021 with SenStadt); Senatsverwaltung für Mobilität, Verkehr, Klimaschutz und Umwelt (Umweltgerechtigkeitsatlas 2023/24); Investitionsbank Berlin (Wohnungsmarktbericht 2025 and Tabellenband); Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen (Betriebskostenübersicht 2026); Moses Mendelssohn Institut; VBB (GTFS open data); and © OpenStreetMap contributors (ODbL 1.0, via Geofabrik). Each figure's source is shown next to it in the app and listed in `backend/data/lifestyle/sources.py`.

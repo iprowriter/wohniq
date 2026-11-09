@@ -1,0 +1,16 @@
+# Keep the Docker build context small and free of secrets.
+.venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+.env.*
+
+# Lifestyle Match raw source files (~250 MB; only `make lifestyle-data` reads them —
+# the API ships the generated data/lifestyle/regions.json + regions_geo.json).
+data/lifestyle/raw/*
+!data/lifestyle/raw/README.md
+
+# Local eval outputs
+evals/results/

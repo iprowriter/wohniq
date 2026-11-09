@@ -15,3 +15,6 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0007](0007-direct-sdk-over-agent-framework.md) | Direct Gemini SDK over LangChain/LangGraph | Accepted |
 | [0008](0008-offline-commute-estimate.md) | Offline commute estimate from straight-line distance and published speeds | Accepted, amended by 0009 |
 | [0009](0009-route-based-commute-estimate.md) | Route-based commute estimate over the VBB weekday-peak network | Accepted |
+| [0010](0010-lifestyle-match-data-model.md) | Lifestyle Match: official-data region profiles with provenance | Accepted |
+| [0011](0011-lifestyle-match-scoring.md) | Lifestyle Match: answers → weights → deterministic, explained ranking | Accepted |
+| [0012](0012-privacy-by-design.md) | Privacy by design: lifestyle answers are never stored or logged | Accepted |

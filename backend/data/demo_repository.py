@@ -186,6 +186,16 @@ class DemoRepository:
     def get_listings(self, listing_ids: Sequence[uuid.UUID]) -> list[Listing]:
         return [self._listings[i] for i in listing_ids if i in self._listings]
 
+    def listings_in_bbox(
+        self, min_lat: float, min_lng: float, max_lat: float, max_lng: float, *, limit: int = 500
+    ) -> list[Listing]:
+        inside = [
+            x
+            for x in self._listings.values()
+            if min_lat <= x.lat <= max_lat and min_lng <= x.lng <= max_lng
+        ]
+        return sorted(inside, key=lambda x: (x.warmmiete_eur, str(x.id)))[:limit]
+
     def retrieve(
         self, criteria: SearchCriteria, query_text: str, *, limit: int
     ) -> list[RetrievalResult]:

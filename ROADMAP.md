@@ -17,4 +17,14 @@ WohnIQ is live at https://wohniq-plum.vercel.app (milestones M0–M5 in [`TASKS.
 | 9 | **Frontend tests** (T6.8) | Playwright smoke test for search → results → detail → compare, running in CI. | 3h |
 | 10 | **Model & prompt upkeep** (T6.9) | Move off `gemini-2.0-flash` to a current model, version the prompts, and re-run the parser and scam evals as a regression check. | 2h |
 
+**Shipped in this round:** **Lifestyle Match** (F9, M7 in [`TASKS.md`](TASKS.md)): questionnaire → persona → 143 ranked Berlin areas with sourced explanations, a shaded results map, tunable weights, and a listing hand-off. It also includes a **results map view** for areas, which partly covers item 5 for listings. See [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md).
+
+**Lifestyle Match follow-ups:**
+- More destinations: more campuses, or free-text resolved locally and never sent out.
+- Two destinations for couples: ties in with item 6.
+- A German UI: ties in with item 3.
+- A yearly data refresh when the crime atlas, population register and IBB report update: `make lifestyle-data`.
+- Finer rents if sub-district asking rents become available.
+- A privacy follow-up for `/search`: stop storing typed work locations in `commute_cache` (ADR-0012, open item).
+
 **Later / ideas:** price-trend chart per Kiez from the synthetic distributions; "why not this one?" explanations for listings filtered out; dark mode.

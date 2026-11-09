@@ -23,7 +23,7 @@ from data.models import CommuteCache
 from enrich.commute_estimate import estimate_commute
 from enrich.commute_parse import CommuteResult, parse_journey
 from enrich.places import resolve_place
-from enrich.transit_network import get_network
+from enrich.transit_network import TransitNetwork, get_network
 
 logger = get_logger(__name__)
 
@@ -98,8 +98,14 @@ def estimate_commute_to(
 
 def estimate_between(lat: float, lng: float, dlat: float, dlng: float) -> CommuteResult:
     """Route-based estimate when the VBB network is available, else straight-line."""
+    return estimate_with_network(lat, lng, dlat, dlng, get_network())
+
+
+def estimate_with_network(
+    lat: float, lng: float, dlat: float, dlng: float, net: TransitNetwork | None
+) -> CommuteResult:
+    """`estimate_between` over an explicit network (None = straight-line only)."""
     straight = estimate_commute(lat, lng, dlat, dlng)
-    net = get_network()
     if net is None:
         return straight
     route = net.route(lat, lng, dlat, dlng)
@@ -140,7 +146,8 @@ def get_commute(
             journey = fetch_first_journey(lat, lng, stop["id"])
             result = parse_journey(journey) if journey else None
     except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully
-        logger.warning("commute lookup failed (%s → %s): %s", origin_key, dest_key, exc)
+        # The destination is user input (typed in /search): not logged (ADR-0012).
+        logger.warning("commute lookup failed (origin %s): %s", origin_key, type(exc).__name__)
 
     if result is None:
         # Show an estimate rather than nothing; deliberately not cached.

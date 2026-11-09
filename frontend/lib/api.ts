@@ -1,6 +1,6 @@
 import type { ListingDetailResponse, ListingOut, SearchResponse } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 /** Photo URLs are absolute (Pexels CDN), or backend-relative in offline demo mode
  * (`/demo-photos/...`, served by the API) — resolve those against the API origin. */

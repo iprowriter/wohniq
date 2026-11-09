@@ -260,11 +260,12 @@ def search(
             )
         )
 
+    # Privacy (ADR-0012): never log the query text or parsed values (budget, work
+    # location, …) — only which fields were understood and how many results we returned.
     logger.info(
-        "search query=%r parsed=%s results=%d",
-        req.query,
-        criteria.model_dump(exclude_none=True),
+        "search results=%d parsed_fields=%s",
         len(results),
+        sorted(k for k, v in criteria.model_dump().items() if v not in (None, False, [], "")),
     )
     commute_note = _commute_note(
         criteria.work_location, [commute_by_id.get(i.listing_id) for i, _ in ranked]

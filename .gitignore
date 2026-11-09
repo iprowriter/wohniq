@@ -12,6 +12,8 @@ build/
 
 # --- Node / Next.js ---
 node_modules/
+frontend/test-results/
+frontend/playwright-report/
 .next/
 out/
 *.tsbuildinfo
@@ -37,3 +39,6 @@ backend/evals/results/
 backend/data/demo/photos/
 # VBB stops extracted from open GTFS data for offline commute estimates (`make demo-stops`)
 backend/data/vbb/
+# Official source files for Lifestyle Match (`make lifestyle-data`); see backend/data/lifestyle/raw/README.md
+backend/data/lifestyle/raw/*
+!backend/data/lifestyle/raw/README.md

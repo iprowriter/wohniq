@@ -7,6 +7,8 @@ import { CriteriaChips } from "@/components/CriteriaChips";
 import { ResultCard } from "@/components/ResultCard";
 import { FeaturedCard } from "@/components/FeaturedCard";
 import { ComparisonModal } from "@/components/ComparisonModal";
+import { LifestyleEntryBar } from "@/components/lifestyle/LifestyleEntryBar";
+import { LifestyleFeatureCard } from "@/components/lifestyle/LifestyleFeatureCard";
 
 const EXAMPLE =
   "I work near Alexanderplatz, budget €1,500, quiet neighborhood, good transport, cafes nearby";
@@ -161,6 +163,10 @@ export default function Home() {
           >
             Try an example →
           </button>
+
+          <div>
+            <LifestyleEntryBar />
+          </div>
         </div>
       </section>
 
@@ -209,6 +215,7 @@ export default function Home() {
           <>
             {/* ── Marketing cards ── */}
             <section id="how-it-works" className="grid gap-4 py-10 sm:grid-cols-2">
+              <LifestyleFeatureCard />
               <MarketingCard
                 icon={
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

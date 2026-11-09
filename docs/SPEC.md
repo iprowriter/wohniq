@@ -86,6 +86,15 @@ Hybrid engine producing an explained 0–100 risk score and Low/Caution/High ban
 Side-by-side comparison of 2–4 selected listings across price, commute, neighborhood, risk, and fit.
 - **AC1.** Renders the same structured fields used by ranking and explanation — no recomputation drift.
 
+### F9 — Lifestyle Match
+A multi-step questionnaire (or preset) → lifestyle persona → ranked Berlin areas, explained with the data behind them. See [`LIFESTYLE_MATCH.md`](LIFESTYLE_MATCH.md) and ADR-0010/0011/0012.
+- **AC1.** Users can go back and change any answer; the summary shows their choices and a predicted persona and asks them to confirm before matching.
+- **AC2.** Ranking is deterministic: answers → 0–5 weights (documented mapping) × fixed-reference area scores. No LLM in the path; removing an area never changes another area's score.
+- **AC3.** Every suggestion lists its reasons, each quoting a figure and citing its source publication; data caveats are shown alongside.
+- **AC4.** Users can adjust weights, remove areas (with undo) and explicitly update the results; over-budget areas are shown but ranked lower.
+- **AC5.** Privacy by design: answers are fixed choices (no free text), never stored in the database, never logged, and never put in URLs, cookies or localStorage.
+- **AC6 (Definition of Done).** With the Student preset, the top results include an area near TU Berlin where a typical flat fits the student budget, with reasons — and the answers are not stored or logged.
+
 ## 6. User flows
 
 **Primary flow**
@@ -95,6 +104,12 @@ Side-by-side comparison of 2–4 selected listings across price, commute, neighb
 4. Ranking (F3) enriched with commute (F5), neighborhood (F6), risk (F7).
 5. Results render as cards with explanation (F4) and a risk badge (F7).
 6. User opens a listing for detail, or selects several to compare (F8).
+
+**Lifestyle Match flow (F9)**
+1. Homepage entry bar / card → `/lifestyle`: pick a preset or start from scratch.
+2. Four question pages → summary with persona → "Yes, that's me".
+3. `/lifestyle/results`: ranked areas with reasons and sources, shaded map, tune weights → Update results, remove areas.
+4. "See flats here" → WohnIQ listings located in the area (with risk badges) → listing detail.
 
 ## 7. Data model (high level)
 
@@ -119,6 +134,7 @@ Authoritative schema lives in code/migrations; this is the conceptual sketch.
 - Parser eval: ≥ 90% schema-valid + field-correct on the 20 canonical queries.
 - Scam detector: reported precision/recall + confusion matrix on the labeled set; precision prioritized (don't cry wolf on legit cheap flats).
 - Ranking: sanity eval — a basket of queries returns the hand-labeled "should be top 5" listing in the top 5.
+- Lifestyle Match: scenario + property eval (`make eval-lifestyle`) passes 100%, including the Definition of Done scenario; privacy tests prove answers never reach logs.
 - Repo quality: green CI, tests passing, README that tells the spec→decisions→evals story.
 
 ## 10. Open questions

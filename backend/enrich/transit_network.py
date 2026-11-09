@@ -23,6 +23,7 @@ import heapq
 import itertools
 import math
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -169,6 +170,30 @@ class TransitNetwork:
         return Route(total, max(0, boardings - 1), walking, legs)
 
 
+def network_from_records(
+    stations: Iterable[dict], rides: Iterable[dict], boardings: Iterable[dict]
+) -> TransitNetwork | None:
+    """Build a routable network from rows shaped like the network_*.csv files.
+
+    Shared by `load_network` (CSV files) and the Lifestyle Match data build, which
+    routes over an in-memory network extracted straight from the GTFS zip.
+    """
+    station_map = {
+        str(r["station_id"]): (r["name"], float(r["lat"]), float(r["lng"])) for r in stations
+    }
+    ride_map: dict[tuple[str, str], list[tuple[str, float]]] = defaultdict(list)
+    line_names: dict[str, str] = {}
+    for r in rides:
+        ride_map[(r["line"], r["from_station"])].append((r["to_station"], float(r["minutes"])))
+        line_names[r["line"]] = r["line_name"]
+    boarding_map: dict[str, list[tuple[str, float]]] = defaultdict(list)
+    for r in boardings:
+        boarding_map[r["station"]].append((r["line"], float(r["wait_minutes"])))
+    if not station_map or not ride_map:
+        return None
+    return TransitNetwork(station_map, dict(ride_map), dict(boarding_map), line_names)
+
+
 def load_network(directory: Path = NETWORK_DIR) -> TransitNetwork | None:
     files = [directory / n for n in (STATIONS_FILE, RIDES_FILE, BOARDINGS_FILE)]
     if not all(f.is_file() for f in files):
@@ -178,20 +203,7 @@ def load_network(directory: Path = NETWORK_DIR) -> TransitNetwork | None:
         with path.open(encoding="utf-8", newline="") as f:
             yield from csv.DictReader(f)
 
-    stations = {
-        r["station_id"]: (r["name"], float(r["lat"]), float(r["lng"])) for r in rows(files[0])
-    }
-    rides: dict[tuple[str, str], list[tuple[str, float]]] = defaultdict(list)
-    line_names: dict[str, str] = {}
-    for r in rows(files[1]):
-        rides[(r["line"], r["from_station"])].append((r["to_station"], float(r["minutes"])))
-        line_names[r["line"]] = r["line_name"]
-    boardings: dict[str, list[tuple[str, float]]] = defaultdict(list)
-    for r in rows(files[2]):
-        boardings[r["station"]].append((r["line"], float(r["wait_minutes"])))
-    if not stations or not rides:
-        return None
-    return TransitNetwork(stations, dict(rides), dict(boardings), line_names)
+    return network_from_records(rows(files[0]), rows(files[1]), rows(files[2]))
 
 
 @lru_cache(maxsize=1)

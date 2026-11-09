@@ -1,0 +1,934 @@
+{
+ "pages": [
+  {
+   "id": "move",
+   "title": "Your move",
+   "subtitle": "Who's moving, how much space, and what you can spend.",
+   "questions": [
+    "household",
+    "budget_strictness"
+   ]
+  },
+  {
+   "id": "days",
+   "title": "Your days",
+   "subtitle": "Where you go most and how you get around.",
+   "questions": [
+    "frequency",
+    "work_style",
+    "getting_around"
+   ]
+  },
+  {
+   "id": "free_time",
+   "title": "Evenings & weekends",
+   "subtitle": "How you like to spend your free time.",
+   "questions": [
+    "evenings",
+    "weekends"
+   ]
+  },
+  {
+   "id": "neighbourhood",
+   "title": "Your neighbourhood",
+   "subtitle": "What else makes a place feel right.",
+   "questions": [
+    "neighbours",
+    "safety",
+    "extras"
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "household",
+   "page": "move",
+   "prompt": "Who's moving?",
+   "help": null,
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "solo",
+     "label": "Just me",
+     "hint": null,
+     "sets": {}
+    },
+    {
+     "id": "couple",
+     "label": "Me and my partner",
+     "hint": null,
+     "sets": {}
+    },
+    {
+     "id": "family",
+     "label": "A family with kids",
+     "hint": null,
+     "sets": {
+      "family": 5,
+      "everyday": 4
+     }
+    },
+    {
+     "id": "flatshare",
+     "label": "Friends / a flatshare",
+     "hint": null,
+     "sets": {}
+    }
+   ]
+  },
+  {
+   "id": "budget_strictness",
+   "page": "move",
+   "prompt": "How firm is your budget?",
+   "help": null,
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "strict",
+     "label": "Firm — every euro counts",
+     "hint": null,
+     "sets": {
+      "affordability": 5
+     }
+    },
+    {
+     "id": "balanced",
+     "label": "Some wiggle room",
+     "hint": null,
+     "sets": {
+      "affordability": 3
+     }
+    },
+    {
+     "id": "flexible",
+     "label": "Flexible for the right place",
+     "hint": null,
+     "sets": {
+      "affordability": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "frequency",
+   "page": "days",
+   "prompt": "How often do you go there?",
+   "help": "Only counts if you pick a destination.",
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "daily",
+     "label": "Every day",
+     "hint": null,
+     "sets": {
+      "commute": 5
+     }
+    },
+    {
+     "id": "most_days",
+     "label": "Most days",
+     "hint": null,
+     "sets": {
+      "commute": 4
+     }
+    },
+    {
+     "id": "few_times",
+     "label": "A few times a week",
+     "hint": null,
+     "sets": {
+      "commute": 3
+     }
+    },
+    {
+     "id": "rarely",
+     "label": "Now and then",
+     "hint": null,
+     "sets": {
+      "commute": 1
+     }
+    }
+   ]
+  },
+  {
+   "id": "work_style",
+   "page": "days",
+   "prompt": "How do you work or study?",
+   "help": null,
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "on_site",
+     "label": "On campus / at the office",
+     "hint": null,
+     "sets": {}
+    },
+    {
+     "id": "hybrid",
+     "label": "Hybrid — some days from home",
+     "hint": null,
+     "sets": {
+      "cafes": 3
+     }
+    },
+    {
+     "id": "remote_creative",
+     "label": "Remote or creative — the neighbourhood is my office",
+     "hint": null,
+     "sets": {
+      "cafes": 5,
+      "culture": 4,
+      "young_crowd": 3
+     }
+    }
+   ]
+  },
+  {
+   "id": "getting_around",
+   "page": "days",
+   "prompt": "How do you mostly get around?",
+   "help": null,
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "public_transport",
+     "label": "U-Bahn, S-Bahn & tram",
+     "hint": null,
+     "sets": {
+      "transit": 4
+     }
+    },
+    {
+     "id": "mix",
+     "label": "A bit of everything",
+     "hint": null,
+     "sets": {
+      "transit": 3
+     }
+    },
+    {
+     "id": "bike",
+     "label": "By bike",
+     "hint": null,
+     "sets": {
+      "transit": 2
+     }
+    },
+    {
+     "id": "car",
+     "label": "By car",
+     "hint": null,
+     "sets": {}
+    }
+   ]
+  },
+  {
+   "id": "evenings",
+   "page": "free_time",
+   "prompt": "What do your evenings look like?",
+   "help": null,
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "out_often",
+     "label": "Out most nights — bars, gigs, clubs",
+     "hint": null,
+     "sets": {
+      "nightlife": 5
+     }
+    },
+    {
+     "id": "sometimes",
+     "label": "Out now and then, cosy at home otherwise",
+     "hint": null,
+     "sets": {
+      "nightlife": 3
+     }
+    },
+    {
+     "id": "home",
+     "label": "Mostly at home — a quiet street matters",
+     "hint": null,
+     "sets": {
+      "quiet": 4
+     }
+    },
+    {
+     "id": "calm",
+     "label": "Peace and quiet is essential",
+     "hint": null,
+     "sets": {
+      "quiet": 5
+     }
+    },
+    {
+     "id": "no_preference",
+     "label": "No strong preference",
+     "hint": null,
+     "sets": {}
+    }
+   ]
+  },
+  {
+   "id": "weekends",
+   "page": "free_time",
+   "prompt": "Your ideal weekend? (pick up to two)",
+   "help": null,
+   "multi": true,
+   "max_choices": 2,
+   "options": [
+    {
+     "id": "nature",
+     "label": "Lakes, forests and long walks",
+     "hint": null,
+     "sets": {
+      "green": 5,
+      "water": 4
+     }
+    },
+    {
+     "id": "park_cafe",
+     "label": "A park and a good café around the corner",
+     "hint": null,
+     "sets": {
+      "green": 3,
+      "cafes": 3
+     }
+    },
+    {
+     "id": "social",
+     "label": "Friends, bars and cafés",
+     "hint": null,
+     "sets": {
+      "cafes": 3,
+      "nightlife": 3
+     }
+    },
+    {
+     "id": "brunch",
+     "label": "Brunch spots and exploring the Kiez",
+     "hint": null,
+     "sets": {
+      "cafes": 4
+     }
+    },
+    {
+     "id": "culture",
+     "label": "Museums, galleries, a show",
+     "hint": null,
+     "sets": {
+      "culture": 3
+     }
+    },
+    {
+     "id": "active",
+     "label": "Sport and staying active",
+     "hint": null,
+     "sets": {
+      "sport": 4
+     }
+    },
+    {
+     "id": "family_time",
+     "label": "Playgrounds and family outings",
+     "hint": null,
+     "sets": {
+      "green": 5,
+      "family": 5
+     }
+    }
+   ]
+  },
+  {
+   "id": "neighbours",
+   "page": "neighbourhood",
+   "prompt": "Who would you like around you?",
+   "help": null,
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "young",
+     "label": "A young crowd — students and young professionals",
+     "hint": null,
+     "sets": {
+      "young_crowd": 4
+     }
+    },
+    {
+     "id": "families",
+     "label": "Lots of families",
+     "hint": null,
+     "sets": {
+      "family": 4
+     }
+    },
+    {
+     "id": "mix",
+     "label": "A mix — doesn't matter",
+     "hint": null,
+     "sets": {}
+    }
+   ]
+  },
+  {
+   "id": "safety",
+   "page": "neighbourhood",
+   "prompt": "How much should reported neighbourhood crime count?",
+   "help": "Based on police statistics per 100,000 residents. Busy central areas read higher because visitors count too.",
+   "multi": false,
+   "max_choices": 1,
+   "options": [
+    {
+     "id": "none",
+     "label": "Not a factor for me",
+     "hint": null,
+     "sets": {}
+    },
+    {
+     "id": "little",
+     "label": "A little",
+     "hint": null,
+     "sets": {
+      "safety": 1
+     }
+    },
+    {
+     "id": "some",
+     "label": "Somewhat",
+     "hint": null,
+     "sets": {
+      "safety": 3
+     }
+    },
+    {
+     "id": "lot",
+     "label": "A lot",
+     "hint": null,
+     "sets": {
+      "safety": 4
+     }
+    },
+    {
+     "id": "top",
+     "label": "It's a top priority",
+     "hint": null,
+     "sets": {
+      "safety": 5
+     }
+    }
+   ]
+  },
+  {
+   "id": "extras",
+   "page": "neighbourhood",
+   "prompt": "Anything else? (optional)",
+   "help": null,
+   "multi": true,
+   "max_choices": 2,
+   "options": [
+    {
+     "id": "clean_air",
+     "label": "Clean air",
+     "hint": null,
+     "sets": {
+      "clean_air": 4
+     }
+    },
+    {
+     "id": "cool_summer",
+     "label": "Cooler summer nights",
+     "hint": null,
+     "sets": {
+      "cool_summer": 4
+     }
+    }
+   ]
+  }
+ ],
+ "presets": [
+  {
+   "id": "student",
+   "label": "Student",
+   "blurb": "Close to campus, easy on the wallet, a young crowd around you.",
+   "answers": {
+    "household": "solo",
+    "budget_eur": 700,
+    "size_m2": 30,
+    "rooms": 1.0,
+    "budget_strictness": "strict",
+    "destination": "tu_berlin",
+    "frequency": "daily",
+    "max_commute_min": 30,
+    "work_style": "on_site",
+    "getting_around": "public_transport",
+    "evenings": "sometimes",
+    "weekends": [
+     "social"
+    ],
+    "neighbours": "young",
+    "safety": "none",
+    "extras": []
+   }
+  },
+  {
+   "id": "young_professional",
+   "label": "Young professional",
+   "blurb": "A quick ride to work, great cafés and something on in the evening.",
+   "answers": {
+    "household": "solo",
+    "budget_eur": 1400,
+    "size_m2": 55,
+    "rooms": 2.0,
+    "budget_strictness": "flexible",
+    "destination": null,
+    "frequency": "most_days",
+    "max_commute_min": 40,
+    "work_style": "on_site",
+    "getting_around": "public_transport",
+    "evenings": "sometimes",
+    "weekends": [
+     "brunch",
+     "culture"
+    ],
+    "neighbours": "mix",
+    "safety": "some",
+    "extras": []
+   }
+  },
+  {
+   "id": "family",
+   "label": "Family",
+   "blurb": "Space, parks and playgrounds, daily errands close by, a calm and safe street.",
+   "answers": {
+    "household": "family",
+    "budget_eur": 1900,
+    "size_m2": 80,
+    "rooms": 3.0,
+    "budget_strictness": "flexible",
+    "destination": null,
+    "frequency": "few_times",
+    "max_commute_min": 45,
+    "work_style": null,
+    "getting_around": null,
+    "evenings": "home",
+    "weekends": [
+     "family_time"
+    ],
+    "neighbours": "families",
+    "safety": "top",
+    "extras": []
+   }
+  },
+  {
+   "id": "remote_creative",
+   "label": "Remote / creative",
+   "blurb": "Your Kiez is your office: cafés, culture and creative energy.",
+   "answers": {
+    "household": "solo",
+    "budget_eur": 1200,
+    "size_m2": 55,
+    "rooms": 2.0,
+    "budget_strictness": "flexible",
+    "destination": null,
+    "frequency": null,
+    "max_commute_min": 45,
+    "work_style": "remote_creative",
+    "getting_around": null,
+    "evenings": "no_preference",
+    "weekends": [
+     "park_cafe"
+    ],
+    "neighbours": "mix",
+    "safety": "none",
+    "extras": []
+   }
+  },
+  {
+   "id": "calm_green",
+   "label": "Calm & green",
+   "blurb": "Quiet streets, parks, water and forest within reach.",
+   "answers": {
+    "household": "couple",
+    "budget_eur": 1300,
+    "size_m2": 55,
+    "rooms": 2.0,
+    "budget_strictness": "flexible",
+    "destination": null,
+    "frequency": null,
+    "max_commute_min": 45,
+    "work_style": null,
+    "getting_around": null,
+    "evenings": "calm",
+    "weekends": [
+     "nature"
+    ],
+    "neighbours": "mix",
+    "safety": "lot",
+    "extras": []
+   }
+  }
+ ],
+ "attributes": [
+  {
+   "id": "affordability",
+   "label": "Affordability",
+   "description": "How typical rents for your flat size compare with your budget.",
+   "kind": "personal",
+   "available": true
+  },
+  {
+   "id": "commute",
+   "label": "Commute",
+   "description": "Public-transport time from the area to the place you go most.",
+   "kind": "personal",
+   "available": true
+  },
+  {
+   "id": "safety",
+   "label": "Safety",
+   "description": "Reported neighbourhood offences per 100,000 residents (lower is safer).",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "family",
+   "label": "Family-friendly",
+   "description": "Share of residents under 18 — how many families already live here.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "young_crowd",
+   "label": "Young crowd",
+   "description": "Share of residents aged 18–27 — students and young professionals.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "quiet",
+   "label": "Quiet",
+   "description": "Low exposure to traffic noise (road, rail, tram, air) where people live.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "green",
+   "label": "Green space",
+   "description": "Public parks within walking distance, relative to how many people share them.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "clean_air",
+   "label": "Clean air",
+   "description": "Low air pollution (NO₂ and fine particles).",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "cool_summer",
+   "label": "Cooler summers",
+   "description": "Less heat stress on hot days and warm nights.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "nightlife",
+   "label": "Nightlife",
+   "description": "Bars, pubs, clubs and beer gardens within about a 12-minute walk.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "cafes",
+   "label": "Cafés & food",
+   "description": "Cafés, restaurants and bakeries within about a 6-minute walk.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "culture",
+   "label": "Culture",
+   "description": "Museums, theatres, cinemas, arts centres and libraries nearby.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "everyday",
+   "label": "Everyday errands",
+   "description": "Supermarkets, pharmacies and doctors within about a 6-minute walk.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "sport",
+   "label": "Sport & fitness",
+   "description": "Gyms, pools and sports centres within about a 12-minute walk.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "water",
+   "label": "Water & nature",
+   "description": "Lakes, rivers, canals and forest within reach.",
+   "kind": "area",
+   "available": true
+  },
+  {
+   "id": "transit",
+   "label": "Transit access",
+   "description": "A short walk to the S-Bahn, U-Bahn, regional train or tram.",
+   "kind": "area",
+   "available": true
+  }
+ ],
+ "destinations": [
+  {
+   "id": "tu_berlin",
+   "name": "TU Berlin (main campus, Charlottenburg)",
+   "short": "TU Berlin",
+   "kind": "university"
+  },
+  {
+   "id": "hu_berlin",
+   "name": "Humboldt-Universität (Campus Mitte)",
+   "short": "HU Berlin",
+   "kind": "university"
+  },
+  {
+   "id": "hu_adlershof",
+   "name": "Adlershof (HU campus & WISTA science park)",
+   "short": "Adlershof",
+   "kind": "university"
+  },
+  {
+   "id": "fu_berlin",
+   "name": "Freie Universität (Dahlem)",
+   "short": "FU Berlin",
+   "kind": "university"
+  },
+  {
+   "id": "htw_berlin",
+   "name": "HTW Berlin (Campus Wilhelminenhof)",
+   "short": "HTW Berlin",
+   "kind": "university"
+  },
+  {
+   "id": "bht_berlin",
+   "name": "Berliner Hochschule für Technik (Wedding)",
+   "short": "BHT",
+   "kind": "university"
+  },
+  {
+   "id": "udk_berlin",
+   "name": "Universität der Künste (Hardenbergstraße)",
+   "short": "UdK Berlin",
+   "kind": "university"
+  },
+  {
+   "id": "hwr_berlin",
+   "name": "HWR Berlin (Campus Schöneberg)",
+   "short": "HWR Berlin",
+   "kind": "university"
+  },
+  {
+   "id": "charite_mitte",
+   "name": "Charité Campus Mitte",
+   "short": "Charité Mitte",
+   "kind": "university"
+  },
+  {
+   "id": "alexanderplatz",
+   "name": "Alexanderplatz",
+   "short": "Alexanderplatz",
+   "kind": "hub"
+  },
+  {
+   "id": "potsdamer_platz",
+   "name": "Potsdamer Platz",
+   "short": "Potsdamer Platz",
+   "kind": "hub"
+  },
+  {
+   "id": "hauptbahnhof",
+   "name": "Berlin Hauptbahnhof",
+   "short": "Hauptbahnhof",
+   "kind": "hub"
+  },
+  {
+   "id": "zoo_city_west",
+   "name": "Zoologischer Garten / City West (Kurfürstendamm)",
+   "short": "Zoo / City West",
+   "kind": "hub"
+  }
+ ],
+ "sources": [
+  {
+   "id": "pks_kriminalitaetsatlas",
+   "title": "Kriminalitätsatlas Berlin — Fallzahlen und Häufigkeitszahlen 2016–2025",
+   "publisher": "Polizei Berlin (LKA), Polizeiliche Kriminalstatistik",
+   "url": "https://www.berlin.de/polizei/",
+   "licence": null,
+   "data_year": "2023–2025",
+   "used_for": "‘Kieztaten’ (neighbourhood offences) per 100,000 residents, averaged over 2023–2025, per Bezirksregion.",
+   "caveat": "Reported offences per 100,000 registered residents. ‘Kieztaten’ are the police's neighbourhood-related offences (e.g. assault, threats, robbery, burglary, vandalism of cars). Areas many people visit (centre, nightlife, transport hubs) read higher than what residents experience; the police note a high rate can also reflect liveliness and popularity. Averaged over three years."
+  },
+  {
+   "id": "afs_einwohnerregister_2024",
+   "title": "Einwohnerregisterstatistik Berlin, 31. Dezember 2024 (Statistischer Bericht A I 16 – hj 2/24), Tabelle 2",
+   "publisher": "Amt für Statistik Berlin-Brandenburg",
+   "url": "https://www.statistik-berlin-brandenburg.de",
+   "licence": "CC BY 3.0 DE",
+   "data_year": "2024",
+   "used_for": "Residents by age group per LOR-Planungsraum, summed to Bezirksregionen.",
+   "caveat": "Registered main residences on 31 Dec 2024. We use age groups only; nationality and migration-background figures are deliberately not used."
+  },
+  {
+   "id": "senstadt_betriebskosten_2026",
+   "title": "Berliner Betriebskostenübersicht 2026 (Abrechnungsjahr 2024)",
+   "publisher": "Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen",
+   "url": "https://www.berlin.de/sen/wohnen/service/betriebskostenuebersicht/",
+   "licence": null,
+   "data_year": "2024",
+   "used_for": "Average operating costs (cold + heating/hot water) to turn cold rent into warm rent.",
+   "caveat": "Averages from larger housing companies' statements; individual flats vary."
+  },
+  {
+   "id": "ibb_wohnungsmarktbericht_2025",
+   "title": "IBB Wohnungsmarktbericht 2025 — Zusammenfassung",
+   "publisher": "Investitionsbank Berlin (IBB)",
+   "url": "https://www.ibb.de/wohnungsmarktbericht",
+   "licence": null,
+   "data_year": "2025",
+   "used_for": "Median asking rents (net cold) for Berlin, inner city and outer city.",
+   "caveat": "Asking rents from listings (VALUE Marktdatenbank), not signed contracts; Berlin-wide, not per neighbourhood."
+  },
+  {
+   "id": "senstadt_lor_2021",
+   "title": "Lebensweltlich orientierte Räume (LOR) 2021 — Planungsräume (WGS84)",
+   "publisher": "Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen / Amt für Statistik Berlin-Brandenburg",
+   "url": "https://daten.berlin.de",
+   "licence": null,
+   "data_year": "2021",
+   "used_for": "Planning-area boundaries (area, centre points) and the official ‘Innere Stadt’ / ‘Äußere Stadt’ classification.",
+   "caveat": "Region centre points are population-weighted, i.e. where people live, not the geometric middle of parks or rail yards."
+  },
+  {
+   "id": "umweltgerechtigkeitsatlas_2023_2024",
+   "title": "Umweltgerechtigkeitsatlas 2023/2024 (Broschüre), ‘Aufschlüsselung der Planungsräume nach Belastungssituation’",
+   "publisher": "Senatsverwaltung für Mobilität, Verkehr, Klimaschutz und Umwelt",
+   "url": "https://www.berlin.de/umweltatlas/",
+   "licence": null,
+   "data_year": "noise 2022 · air 2023 · heat 2022 · green space 2020",
+   "used_for": "Noise, air, heat and green-space burden class (low / medium / high) per Planungsraum, weighted by residents to Bezirksregionen.",
+   "caveat": "Classes are relative to the rest of Berlin (lowest quarter = low, highest quarter = high), not absolute health thresholds. The atlas's social-disadvantage indicator is deliberately not used."
+  },
+  {
+   "id": "mmi_studentisches_wohnen_sose_2025",
+   "title": "Pressemitteilung: Neue Zahlen zu Studentischen Wohnkosten Sommersemester 2025 (10.03.2025)",
+   "publisher": "Moses Mendelssohn Institut with WG-Gesucht.de",
+   "url": "https://www.moses-mendelssohn-institut.de/aktuelles/SoSe2025",
+   "licence": null,
+   "data_year": "2025",
+   "used_for": "Typical Berlin WG-room price and student housing allowances.",
+   "caveat": "Average ‘ordinary’ WG room from listings; whole flats cost more."
+  },
+  {
+   "id": "ibb_tabellenband_2025",
+   "title": "IBB Wohnungsmarktbericht 2025 — Tabellenband, Tab. 25 ‘Angebotsmieten nach Bezirken 2025’",
+   "publisher": "Investitionsbank Berlin (IBB); data: VALUE Marktdatenbank, RegioKontext GmbH",
+   "url": "https://www.ibb.de/wohnungsmarktbericht",
+   "licence": null,
+   "data_year": "2025",
+   "used_for": "Median asking rent (net cold) per district, and the range that 80% of offers fall into.",
+   "caveat": "District medians from listings, not signed contracts. Neighbourhoods within a district differ; the range shows how much."
+  },
+  {
+   "id": "openstreetmap_geofabrik",
+   "title": "OpenStreetMap — Geofabrik ‘berlin-latest-free’ GeoPackage",
+   "publisher": "© OpenStreetMap contributors (ODbL 1.0), extract by Geofabrik GmbH",
+   "url": "https://www.openstreetmap.org/copyright",
+   "licence": "ODbL 1.0",
+   "data_year": "2026",
+   "used_for": "Cafés, shops, doctors, bars, culture and sport venues; residential land; lakes, rivers and forests.",
+   "caveat": "Community-mapped: very complete in Berlin but not official. Distances are straight lines from homes, so real walks are a little longer."
+  },
+  {
+   "id": "vbb_gtfs",
+   "title": "VBB GTFS timetable — weekday peak network (07:00–09:00)",
+   "publisher": "VBB Verkehrsverbund Berlin-Brandenburg GmbH (open data)",
+   "url": "https://www.vbb.de/vbbgtfs",
+   "licence": null,
+   "data_year": "2026",
+   "used_for": "S-Bahn, U-Bahn, regional-rail and tram stops with peak-hour service.",
+   "caveat": "Buses are not counted: almost everyone in Berlin lives near one."
+  }
+ ],
+ "city": {
+  "asking_rent_median": {
+   "value": 15.78,
+   "unit": "EUR/m² net cold",
+   "source_id": "ibb_wohnungsmarktbericht_2025",
+   "year": "2025",
+   "note": "Berlin median asking rent (key figures table, p. 4; text p. 9)."
+  },
+  "asking_rent_inner_city": {
+   "value": 19.22,
+   "unit": "EUR/m² net cold",
+   "source_id": "ibb_wohnungsmarktbericht_2025",
+   "year": "2025",
+   "note": "Median asking rent, inner city (section ‘Mietwohnungsmarkt’, p. 9)."
+  },
+  "asking_rent_outer_city": {
+   "value": 13.01,
+   "unit": "EUR/m² net cold",
+   "source_id": "ibb_wohnungsmarktbericht_2025",
+   "year": "2025",
+   "note": "Median asking rent, outer city (section ‘Mietwohnungsmarkt’, p. 9)."
+  },
+  "operating_costs_cold": {
+   "value": 1.93,
+   "unit": "EUR/m² per month",
+   "source_id": "senstadt_betriebskosten_2026",
+   "year": "2024",
+   "note": "Average ‘kalte’ Betriebskosten."
+  },
+  "operating_costs_warm": {
+   "value": 1.5,
+   "unit": "EUR/m² per month",
+   "source_id": "senstadt_betriebskosten_2026",
+   "year": "2024",
+   "note": "Average heating + hot water (‘warme’ Betriebskosten)."
+  },
+  "student_room_berlin": {
+   "value": 650.0,
+   "unit": "EUR/month",
+   "source_id": "mmi_studentisches_wohnen_sose_2025",
+   "year": "2025",
+   "note": "Average ordinary WG room in Berlin, summer semester 2025 (p. 5)."
+  },
+  "bafoeg_housing_allowance": {
+   "value": 380.0,
+   "unit": "EUR/month",
+   "source_id": "mmi_studentisches_wohnen_sose_2025",
+   "year": "2025",
+   "note": "BAföG housing allowance (Wohnkostenpauschale), raised from €360 (p. 4)."
+  },
+  "student_need_duesseldorf_table": {
+   "value": 440.0,
+   "unit": "EUR/month warm",
+   "source_id": "mmi_studentisches_wohnen_sose_2025",
+   "year": "2025",
+   "note": "Housing need of a student living away from home per the Düsseldorfer Tabelle, as cited (p. 4)."
+  }
+ },
+ "region_count": 143,
+ "privacy": "Your answers are used only to compute this result. They are not stored or logged, and they never leave WohnIQ."
+}

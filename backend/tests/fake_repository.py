@@ -21,6 +21,14 @@ class FakeRepository:
     def get_listings(self, listing_ids):
         return [self.listings[i] for i in listing_ids if i in self.listings]
 
+    def listings_in_bbox(self, min_lat, min_lng, max_lat, max_lng, *, limit=500):
+        inside = [
+            x
+            for x in self.listings.values()
+            if min_lat <= x.lat <= max_lat and min_lng <= x.lng <= max_lng
+        ]
+        return sorted(inside, key=lambda x: (x.warmmiete_eur, str(x.id)))[:limit]
+
     def retrieve(self, criteria, query_text, *, limit):
         return self.retrieval[:limit]
 

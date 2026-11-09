@@ -27,6 +27,16 @@ function Header() {
           <Link href="/" className="text-gray-500 hover:text-gray-900">
             Search
           </Link>
+          <Link
+            href="/lifestyle"
+            className="hidden items-center gap-1.5 font-medium text-indigo-600 hover:text-indigo-800 sm:inline-flex"
+          >
+            Lifestyle Match
+            <span className="relative flex h-2 w-2" aria-label="new">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-fuchsia-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-fuchsia-500" />
+            </span>
+          </Link>
           <a
             href="#how-it-works"
             className="hidden text-gray-500 hover:text-gray-900 sm:inline"
@@ -64,6 +74,9 @@ function Footer() {
               <p className="font-semibold text-gray-800">Product</p>
               <Link href="/" className="block text-gray-500 hover:text-gray-900">
                 Search
+              </Link>
+              <Link href="/lifestyle" className="block text-gray-500 hover:text-gray-900">
+                Lifestyle Match
               </Link>
               <a href="#how-it-works" className="block text-gray-500 hover:text-gray-900">
                 How it works

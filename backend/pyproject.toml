@@ -30,6 +30,11 @@ dev = [
     "pytest>=8.0",
     "ruff>=0.4",
     "black>=24.0",
+    # Lifestyle Match data build only (`make lifestyle-data`): read the official
+    # XLSX/PDF sources. Not runtime deps — the API reads the generated JSON.
+    "openpyxl>=3.1",
+    "pypdf>=4.0",
+    "pdfplumber>=0.11",  # glyph x-positions for the Umweltgerechtigkeit table
 ]
 
 [build-system]
@@ -38,7 +43,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 # Treat each top-level folder as an importable package.
-packages = ["app", "core", "search", "scam", "enrich", "data", "evals"]
+packages = ["app", "core", "search", "scam", "enrich", "data", "evals", "lifestyle"]
 
 # --- Tooling config (single source of truth) ---
 
@@ -57,4 +62,5 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.pytest.ini_options]
 pythonpath = ["."]          # so tests can `from app.main import app`
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not slow'"  # `make test-all` includes the slow ones
+markers = ["slow: long-running checks (e.g. rebuilding Lifestyle Match data from raw files)"]

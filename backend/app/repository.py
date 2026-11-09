@@ -38,6 +38,10 @@ class ListingRepository(Protocol):
 
     def get_listings(self, listing_ids: Sequence[uuid.UUID]) -> list[Listing]: ...
 
+    def listings_in_bbox(
+        self, min_lat: float, min_lng: float, max_lat: float, max_lng: float, *, limit: int = 500
+    ) -> list[Listing]: ...
+
     def retrieve(
         self, criteria: SearchCriteria, query_text: str, *, limit: int
     ) -> list[RetrievalResult]: ...
@@ -69,6 +73,22 @@ class SqlRepository:
 
     def get_listings(self, listing_ids: Sequence[uuid.UUID]) -> list[Listing]:
         return list(self.session.scalars(select(Listing).where(Listing.id.in_(listing_ids))))
+
+    def listings_in_bbox(
+        self, min_lat: float, min_lng: float, max_lat: float, max_lng: float, *, limit: int = 500
+    ) -> list[Listing]:
+        """Listings inside a lat/lng box (Lifestyle Match hand-off; exact region test follows)."""
+        return list(
+            self.session.scalars(
+                select(Listing)
+                .where(
+                    Listing.lat.between(min_lat, max_lat),
+                    Listing.lng.between(min_lng, max_lng),
+                )
+                .order_by(Listing.warmmiete_eur, Listing.id)
+                .limit(limit)
+            )
+        )
 
     def retrieve(
         self, criteria: SearchCriteria, query_text: str, *, limit: int

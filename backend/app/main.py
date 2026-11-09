@@ -10,6 +10,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.routers import lifestyle as lifestyle_router
 from app.routers import search as search_router
 from core.config import settings
 from core.logging import configure_logging, get_logger
@@ -87,6 +88,7 @@ def health() -> dict[str, str]:
 
 
 api_v1.include_router(search_router.router)
+api_v1.include_router(lifestyle_router.router)
 app.include_router(api_v1)
 
 if settings.demo_mode:

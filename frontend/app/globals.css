@@ -17,3 +17,16 @@ body {
   background: #f8fafc;
   outline: 1px solid #e5e7eb;
 }
+
+/* Lifestyle Match: honour the user's reduced-motion setting. */
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe-anim,
+  [class*="animate-"] {
+    animation: none !important;
+  }
+}
+
+/* Range sliders in the indigo accent colour. */
+.lm-range {
+  accent-color: #4f46e5;
+}

@@ -127,7 +127,15 @@ def generate_structured(
             data = schema.model_validate_json(raw.text)
         except ValidationError as exc:
             last_error = exc
-            logger.warning("llm prompt=%s attempt=%d invalid: %s", prompt_id, attempt, exc)
+            # Log where validation failed, not the values: model output can echo the
+            # user's query (ADR-0012).
+            logger.warning(
+                "llm prompt=%s attempt=%d invalid: %d error(s) at %s",
+                prompt_id,
+                attempt,
+                exc.error_count(),
+                [".".join(str(p) for p in e["loc"]) for e in exc.errors()],
+            )
             current_user = (
                 f"{user}\n\nYour previous response failed validation:\n{exc}\n"
                 "Return ONLY valid JSON matching the schema."
