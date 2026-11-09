@@ -17,20 +17,17 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
-from sqlalchemy.orm import Session
 
-from core.db import get_session
+from app.repository import ListingRepository, get_repository
 from core.logging import get_logger
 from data.kieze import KIEZE
 from data.models import Listing, Photo, RiskAssessment
-from enrich.commute import get_commute
-from enrich.neighborhood import get_neighborhood
+from enrich.commute_parse import CommuteResult
+from enrich.neighborhood_parse import DEFAULT_RADIUS_M
 from search.criteria import SearchCriteria
 from search.explanation import Explanation, explain
 from search.parser import parse_query
 from search.ranking import RankCriteria, RankingInput, rank, score_listing
-from search.retrieval import retrieve
 
 logger = get_logger(__name__)
 router = APIRouter(tags=["search"])
@@ -58,8 +55,10 @@ class FactorOut(BaseModel):
 
 class CommuteOut(BaseModel):
     minutes: int
-    changes: int
+    changes: int | None = None  # None when unknown (straight-line estimates)
     walk_minutes: int | None = None
+    estimated: bool = False  # offline estimate, not a live BVG/VBB journey
+    source: str = "live"  # "live" | "network" (ADR-0009) | "distance" (ADR-0008)
 
 
 class NeighborhoodOut(BaseModel):
@@ -110,27 +109,8 @@ class SearchResultItem(BaseModel):
 class SearchResponse(BaseModel):
     criteria: SearchCriteria
     results: list[SearchResultItem]
-
-
-def _load_photos(session: Session, set_ids: list[uuid.UUID]) -> dict[uuid.UUID, list[Photo]]:
-    if not set_ids:
-        return {}
-    rows = session.scalars(
-        select(Photo).where(Photo.photo_set_id.in_(set_ids)).order_by(Photo.position)
-    )
-    by_set: dict[uuid.UUID, list[Photo]] = {}
-    for photo in rows:
-        by_set.setdefault(photo.photo_set_id, []).append(photo)
-    return by_set
-
-
-def _load_risk(session: Session, listing_ids: list[uuid.UUID]) -> dict[str, RiskAssessment]:
-    if not listing_ids:
-        return {}
-    rows = session.scalars(
-        select(RiskAssessment).where(RiskAssessment.listing_id.in_(listing_ids))
-    )
-    return {str(r.listing_id): r for r in rows}
+    # Shown under the criteria when commute times are estimated or unavailable.
+    commute_note: str | None = None
 
 
 def _to_risk_out(row: RiskAssessment | None) -> RiskOut | None:
@@ -146,6 +126,37 @@ def _to_risk_out(row: RiskAssessment | None) -> RiskOut | None:
         for s in (row.signals or [])
     ]
     return RiskOut(band=row.band, score=row.score, signals=signals)
+
+
+def _to_commute_out(commute: CommuteResult | None) -> CommuteOut | None:
+    if commute is None:
+        return None
+    return CommuteOut(
+        minutes=commute.minutes,
+        changes=commute.changes,
+        walk_minutes=commute.walk_minutes,
+        estimated=commute.estimated,
+        source=commute.source,
+    )
+
+
+def _commute_note(work_location: str | None, commutes: list[CommuteResult | None]) -> str | None:
+    if not work_location or not commutes:
+        return None
+    if all(c is None for c in commutes):
+        return f"Couldn't find \"{work_location}\", so commute times aren't shown."
+    sources = {c.source for c in commutes if c is not None}
+    if "network" in sources:
+        return (
+            f"Commute times to {work_location} are estimated from the VBB timetable "
+            "(weekday peak, 7–9 am); live transit data is unavailable."
+        )
+    if "distance" in sources:
+        return (
+            f"Commute times to {work_location} are estimates from straight-line distance "
+            "and average transit speeds (live transit data unavailable)."
+        )
+    return None
 
 
 def _to_listing_out(listing: Listing, photos: list[Photo]) -> ListingOut:
@@ -172,7 +183,9 @@ def _to_listing_out(listing: Listing, photos: list[Photo]) -> ListingOut:
 
 
 @router.post("/search", response_model=SearchResponse)
-def search(req: SearchRequest, session: Session = Depends(get_session)) -> SearchResponse:
+def search(
+    req: SearchRequest, repo: ListingRepository = Depends(get_repository)
+) -> SearchResponse:
     criteria = parse_query(req.query)
     rank_criteria = RankCriteria(
         max_warm_rent=criteria.max_warm_rent,
@@ -180,7 +193,7 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
         desired_amenities=tuple(criteria.desired_amenities),
     )
 
-    pool = retrieve(session, criteria, req.query, limit=max(req.limit * 3, 20))
+    pool = repo.retrieve(criteria, req.query, limit=max(req.limit * 3, 20))
     listings_by_id = {str(r.listing.id): r.listing for r in pool}
     distance_by_id = {str(r.listing.id): r.distance for r in pool}
 
@@ -202,8 +215,8 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
     enriched_inputs: list[RankingInput] = []
     for inp, _ in page:
         listing = listings_by_id[inp.listing_id]
-        neighborhood = get_neighborhood(session, listing.lat, listing.lng)
-        commute = get_commute(session, listing.lat, listing.lng, criteria.work_location)
+        neighborhood = repo.neighborhood(listing.lat, listing.lng)
+        commute = repo.commute(listing.lat, listing.lng, criteria.work_location)
         if neighborhood is not None:
             neighborhood_by_id[inp.listing_id] = neighborhood
         if commute is not None:
@@ -215,14 +228,16 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
                 nightlife=_NIGHTLIFE.get(listing.kiez),
                 available_amenities=neighborhood.available_amenities if neighborhood else None,
                 commute_minutes=commute.minutes if commute else None,
+                commute_source=commute.source if commute else "live",
+                commute_changes=commute.changes if commute else None,
                 listing_id=inp.listing_id,
             )
         )
     ranked = rank(enriched_inputs, rank_criteria)
 
     page_listings = [listings_by_id[i.listing_id] for i, _ in ranked]
-    photos_by_set = _load_photos(session, [x.photo_set_id for x in page_listings])
-    risk_by_id = _load_risk(session, [x.id for x in page_listings])
+    photos_by_set = repo.photos_by_set([x.photo_set_id for x in page_listings])
+    risk_by_id = repo.risk_by_listing([x.id for x in page_listings])
 
     results: list[SearchResultItem] = []
     for inp, result in ranked:
@@ -236,15 +251,7 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
                 factors=[FactorOut(**vars(f)) for f in result.factors],
                 explanation=explain(result),
                 risk=_to_risk_out(risk_by_id.get(inp.listing_id)),
-                commute=(
-                    CommuteOut(
-                        minutes=commute.minutes,
-                        changes=commute.changes,
-                        walk_minutes=commute.walk_minutes,
-                    )
-                    if commute
-                    else None
-                ),
+                commute=_to_commute_out(commute),
                 neighborhood=(
                     NeighborhoodOut(summary=neighborhood.summary, counts=neighborhood.counts)
                     if neighborhood
@@ -259,7 +266,10 @@ def search(req: SearchRequest, session: Session = Depends(get_session)) -> Searc
         criteria.model_dump(exclude_none=True),
         len(results),
     )
-    return SearchResponse(criteria=criteria, results=results)
+    commute_note = _commute_note(
+        criteria.work_location, [commute_by_id.get(i.listing_id) for i, _ in ranked]
+    )
+    return SearchResponse(criteria=criteria, results=results, commute_note=commute_note)
 
 
 # --- Listing detail (T5.1) ------------------------------------------------------
@@ -299,6 +309,8 @@ class NeighborhoodDetailOut(BaseModel):
     summary: str | None = None
     counts: dict[str, int] = Field(default_factory=dict)
     pois: list[PoiOut] = Field(default_factory=list)
+    # Radius the amenities were searched in (drawn on the map when tiles are offline).
+    radius_m: int = DEFAULT_RADIUS_M
 
 
 class ListingDetailResponse(BaseModel):
@@ -308,29 +320,33 @@ class ListingDetailResponse(BaseModel):
 
 
 @router.get("/listings/random", response_model=list[ListingOut])
-def get_random_listings(n: int = 6, session: Session = Depends(get_session)) -> list[ListingOut]:
-    rows = session.scalars(select(Listing).order_by(func.random()).limit(n)).all()
+def get_random_listings(
+    n: int = 6, repo: ListingRepository = Depends(get_repository)
+) -> list[ListingOut]:
+    rows = repo.random_listings(n)
     if not rows:
         return []
-    photos_by_set = _load_photos(session, [x.photo_set_id for x in rows])
+    photos_by_set = repo.photos_by_set([x.photo_set_id for x in rows])
     return [_to_listing_out(listing, photos_by_set.get(listing.photo_set_id, [])) for listing in rows]
 
 
 @router.get("/listings/{listing_id}", response_model=ListingDetailResponse)
-def get_listing(listing_id: str, session: Session = Depends(get_session)) -> ListingDetailResponse:
+def get_listing(
+    listing_id: str, repo: ListingRepository = Depends(get_repository)
+) -> ListingDetailResponse:
     try:
         uid = uuid.UUID(listing_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid listing id") from None
 
-    listing = session.get(Listing, uid)
+    listing = repo.get_listing(uid)
     if listing is None:
         raise HTTPException(status_code=404, detail="Listing not found")
 
-    photos_by_set = _load_photos(session, [listing.photo_set_id])
+    photos_by_set = repo.photos_by_set([listing.photo_set_id])
     photos = photos_by_set.get(listing.photo_set_id, [])
-    risk_by_id = _load_risk(session, [listing.id])
-    neighborhood = get_neighborhood(session, listing.lat, listing.lng, cache_only=True)
+    risk_by_id = repo.risk_by_listing([listing.id])
+    neighborhood = repo.neighborhood(listing.lat, listing.lng, cache_only=True)
 
     neighborhood_detail: NeighborhoodDetailOut | None = None
     if neighborhood is not None:
@@ -407,13 +423,15 @@ class CompareResponse(BaseModel):
 
 
 @router.post("/compare", response_model=CompareResponse)
-def compare(req: CompareRequest, session: Session = Depends(get_session)) -> CompareResponse:
+def compare(
+    req: CompareRequest, repo: ListingRepository = Depends(get_repository)
+) -> CompareResponse:
     try:
         ids = [uuid.UUID(x) for x in req.listing_ids]
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid listing id") from None
 
-    found = {str(x.id): x for x in session.scalars(select(Listing).where(Listing.id.in_(ids)))}
+    found = {str(x.id): x for x in repo.get_listings(ids)}
     missing = [x for x in req.listing_ids if x not in found]
     if missing:
         raise HTTPException(status_code=404, detail=f"Listing(s) not found: {missing}")
@@ -429,14 +447,14 @@ def compare(req: CompareRequest, session: Session = Depends(get_session)) -> Com
         if criteria
         else None
     )
-    photos_by_set = _load_photos(session, [x.photo_set_id for x in ordered])
-    risk_by_id = _load_risk(session, [x.id for x in ordered])
+    photos_by_set = repo.photos_by_set([x.photo_set_id for x in ordered])
+    risk_by_id = repo.risk_by_listing([x.id for x in ordered])
 
     items: list[ComparisonItem] = []
     for listing in ordered:
-        neighborhood = get_neighborhood(session, listing.lat, listing.lng)
+        neighborhood = repo.neighborhood(listing.lat, listing.lng)
         commute = (
-            get_commute(session, listing.lat, listing.lng, criteria.work_location)
+            repo.commute(listing.lat, listing.lng, criteria.work_location)
             if criteria
             else None
         )
@@ -452,6 +470,8 @@ def compare(req: CompareRequest, session: Session = Depends(get_session)) -> Com
                     nightlife=_NIGHTLIFE.get(listing.kiez),
                     available_amenities=neighborhood.available_amenities if neighborhood else None,
                     commute_minutes=commute.minutes if commute else None,
+                    commute_source=commute.source if commute else "live",
+                    commute_changes=commute.changes if commute else None,
                     listing_id=str(listing.id),
                 ),
                 rank_criteria,
@@ -466,15 +486,7 @@ def compare(req: CompareRequest, session: Session = Depends(get_session)) -> Com
                 fit_score=fit_score,
                 factors=factors,
                 explanation=explanation,
-                commute=(
-                    CommuteOut(
-                        minutes=commute.minutes,
-                        changes=commute.changes,
-                        walk_minutes=commute.walk_minutes,
-                    )
-                    if commute
-                    else None
-                ),
+                commute=_to_commute_out(commute),
                 neighborhood=(
                     NeighborhoodOut(summary=neighborhood.summary, counts=neighborhood.counts)
                     if neighborhood

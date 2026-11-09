@@ -13,3 +13,5 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0005](0005-supabase-postgres-pgvector.md) | Supabase Postgres + pgvector for storage and search | Accepted |
 | [0006](0006-orm-sqlalchemy-alembic.md) | SQLAlchemy 2.0 + Alembic; raw SQL for vector/ranking | Accepted |
 | [0007](0007-direct-sdk-over-agent-framework.md) | Direct Gemini SDK over LangChain/LangGraph | Accepted |
+| [0008](0008-offline-commute-estimate.md) | Offline commute estimate from straight-line distance and published speeds | Accepted, amended by 0009 |
+| [0009](0009-route-based-commute-estimate.md) | Route-based commute estimate over the VBB weekday-peak network | Accepted |

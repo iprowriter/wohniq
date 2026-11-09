@@ -3,7 +3,7 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status seed dev test lint format frontend-dev
+.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops test lint format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
@@ -16,8 +16,12 @@ help:
 	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
 	@echo "eval-ranking   Run the ranking sanity eval (offline)"
 	@echo "eval-scam      Run the scam-detection eval (DB; ARGS='--no-llm' to skip LLM)"
+	@echo "eval-commute   Offline commute estimates vs. live VBB journeys (online; ARGS='--offline')"
 	@echo "neighboorhood  Populate neighboorhood_cache table"
 	@echo "dev            Run the FastAPI backend with reload"
+	@echo "demo           Run the backend in offline demo mode (no DB/APIs; WOHNIQ_DEMO=1)"
+	@echo "demo-photos    Download local copies of demo photos (run once while online)"
+	@echo "demo-stops     Download VBB stops + peak network for offline commute estimates (once, online)"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "lint           Ruff check + Black --check"
 	@echo "format         Auto-format with Black + Ruff --fix"
@@ -54,11 +58,23 @@ eval-ranking:
 eval-scam:
 	cd backend && uv run python -m evals.scam_eval $(ARGS)
 
+eval-commute:
+	cd backend && uv run python -m evals.commute_eval $(ARGS)
+
 neighboorhood:
 	cd backend && .venv/bin/python data/enrich_neighborhoods.py
 
 dev:
 	cd backend && uv run uvicorn app.main:app --reload
+
+demo:
+	cd backend && WOHNIQ_DEMO=1 uv run uvicorn app.main:app --reload
+
+demo-photos:
+	cd backend && uv run python -m data.fetch_demo_photos
+
+demo-stops:
+	cd backend && uv run python -m data.fetch_vbb_stops $(ARGS)
 
 test:
 	cd backend && uv run pytest

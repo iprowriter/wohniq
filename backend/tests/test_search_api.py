@@ -1,7 +1,7 @@
 """Endpoint test for /api/v1/search.
 
-Monkeypatches the LLM/DB-touching steps (parse, retrieve, explain) and overrides the
-session, so it verifies the *wiring* — pipeline order, ranking applied, response
+Monkeypatches the LLM steps (parse, explain) and overrides the repository (retrieval +
+enrichment), so it verifies the *wiring* — pipeline order, ranking applied, response
 shape, and that is_scam never leaks — without network or a database. Ranking runs
 for real (it's pure). Runs locally (needs FastAPI/SQLAlchemy).
 """
@@ -10,12 +10,13 @@ import uuid
 
 import app.routers.search as search_mod
 from app.main import app
-from core.db import get_session
+from app.repository import get_repository
 from data.models import Listing
 from fastapi.testclient import TestClient
 from search.criteria import SearchCriteria
 from search.explanation import Explanation
 from search.retrieval import RetrievalResult
+from tests.fake_repository import FakeRepository
 
 
 def _listing(title, kiez, warm, rooms=2):
@@ -39,11 +40,6 @@ def _listing(title, kiez, warm, rooms=2):
     return listing
 
 
-class _FakeSession:
-    def scalars(self, stmt):
-        return []  # no photos in this test
-
-
 def test_search_pipeline_wiring(monkeypatch):
     good = _listing("Great flat in Mitte", "Mitte", 1100)
     meh = _listing("Pricey flat in Mitte", "Mitte", 1480)
@@ -53,17 +49,12 @@ def test_search_pipeline_wiring(monkeypatch):
         lambda text, **kw: SearchCriteria(max_warm_rent=1500, quiet_priority=True),
     )
     monkeypatch.setattr(
-        search_mod, "retrieve",
-        lambda *a, **kw: [RetrievalResult(good, 0.1), RetrievalResult(meh, 0.5)],
-    )
-    monkeypatch.setattr(
         search_mod, "explain",
         lambda result, **kw: Explanation(summary="Fits well.", reasons=["€400 under budget"], caveats=[]),
     )
-    # Enrichment is network-bound; stub to None so factors stay inactive in the test.
-    monkeypatch.setattr(search_mod, "get_neighborhood", lambda *a, **kw: None)
-    monkeypatch.setattr(search_mod, "get_commute", lambda *a, **kw: None)
-    app.dependency_overrides[get_session] = lambda: _FakeSession()
+    # The fake repository returns no enrichment/photos, so those factors stay inactive.
+    repo = FakeRepository(retrieval=[RetrievalResult(good, 0.1), RetrievalResult(meh, 0.5)])
+    app.dependency_overrides[get_repository] = lambda: repo
     try:
         client = TestClient(app)
         resp = client.post("/api/v1/search", json={"query": "quiet flat in Mitte under 1500", "limit": 5})
@@ -84,3 +75,15 @@ def test_search_pipeline_wiring(monkeypatch):
     # ground-truth labels must never be serialized
     assert "is_scam" not in first["listing"]
     assert "scam_type" not in first["listing"]
+
+
+def test_commute_note_cases():
+    from enrich.commute_parse import CommuteResult
+
+    live = CommuteResult(minutes=20, changes=1, walk_minutes=5)
+    est = CommuteResult(minutes=25, changes=None, walk_minutes=None, source="distance")
+    note = search_mod._commute_note
+    assert note(None, [est]) is None  # no work location asked for
+    assert note("Alexanderplatz", [live, live]) is None  # all live: nothing to explain
+    assert "estimates" in note("Alexanderplatz", [live, est])
+    assert note("Narnia", [None, None]).startswith('Couldn\'t find "Narnia"')

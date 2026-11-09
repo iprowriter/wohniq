@@ -178,6 +178,52 @@ uv run python -m evals.scam_eval     # or: make eval-scam
 
 From the repo root: `make install`, `make dev`, `make test`, `make lint`.
 
+### Offline demo mode
+
+Runs the whole app with **no database and no external APIs** (no Supabase, Gemini,
+BVG/VBB, or Overpass). Which mode the backend runs in (first match wins):
+
+| `WOHNIQ_DEMO` | `DATABASE_URL` | Mode |
+|---|---|---|
+| `1` | set or empty | **demo**: the URL is ignored and no DB connection is opened |
+| `0` or empty/unset | empty (e.g. no `.env`) | **demo**: there is no database to use |
+| `0` or empty/unset | set | **live** |
+
+`WOHNIQ_DEMO` accepts `1/0`, `true/false`, `yes/no`, `on/off`; any other value stops the
+backend at startup rather than silently running live. The startup log prints the mode and
+why, and `/api/v1/health` reports `"mode": "demo"` or `"live"`. A variable exported in the
+shell beats `.env`, so `make demo` (which sets `WOHNIQ_DEMO=1`) works with a full `.env`.
+This only affects the API server: CLI scripts (`make migrate`, `make seed`, `export_demo_data`)
+always use `DATABASE_URL`.
+
+```bash
+make demo-photos   # once, while online: local copies of listing photos (~141 files)
+make demo-stops    # once, while online: VBB stops + weekday-peak network (takes a few minutes)
+make demo          # backend on :8000 (WOHNIQ_DEMO=1)
+make frontend-dev  # frontend on :3000
+```
+
+Data comes from `backend/data/demo/` (exported with `python -m data.export_demo_data`)
+plus the deterministic seed-42 generator, so it matches the live database. In offline mode:
+
+- Query parsing and explanations use the deterministic fallbacks (keyword parser, template).
+- Semantic search is replaced by keyword overlap with the listing text; hard filters are identical.
+- Commute times are **estimated**. After `make demo-stops`, each trip is routed over the VBB
+  weekday-peak network (7–9 am): walking, waiting, riding and changes. It's shown as
+  "≈25 min · direct · estimated" and weighted 1.5 in ranking instead of 2.0
+  ([ADR-0009](docs/adr/0009-route-based-commute-estimate.md)). Without the download, a
+  straight-line estimate is used: "≈25 min · estimated", weight 1.0
+  ([ADR-0008](docs/adr/0008-offline-commute-estimate.md)). The work location is matched against
+  VBB stops and Kiez names; without the download only Kiez names match. Live mode uses the same
+  estimates when the transit API fails, instead of showing nothing. `make eval-commute` (online)
+  measures both estimates against live journeys.
+- Featured listings are drawn from the 38 that have cached neighborhood data, so every card
+  opens onto photos, amenities, and a risk rating. Search covers all 100 listings, as live does.
+- Without `make demo-photos`, photos load from Pexels if there's internet, otherwise a
+  placeholder is shown. Map tiles (OpenStreetMap) always need internet. Without them, the
+  listing map switches to a clean background with the 500 m amenity search area, a scale bar and
+  a short note; when the connection returns, the tiles reload.
+
 ---
 
 ## License / attribution

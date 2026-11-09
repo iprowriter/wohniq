@@ -20,6 +20,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
+from core.config import settings
 from core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -64,8 +65,6 @@ def _call_gemini(system: str, user: str, schema: type[BaseModel], temperature: f
     from google import genai
     from google.genai import types
 
-    from core.config import settings
-
     if not settings.gemini_api_key:
         raise RuntimeError("GEMINI_API_KEY is not set. Add it to .env.")
 
@@ -101,6 +100,22 @@ def generate_structured(
     On a validation failure, re-prompts up to `max_retries` times with the error
     appended. If still invalid, uses `fallback()` when provided, else raises LLMError.
     """
+    if transport is None and settings.demo_mode:
+        # Offline demo mode: never reach Gemini; go straight to the deterministic path.
+        if fallback is None:
+            raise LLMError(f"{prompt_id}: offline demo mode and no fallback provided")
+        logger.info("llm prompt=%s offline demo mode -> fallback (no network)", prompt_id)
+        return LLMResult(
+            data=fallback(),
+            raw="",
+            prompt_id=prompt_id,
+            tokens_in=0,
+            tokens_out=0,
+            latency_ms=0.0,
+            attempts=0,
+            used_fallback=True,
+        )
+
     send = transport or _call_gemini
     start = time.perf_counter()
     current_user = user

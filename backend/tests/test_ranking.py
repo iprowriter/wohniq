@@ -72,3 +72,23 @@ def test_rank_orders_best_first_and_is_deterministic():
     out2 = rank(items, crit)
     assert [i.listing_id for i, _ in out1] == ["great", "pricey"]
     assert [i.listing_id for i, _ in out1] == [i.listing_id for i, _ in out2]  # reproducible
+
+
+def test_commute_weight_and_detail_depend_on_source():
+    crit = RankCriteria()
+
+    def commute(**kw):
+        item = RankingInput(warmmiete_eur=1, commute_minutes=30, **kw)
+        return _factor(score_listing(item, crit), "commute")
+
+    live = commute()
+    network = commute(commute_source="network", commute_changes=1)
+    direct = commute(commute_source="network", commute_changes=0)
+    distance = commute(commute_source="distance")
+    assert live.score == network.score == distance.score  # same minutes → same score
+    # Live 2.0 > route-based 1.5 (ADR-0009) > straight-line 1.0 (ADR-0008)
+    assert (live.weight, network.weight, distance.weight) == (2.0, 1.5, 1.0)
+    assert live.detail == "30 min to work"
+    assert network.detail == "≈30 min to work, 1 change (estimated)"
+    assert direct.detail == "≈30 min to work, direct (estimated)"
+    assert distance.detail == "≈30 min to work (estimated)"

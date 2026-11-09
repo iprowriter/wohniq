@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import type { SearchResultItem, RiskBand } from "@/lib/types";
+import { commuteDetail, commuteMinutes, commuteTooltip } from "@/lib/commute";
 
 const RISK_STYLES: Record<RiskBand, string> = {
   low: "bg-green-100 text-green-800",
@@ -133,15 +134,18 @@ export function ComparisonModal({ items, onClose }: Props) {
                   <Cell key={item.listing.id} highlight={item.commute?.minutes === best.commute}>
                     {item.commute ? (
                       <>
-                        <span className={item.commute.minutes === best.commute ? "font-semibold text-indigo-700" : ""}>
-                          {item.commute.minutes} min
+                        <span
+                          className={item.commute.minutes === best.commute ? "font-semibold text-indigo-700" : ""}
+                          title={commuteTooltip(item.commute)}
+                        >
+                          {commuteMinutes(item.commute)}
                         </span>
                         {item.commute.minutes === best.commute && items.filter((i) => i.commute).length > 1 && (
                           <span className="ml-1.5 text-xs text-indigo-500">fastest</span>
                         )}
-                        <div className="text-xs text-gray-400">
-                          {item.commute.changes === 0 ? "Direct" : `${item.commute.changes} change${item.commute.changes > 1 ? "s" : ""}`}
-                        </div>
+                        {commuteDetail(item.commute) && (
+                          <div className="text-xs capitalize text-gray-400">{commuteDetail(item.commute)}</div>
+                        )}
                       </>
                     ) : (
                       <span className="text-gray-400">—</span>

@@ -177,6 +177,9 @@ export default function Home() {
           <section ref={resultsRef} className="py-10">
             <div className="mb-4">
               <CriteriaChips criteria={data.criteria} />
+              {data.commute_note && (
+                <p className="mt-2 text-xs text-gray-500">{data.commute_note}</p>
+              )}
             </div>
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-gray-500">

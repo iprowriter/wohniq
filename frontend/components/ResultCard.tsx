@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { SearchResultItem } from "@/lib/types";
 import { RiskBadge } from "./RiskBadge";
+import { ListingPhoto } from "./ListingPhoto";
+import { commuteDetail, commuteMinutes, commuteTooltip } from "@/lib/commute";
 
 const NAV_FLAG = "wohniq_navigating_to_listing";
 
@@ -46,9 +48,8 @@ export function ResultCard({ item, selected = false, onToggleSelect, selectionDi
         onClick={() => sessionStorage.setItem(NAV_FLAG, "1")}
       >
         {cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={cover.url}
+          <ListingPhoto
+            url={cover.url}
             alt={listing.title}
             className="h-28 w-36 flex-shrink-0 rounded-lg object-cover"
           />
@@ -70,9 +71,9 @@ export function ResultCard({ item, selected = false, onToggleSelect, selectionDi
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
             <span>{euro(listing.warmmiete_eur)} warm</span>
             {commute && (
-              <span>
-                {commute.minutes} min
-                {commute.changes > 0 ? ` · ${commute.changes} change${commute.changes > 1 ? "s" : ""}` : " · direct"}
+              <span title={commuteTooltip(commute)}>
+                {commuteMinutes(commute)}
+                {commuteDetail(commute) && ` · ${commuteDetail(commute)}`}
               </span>
             )}
             {neighborhood?.summary && <span>{neighborhood.summary}</span>}

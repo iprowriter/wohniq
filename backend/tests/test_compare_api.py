@@ -1,14 +1,15 @@
-"""Endpoint test for /api/v1/compare (stubbed enrichment/LLM, fake session)."""
+"""Endpoint test for /api/v1/compare (stubbed LLM, fake repository)."""
 
 import uuid
 
 import app.routers.search as search_mod
 from app.main import app
-from core.db import get_session
+from app.repository import get_repository
 from data.models import Listing
 from fastapi.testclient import TestClient
 from search.criteria import SearchCriteria
 from search.explanation import Explanation
+from tests.fake_repository import FakeRepository
 
 
 def _listing(title, warm, rooms=2):
@@ -32,27 +33,15 @@ def _listing(title, warm, rooms=2):
     return x
 
 
-class _FakeSession:
-    """Returns the listings on the first scalars() call, [] (photos) afterwards."""
-
-    def __init__(self, listings):
-        self._queue = [listings, []]
-
-    def scalars(self, stmt):
-        return self._queue.pop(0) if self._queue else []
-
-
 def test_compare_two_listings(monkeypatch):
     a, b = _listing("Flat A", 1100), _listing("Flat B", 1450)
 
     monkeypatch.setattr(search_mod, "parse_query", lambda text, **kw: SearchCriteria(max_warm_rent=1500))
-    monkeypatch.setattr(search_mod, "get_neighborhood", lambda *a, **kw: None)
-    monkeypatch.setattr(search_mod, "get_commute", lambda *a, **kw: None)
     monkeypatch.setattr(
         search_mod, "explain",
         lambda result, **kw: Explanation(summary="ok", reasons=["under budget"], caveats=[]),
     )
-    app.dependency_overrides[get_session] = lambda: _FakeSession([a, b])
+    app.dependency_overrides[get_repository] = lambda: FakeRepository([a, b])
     try:
         client = TestClient(app)
         resp = client.post(
@@ -73,8 +62,8 @@ def test_compare_two_listings(monkeypatch):
 
 def test_compare_rejects_single_listing():
     # FastAPI resolves dependencies before reporting body validation errors,
-    # so the session must be faked even though the request never reaches the DB.
-    app.dependency_overrides[get_session] = lambda: _FakeSession([])
+    # so the repository must be faked even though the request never reaches it.
+    app.dependency_overrides[get_repository] = lambda: FakeRepository()
     try:
         client = TestClient(app)
         resp = client.post("/api/v1/compare", json={"listing_ids": [str(uuid.uuid4())]})
@@ -85,7 +74,7 @@ def test_compare_rejects_single_listing():
 
 def test_compare_missing_listing_404(monkeypatch):
     monkeypatch.setattr(search_mod, "parse_query", lambda text, **kw: SearchCriteria())
-    app.dependency_overrides[get_session] = lambda: _FakeSession([])  # none found
+    app.dependency_overrides[get_repository] = lambda: FakeRepository()  # none found
     try:
         client = TestClient(app)
         resp = client.post(

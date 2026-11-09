@@ -2,6 +2,12 @@ import type { ListingDetailResponse, ListingOut, SearchResponse } from "./types"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+/** Photo URLs are absolute (Pexels CDN), or backend-relative in offline demo mode
+ * (`/demo-photos/...`, served by the API) — resolve those against the API origin. */
+export function photoSrc(url: string): string {
+  return url.startsWith("/") ? `${API_BASE}${url}` : url;
+}
+
 export async function search(query: string, limit = 6): Promise<SearchResponse> {
   const res = await fetch(`${API_BASE}/api/v1/search`, {
     method: "POST",

@@ -16,8 +16,10 @@ export interface FactorOut {
 
 export interface CommuteOut {
   minutes: number;
-  changes: number;
+  changes?: number | null; // null for offline estimates (minutes only)
   walk_minutes?: number | null;
+  estimated?: boolean; // offline estimate, not a live BVG/VBB journey
+  source?: "live" | "network" | "distance"; // network = routed over the VBB peak timetable
 }
 
 export interface NeighborhoodOut {
@@ -88,6 +90,7 @@ export interface SearchCriteria {
 export interface SearchResponse {
   criteria: SearchCriteria;
   results: SearchResultItem[];
+  commute_note?: string | null;
 }
 
 // Detail page types
@@ -111,6 +114,7 @@ export interface NeighborhoodDetailOut {
   summary?: string | null;
   counts: Record<string, number>;
   pois: PoiOut[];
+  radius_m?: number; // amenity search radius in metres
 }
 
 export interface ListingDetailResponse {

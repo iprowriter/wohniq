@@ -10,12 +10,23 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+# Where a commute figure comes from (ADR-0008, ADR-0009):
+#   "live"     — a real BVG/VBB journey (API or commute_cache)
+#   "network"  — offline estimate routed over the VBB timetable network (weekday peak)
+#   "distance" — offline estimate from straight-line distance and average speeds
+COMMUTE_SOURCES = ("live", "network", "distance")
+
 
 @dataclass
 class CommuteResult:
     minutes: int
-    changes: int
+    changes: int | None  # None when unknown (straight-line estimates)
     walk_minutes: int | None
+    source: str = "live"
+
+    @property
+    def estimated(self) -> bool:
+        return self.source != "live"
 
 
 def _dt(value: str) -> datetime:

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ListingOut } from "@/lib/types";
+import { ListingPhoto } from "./ListingPhoto";
 
 function euro(n: number) {
   return `€${n.toLocaleString("de-DE")}`;
@@ -18,9 +19,8 @@ export function FeaturedCard({ listing }: { listing: ListingOut }) {
       className="group block overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all hover:border-gray-300 hover:shadow-lg"
     >
       {cover ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={cover.url}
+        <ListingPhoto
+          url={cover.url}
           alt={listing.title}
           className="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />

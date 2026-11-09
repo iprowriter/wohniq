@@ -33,3 +33,7 @@ Thumbs.db
 *.sqlite3
 backend/data/generated/
 backend/evals/results/
+# Local copies of Pexels photos for offline demos (`make demo-photos`)
+backend/data/demo/photos/
+# VBB stops extracted from open GTFS data for offline commute estimates (`make demo-stops`)
+backend/data/vbb/

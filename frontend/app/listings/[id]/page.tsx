@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import { getListingDetail } from "@/lib/api";
 import type { ListingDetailResponse } from "@/lib/types";
 import { RiskBadge } from "@/components/RiskBadge";
+import { ListingPhoto } from "@/components/ListingPhoto";
 
 const NeighborhoodMap = dynamic(
   () => import("@/components/NeighborhoodMap").then((m) => m.NeighborhoodMap),
@@ -116,9 +117,8 @@ export default function ListingDetailPage() {
               }`}
               title="Click to enlarge"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.url}
+              <ListingPhoto
+                url={p.url}
                 alt={p.room_type}
                 className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
               />
@@ -247,7 +247,12 @@ export default function ListingDetailPage() {
                 </span>
               ))}
           </div>
-          <NeighborhoodMap lat={listing.lat} lng={listing.lng} pois={neighborhood.pois} />
+          <NeighborhoodMap
+            lat={listing.lat}
+            lng={listing.lng}
+            pois={neighborhood.pois}
+            radiusM={neighborhood.radius_m ?? undefined}
+          />
         </div>
       )}
 
@@ -274,11 +279,11 @@ export default function ListingDetailPage() {
             </button>
 
             {/* Image */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photos[lightboxIndex].url}
+            <ListingPhoto
+              url={photos[lightboxIndex].url}
               alt={photos[lightboxIndex].room_type}
               className="max-h-[80vh] max-w-full rounded-xl object-contain"
+              placeholderClassName="h-[60vh] w-[80vw] max-w-full rounded-xl"
             />
 
             {/* Room label + counter */}

@@ -26,7 +26,11 @@ _NIGHTLIFE_QUIET = {"low": 1.0, "medium": 0.5, "high": 0.1}
 class RankingWeights:
     relevance: float = 1.0
     budget: float = 1.5
-    commute: float = 2.0
+    commute: float = 2.0  # live BVG/VBB journey
+    # Offline estimates are less certain than live journeys, so they count less.
+    # Route-based (VBB timetable network, ADR-0009) sits between straight-line and live.
+    commute_network: float = 1.5
+    commute_estimated: float = 1.0  # straight-line estimate (ADR-0008)
     quiet: float = 1.0
     amenities: float = 1.0
 
@@ -40,6 +44,8 @@ class RankingInput:
     nightlife: str | None = None  # 'low' | 'medium' | 'high'
     available_amenities: set[str] | None = None
     commute_minutes: int | None = None
+    commute_source: str = "live"  # "live" | "network" | "distance" (see CommuteResult)
+    commute_changes: int | None = None
     listing_id: str | None = None  # so callers can map results back
 
 
@@ -62,6 +68,12 @@ class FactorScore:
 class RankingResult:
     total: float  # 0..1 weighted average of active factors
     factors: list[FactorScore]
+
+
+def _changes(n: int | None) -> str:
+    if not n:
+        return "direct"
+    return f"{n} change{'s' if n > 1 else ''}"
 
 
 def _clamp(value: float, low: float = 0.0, high: float = 1.0) -> float:
@@ -94,9 +106,16 @@ def score_listing(
     # Commute — closer to work scores higher (M4 supplies the minutes).
     if item.commute_minutes is not None:
         score = _clamp(1.0 - item.commute_minutes / MAX_COMMUTE_MIN)
-        factors.append(
-            FactorScore("commute", score, w.commute, f"{item.commute_minutes} min to work")
-        )
+        if item.commute_source == "network":
+            weight = w.commute_network
+            changes = _changes(item.commute_changes)
+            detail = f"≈{item.commute_minutes} min to work, {changes} (estimated)"
+        elif item.commute_source == "distance":
+            weight = w.commute_estimated
+            detail = f"≈{item.commute_minutes} min to work (estimated)"
+        else:
+            weight, detail = w.commute, f"{item.commute_minutes} min to work"
+        factors.append(FactorScore("commute", score, weight, detail))
 
     # Quiet — only if they asked for it and we know the Kiez nightlife.
     if criteria.quiet_priority and item.nightlife:
