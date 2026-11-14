@@ -18,3 +18,4 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0010](0010-lifestyle-match-data-model.md) | Lifestyle Match: official-data region profiles with provenance | Accepted |
 | [0011](0011-lifestyle-match-scoring.md) | Lifestyle Match: answers → weights → deterministic, explained ranking | Accepted |
 | [0012](0012-privacy-by-design.md) | Privacy by design: lifestyle answers are never stored or logged | Accepted |
+| [0013](0013-berlin-neighborhoods.md) | Berlin Neighborhoods: ranked area profiles from official data | Accepted (amends 0010's data-ethics section for this feature) |

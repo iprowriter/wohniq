@@ -42,3 +42,6 @@ backend/data/vbb/
 # Official source files for Lifestyle Match (`make lifestyle-data`); see backend/data/lifestyle/raw/README.md
 backend/data/lifestyle/raw/*
 !backend/data/lifestyle/raw/README.md
+# Official source files for Berlin Neighbourhoods (`make neighborhoods-data`); see backend/data/neighborhoods/raw/README.md
+backend/data/neighborhoods/raw/*
+!backend/data/neighborhoods/raw/README.md

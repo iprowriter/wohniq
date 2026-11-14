@@ -3,7 +3,7 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture test test-all lint frontend-test format frontend-dev
+.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture eval-neighborhoods test test-all lint frontend-test format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
@@ -17,6 +17,7 @@ help:
 	@echo "eval-ranking   Run the ranking sanity eval (offline)"
 	@echo "eval-scam      Run the scam-detection eval (DB; ARGS='--no-llm' to skip LLM)"
 	@echo "eval-lifestyle Run the Lifestyle Match eval (offline; scenarios + properties)"
+	@echo "eval-neighborhoods Run the Berlin Neighbourhoods eval (offline; ground truth + properties)"
 	@echo "eval-commute   Offline commute estimates vs. live VBB journeys (online; ARGS='--offline')"
 	@echo "neighboorhood  Populate neighboorhood_cache table"
 	@echo "dev            Run the FastAPI backend with reload"
@@ -24,6 +25,8 @@ help:
 	@echo "demo-photos    Download local copies of demo photos (run once while online)"
 	@echo "demo-stops     Download VBB stops + peak network for offline commute estimates (once, online)"
 	@echo "lifestyle-data Rebuild Lifestyle Match region profiles from the official files in data/lifestyle/raw/"
+	@echo "neighborhoods-data Rebuild the Berlin Neighbourhoods bundle from data/neighborhoods/raw/"
+	@echo "neighborhoods-fixture Refresh the frontend's neighbourhoods contract fixture from the API"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "test-all       Run pytest including slow tests (e.g. Lifestyle data rebuild)"
 	@echo "lint           Ruff check + Black --check"
@@ -66,6 +69,9 @@ eval-scam:
 eval-lifestyle:
 	cd backend && uv run python -m evals.lifestyle_eval
 
+eval-neighborhoods:
+	cd backend && uv run python -m evals.neighborhoods_eval
+
 eval-commute:
 	cd backend && uv run python -m evals.commute_eval $(ARGS)
 
@@ -89,6 +95,12 @@ lifestyle-data:
 
 lifestyle-fixture:
 	cd backend && uv run python -m data.lifestyle.export_catalog
+
+neighborhoods-data:
+	cd backend && uv run python -m data.neighborhoods.build_index $(ARGS)
+
+neighborhoods-fixture:
+	cd backend && uv run python -m data.neighborhoods.export_fixture
 
 frontend-test:
 	cd frontend && npm test

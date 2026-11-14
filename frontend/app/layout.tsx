@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
+import { NeighborhoodsNavLink } from "@/components/neighborhoods/NavLink";
 
 export const metadata: Metadata = {
   title: "WohnIQ — AI apartment search for Berlin",
@@ -23,10 +24,11 @@ function Header() {
             Wohn<span className="text-indigo-600">IQ</span>
           </span>
         </Link>
-        <nav className="flex items-center gap-5 text-sm">
-          <Link href="/" className="text-gray-500 hover:text-gray-900">
+        <nav className="flex items-center gap-4 text-sm sm:gap-5">
+          <Link href="/" className="hidden text-gray-500 hover:text-gray-900 sm:inline">
             Search
           </Link>
+          <NeighborhoodsNavLink />
           <Link
             href="/lifestyle"
             className="hidden items-center gap-1.5 font-medium text-indigo-600 hover:text-indigo-800 sm:inline-flex"
@@ -77,6 +79,9 @@ function Footer() {
               </Link>
               <Link href="/lifestyle" className="block text-gray-500 hover:text-gray-900">
                 Lifestyle Match
+              </Link>
+              <Link href="/neighborhoods" className="block text-gray-500 hover:text-gray-900">
+                Berlin Neighborhoods
               </Link>
               <a href="#how-it-works" className="block text-gray-500 hover:text-gray-900">
                 How it works

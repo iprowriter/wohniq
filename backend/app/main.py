@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.routers import lifestyle as lifestyle_router
+from app.routers import neighborhoods as neighborhoods_router
 from app.routers import search as search_router
 from core.config import settings
 from core.logging import configure_logging, get_logger
@@ -52,6 +53,13 @@ async def lifespan(app: FastAPI):
                 )
         else:
             print("✓  LIVE MODE: using DATABASE_URL.")
+        from neighborhoods.bundle import get_bundle as get_neighbourhoods
+
+        hoods = get_neighbourhoods()  # validate the bundle now, not on first request
+        print(
+            f"✓  Berlin Neighbourhoods: {len(hoods.regions)} areas, "
+            f"{len(hoods.available())} metrics ({len(hoods.pending())} waiting for data)."
+        )
         print("✓  Backend ready.")
     except Exception as exc:
         print(f"⚠  Backend failed to initialise properly: {exc}")
@@ -89,6 +97,7 @@ def health() -> dict[str, str]:
 
 api_v1.include_router(search_router.router)
 api_v1.include_router(lifestyle_router.router)
+api_v1.include_router(neighborhoods_router.router)
 app.include_router(api_v1)
 
 if settings.demo_mode:

@@ -30,6 +30,16 @@ Not everyone knows which neighbourhood to search in. **Lifestyle Match** (`/life
 
 → Full write-up, data sources, scoring, evaluation and privacy guarantees: [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md)
 
+### Berlin Neighborhoods — every area, ranked your way
+
+**Berlin Neighborhoods** (`/neighborhoods`, in the header menu) shows **all 143 Berlin areas** as a ranked list next to an OpenStreetMap map. Switch the category and both re-rank and recolour: crime, road safety, affluence, education, healthcare, amenities, parks & nature, public transport, quiet & clean air, parking, affordability, or a weighted overall score you can tune. Click an area on the map and the sidebar jumps to it with every figure, its Berlin comparison and its source.
+
+The data comes from the police crime atlas, the Unfallatlas, the Senate's social-monitoring index, official land values (Bodenrichtwerte 2026), the schools report and OpenStreetMap. Scores are percentiles against a fixed Berlin-wide distribution, with no LLM involved. Labels describe the measure, never the residents.
+
+![Berlin Neighborhoods](./assets/neighborhoods-overall.png)
+
+→ Categories, sources, scoring, data still needed, evaluation and the DoD checklist: [`docs/NEIGHBORHOODS.md`](docs/NEIGHBORHOODS.md)
+
 ---
 
 ## Key architectural decisions
@@ -90,6 +100,10 @@ Fixed-choice answers map to 0–5 weights ("max level", explainable per answer).
 
 Lifestyle answers are bounded choices (no free text, no addresses). The matching endpoints never touch the database. Logs hold counts only, and answers travel only in POST bodies (`no-store`). The browser keeps them in `sessionStorage` for the tab. The same change redacted user input from `/search`, commute and LLM logs. Tests inject distinctive answers and assert they appear in no log. [→ ADR-0012](docs/adr/0012-privacy-by-design.md)
 
+
+### ADR-0013 — Berlin Neighborhoods: ranked area profiles from official data
+
+Same 143 areas and outlines as Lifestyle Match, with a separate, reproducible bundle: 40 metrics, each with `{source, year, method}`. Metric scores are percentiles against a fixed distribution, so they are robust to outliers and comparable across categories. Categories are weighted means and the overall weights are user-adjustable. Socio-economic data is used as a clearly named proxy with caveats. Land values are compared only within the same density class, as the Gutachterausschuss requires. Missing data (income per district) is shown as *pending* next to the Berlin-wide figure, never scored as zero. [→ ADR-0013](docs/adr/0013-berlin-neighborhoods.md)
 ---
 
 ## Stack
@@ -162,6 +176,19 @@ Offline and deterministic (`make eval-lifestyle`, also part of `pytest`): **38 /
 
 Plus the log-leak privacy tests, 34 frontend logic tests, and a Playwright end-to-end suite (5 journeys × desktop/mobile). Details: [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md#5-evaluation--tests).
 
+
+### Berlin Neighborhoods (F10)
+
+Offline and deterministic (`make eval-neighborhoods`, also part of `pytest`): **65 / 65 checks pass**, with no known data gaps.
+
+| Check | Result |
+|---|---|
+| Ground truth: 13 cases from well-known facts (visitor hubs lowest for safety, outer villages highest; Prenzlauer Berg hardest parking; Marzahn-Hellersdorf cheaper than Mitte; Steglitz-Zehlendorf ahead on education, …) | ✅ 13 / 13 |
+| Determinism · direction · dominance · weight monotonicity · single focus · tier sizes | ✅ 48 / 48 |
+| Grounded highlights (each quotes its stored number, true rank and a registered source) · provenance · wording (no "avoid") | ✅ 4 / 4 |
+| Formerly reported known gap, closed by the Bodenrichtwerte 2026: Grunewald in the Affluence top 20% (#19) | ✅ now a ground-truth case |
+
+Plus parser self-checks against each publication, a byte-for-byte rebuild test, 18 frontend logic tests and 7 Playwright journeys × desktop/mobile. Details: [`docs/NEIGHBORHOODS.md`](docs/NEIGHBORHOODS.md#6-evaluation--tests).
 ---
 
 ## Repo map
@@ -185,6 +212,11 @@ Plus the log-leak privacy tests, 34 frontend logic tests, and a Playwright end-t
 | `backend/app/routers/lifestyle.py` | `/api/v1/lifestyle/*` — catalog, profile, match, listings, region outlines |
 | `frontend/app/lifestyle/` | Questionnaire (`/lifestyle`) and results (`/lifestyle/results`) |
 | `frontend/tests/`, `frontend/e2e/` | Frontend logic tests (`npm test`) and Playwright journeys (`npm run test:e2e`) |
+| [`docs/NEIGHBORHOODS.md`](docs/NEIGHBORHOODS.md) | Berlin Neighborhoods — categories, sources, scoring, data status, evaluation, DoD checklist |
+| `backend/neighborhoods/` | Berlin Neighborhoods engine: catalogue, bundle model, percentile scoring, explanations (pure) |
+| `backend/data/neighborhoods/` | Bundle build from official files (`make neighborhoods-data`) + shipped `neighborhoods.json` |
+| `backend/app/routers/neighborhoods.py` | `/api/v1/neighborhoods/*` — catalog, ranking, area detail, outlines |
+| `frontend/app/neighborhoods/` | The `/neighborhoods` page (list + map, categories, weights) |
 
 ---
 
@@ -215,6 +247,7 @@ uv run python -m evals.parser_eval   # or: make eval-parser
 uv run python -m evals.ranking_eval  # or: make eval-ranking
 uv run python -m evals.scam_eval     # or: make eval-scam
 uv run python -m evals.lifestyle_eval  # or: make eval-lifestyle (offline)
+uv run python -m evals.neighborhoods_eval  # or: make eval-neighborhoods (offline)
 
 # Lifestyle Match
 make lifestyle-data                  # rebuild region profiles from the raw official files (~4 min)

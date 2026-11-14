@@ -95,6 +95,14 @@ A multi-step questionnaire (or preset) → lifestyle persona → ranked Berlin a
 - **AC5.** Privacy by design: answers are fixed choices (no free text), never stored in the database, never logged, and never put in URLs, cookies or localStorage.
 - **AC6 (Definition of Done).** With the Student preset, the top results include an area near TU Berlin where a typical flat fits the student budget, with reasons — and the answers are not stored or logged.
 
+### F10 — Berlin Neighborhoods
+All 143 Berlin areas as a ranked list next to an OSM map, re-rankable by category. See [`NEIGHBORHOODS.md`](NEIGHBORHOODS.md) and ADR-0013.
+- **AC1.** A "Berlin Neighborhoods" menu entry opens `/neighborhoods`: the list on one side (below on mobile), the map on the other (above on mobile).
+- **AC2.** Clicking an area on the map selects it in the sidebar (scrolls to it and expands its detail); selecting a row highlights the area on the map.
+- **AC3.** Areas are ranked Berlin-wide; a category switcher (crime, road safety, affluence, education, healthcare, amenities, parks, transport, environment, parking, affordability, weighted overall) re-ranks the list and recolours the map; best-first / worst-first.
+- **AC4.** Every figure cites its source, period and method; category caveats are shown; missing data is marked pending, never scored as zero.
+- **AC5.** Deterministic, no LLM; labels describe the measure, never the residents; no "avoid" wording.
+
 ## 6. User flows
 
 **Primary flow**
@@ -110,6 +118,12 @@ A multi-step questionnaire (or preset) → lifestyle persona → ranked Berlin a
 2. Four question pages → summary with persona → "Yes, that's me".
 3. `/lifestyle/results`: ranked areas with reasons and sources, shaded map, tune weights → Update results, remove areas.
 4. "See flats here" → WohnIQ listings located in the area (with risk badges) → listing detail.
+
+**Berlin Neighborhoods flow (F10)**
+1. Header menu "Berlin Neighborhoods" → `/neighborhoods`: overall ranking, list + map.
+2. Pick a category (e.g. Safety) → re-ranked list and recoloured map; toggle best-first / worst-first.
+3. Click an area on the map (or a row) → its detail: strengths, watch-outs, metrics vs. Berlin with sources, rank in every category.
+4. Optional: adjust weights → Update ranking; share the URL.
 
 ## 7. Data model (high level)
 

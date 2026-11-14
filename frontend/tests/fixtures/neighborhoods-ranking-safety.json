@@ -1,0 +1,2727 @@
+{
+ "category": "safety",
+ "label": "Safety",
+ "best_label": "Lowest crime",
+ "worst_label": "Highest crime",
+ "weights": null,
+ "total": 143,
+ "areas": [
+  {
+   "key": "094016",
+   "name": "Müggelheim",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 4",
+   "rank": 1,
+   "score": 98.4,
+   "tier": "best",
+   "centroid": [
+    52.41594,
+    13.66917
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 864.1,
+    "text": "864 per 100,000 residents"
+   }
+  },
+  {
+   "key": "093012",
+   "name": "Schmöckwitz",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 3",
+   "rank": 2,
+   "score": 94.4,
+   "tier": "best",
+   "centroid": [
+    52.37888,
+    13.63834
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 873.1,
+    "text": "873 per 100,000 residents"
+   }
+  },
+  {
+   "key": "124006",
+   "name": "Heiligensee/Konradshöhe",
+   "district": "Reinickendorf",
+   "area_group": "Grüner Norden",
+   "rank": 3,
+   "score": 94.2,
+   "tier": "best",
+   "centroid": [
+    52.60444,
+    13.23237
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1021.2,
+    "text": "1,021 per 100,000 residents"
+   }
+  },
+  {
+   "key": "054009",
+   "name": "Gatow/Kladow",
+   "district": "Spandau",
+   "area_group": "Gatow / Kladow",
+   "rank": 4,
+   "score": 93.2,
+   "tier": "best",
+   "centroid": [
+    52.46315,
+    13.13921
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1060.6,
+    "text": "1,061 per 100,000 residents"
+   }
+  },
+  {
+   "key": "032003",
+   "name": "Buchholz",
+   "district": "Pankow",
+   "area_group": "Nördliches Pankow",
+   "rank": 5,
+   "score": 91.1,
+   "tier": "best",
+   "centroid": [
+    52.60608,
+    13.42886
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1264.0,
+    "text": "1,264 per 100,000 residents"
+   }
+  },
+  {
+   "key": "033004",
+   "name": "Karow",
+   "district": "Pankow",
+   "area_group": "Nördliches Weißensee",
+   "rank": 6,
+   "score": 90.5,
+   "tier": "best",
+   "centroid": [
+    52.61427,
+    13.48536
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1113.4,
+    "text": "1,113 per 100,000 residents"
+   }
+  },
+  {
+   "key": "032002",
+   "name": "Blankenfelde/Niederschönhausen",
+   "district": "Pankow",
+   "area_group": "Nördliches Pankow",
+   "rank": 7,
+   "score": 87.0,
+   "tier": "best",
+   "centroid": [
+    52.59146,
+    13.40287
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1324.2,
+    "text": "1,324 per 100,000 residents"
+   }
+  },
+  {
+   "key": "104009",
+   "name": "Mahlsdorf",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Kaulsdorf/Mahlsdorf",
+   "rank": 8,
+   "score": 86.5,
+   "tier": "best",
+   "centroid": [
+    52.50228,
+    13.61667
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 826.9,
+    "text": "827 per 100,000 residents"
+   }
+  },
+  {
+   "key": "095018",
+   "name": "Rahnsdorf",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 5",
+   "rank": 9,
+   "score": 85.4,
+   "tier": "best",
+   "centroid": [
+    52.43469,
+    13.70626
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1192.7,
+    "text": "1,193 per 100,000 residents"
+   }
+  },
+  {
+   "key": "061002",
+   "name": "Albrechtstraße",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Steglitz",
+   "rank": 10,
+   "score": 84.9,
+   "tier": "best",
+   "centroid": [
+    52.45332,
+    13.33844
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1463.6,
+    "text": "1,464 per 100,000 residents"
+   }
+  },
+  {
+   "key": "094013",
+   "name": "Köpenick Süd",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 4",
+   "rank": 11,
+   "score": 82.9,
+   "tier": "best",
+   "centroid": [
+    52.42884,
+    13.59076
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1317.7,
+    "text": "1,318 per 100,000 residents"
+   }
+  },
+  {
+   "key": "095020",
+   "name": "Köpenick Nord",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 5",
+   "rank": 12,
+   "score": 82.5,
+   "tier": "best",
+   "centroid": [
+    52.46658,
+    13.58102
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1242.8,
+    "text": "1,243 per 100,000 residents"
+   }
+  },
+  {
+   "key": "076015",
+   "name": "Lichtenrade Süd",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Marienfelde / Lichtenrade",
+   "rank": 13,
+   "score": 82.1,
+   "tier": "best",
+   "centroid": [
+    52.38858,
+    13.40517
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1624.5,
+    "text": "1,624 per 100,000 residents"
+   }
+  },
+  {
+   "key": "124007",
+   "name": "Frohnau/Hermsdorf",
+   "district": "Reinickendorf",
+   "area_group": "Grüner Norden",
+   "rank": 14,
+   "score": 81.8,
+   "tier": "best",
+   "centroid": [
+    52.62653,
+    13.2969
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1089.6,
+    "text": "1,090 per 100,000 residents"
+   }
+  },
+  {
+   "key": "076014",
+   "name": "Lichtenrade Nord",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Marienfelde / Lichtenrade",
+   "rank": 15,
+   "score": 81.3,
+   "tier": "best",
+   "centroid": [
+    52.40445,
+    13.40534
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1392.0,
+    "text": "1,392 per 100,000 residents"
+   }
+  },
+  {
+   "key": "115013",
+   "name": "Karlshorst",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Süd",
+   "rank": 16,
+   "score": 79.5,
+   "tier": "best",
+   "centroid": [
+    52.48505,
+    13.52536
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1541.1,
+    "text": "1,541 per 100,000 residents"
+   }
+  },
+  {
+   "key": "063006",
+   "name": "Drakestraße",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Zehlendorf Süd/Lichterfelde West",
+   "rank": 17,
+   "score": 78.3,
+   "tier": "best",
+   "centroid": [
+    52.43593,
+    13.29933
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1498.4,
+    "text": "1,498 per 100,000 residents"
+   }
+  },
+  {
+   "key": "095017",
+   "name": "Friedrichshagen",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 5",
+   "rank": 18,
+   "score": 77.7,
+   "tier": "best",
+   "centroid": [
+    52.45241,
+    13.62365
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1467.6,
+    "text": "1,468 per 100,000 residents"
+   }
+  },
+  {
+   "key": "104008",
+   "name": "Kaulsdorf",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Kaulsdorf/Mahlsdorf",
+   "rank": 19,
+   "score": 77.3,
+   "tier": "best",
+   "centroid": [
+    52.50615,
+    13.5898
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1296.3,
+    "text": "1,296 per 100,000 residents"
+   }
+  },
+  {
+   "key": "062003",
+   "name": "Lankwitz",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Lankwitz/Lichterfelde Ost",
+   "rank": 19,
+   "score": 77.3,
+   "tier": "best",
+   "centroid": [
+    52.43178,
+    13.34741
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1763.9,
+    "text": "1,764 per 100,000 residents"
+   }
+  },
+  {
+   "key": "062004",
+   "name": "Ostpreußendamm",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Lankwitz/Lichterfelde Ost",
+   "rank": 21,
+   "score": 76.8,
+   "tier": "best",
+   "centroid": [
+    52.41961,
+    13.32064
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1474.4,
+    "text": "1,474 per 100,000 residents"
+   }
+  },
+  {
+   "key": "034006",
+   "name": "Schönholz/Wilhelmsruh/Rosenthal",
+   "district": "Pankow",
+   "area_group": "Südliches Pankow",
+   "rank": 22,
+   "score": 76.3,
+   "tier": "best",
+   "centroid": [
+    52.58784,
+    13.37523
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1403.6,
+    "text": "1,404 per 100,000 residents"
+   }
+  },
+  {
+   "key": "125008",
+   "name": "Borsigwalde/Freie Scholle",
+   "district": "Reinickendorf",
+   "area_group": "Wittenau/Borsigwalde",
+   "rank": 23,
+   "score": 76.0,
+   "tier": "best",
+   "centroid": [
+    52.59179,
+    13.29856
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1998.0,
+    "text": "1,998 per 100,000 residents"
+   }
+  },
+  {
+   "key": "082008",
+   "name": "Buckow",
+   "district": "Neukölln",
+   "area_group": "Britz/Buckow",
+   "rank": 24,
+   "score": 75.8,
+   "tier": "best",
+   "centroid": [
+    52.4195,
+    13.42827
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1825.1,
+    "text": "1,825 per 100,000 residents"
+   }
+  },
+  {
+   "key": "051001",
+   "name": "Hakenfelde",
+   "district": "Spandau",
+   "area_group": "Spandau Mitte / Nord",
+   "rank": 25,
+   "score": 75.1,
+   "tier": "best",
+   "centroid": [
+    52.56297,
+    13.20451
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2277.5,
+    "text": "2,278 per 100,000 residents"
+   }
+  },
+  {
+   "key": "126012",
+   "name": "Märkisches Viertel Süd",
+   "district": "Reinickendorf",
+   "area_group": "Märkisches Viertel",
+   "rank": 26,
+   "score": 75.0,
+   "tier": "best",
+   "centroid": [
+    52.59415,
+    13.3548
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2009.0,
+    "text": "2,009 per 100,000 residents"
+   }
+  },
+  {
+   "key": "111001",
+   "name": "Malchow",
+   "district": "Lichtenberg",
+   "area_group": "Hohenschönhausen Nord",
+   "rank": 27,
+   "score": 74.9,
+   "tier": "best",
+   "centroid": [
+    52.57675,
+    13.53338
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1787.8,
+    "text": "1,788 per 100,000 residents"
+   }
+  },
+  {
+   "key": "073005",
+   "name": "Friedenau West",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Friedenau",
+   "rank": 28,
+   "score": 74.3,
+   "tier": "best",
+   "centroid": [
+    52.47237,
+    13.32827
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1649.6,
+    "text": "1,650 per 100,000 residents"
+   }
+  },
+  {
+   "key": "094014",
+   "name": "Allende-Viertel",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 4",
+   "rank": 29,
+   "score": 73.4,
+   "tier": "best",
+   "centroid": [
+    52.44307,
+    13.59485
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1886.9,
+    "text": "1,887 per 100,000 residents"
+   }
+  },
+  {
+   "key": "034008",
+   "name": "Pankow Süd",
+   "district": "Pankow",
+   "area_group": "Südliches Pankow",
+   "rank": 30,
+   "score": 72.1,
+   "tier": "middle",
+   "centroid": [
+    52.56079,
+    13.41858
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1975.1,
+    "text": "1,975 per 100,000 residents"
+   }
+  },
+  {
+   "key": "076012",
+   "name": "Marienfelde Nord",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Marienfelde / Lichtenrade",
+   "rank": 31,
+   "score": 71.6,
+   "tier": "middle",
+   "centroid": [
+    52.41795,
+    13.36892
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1798.4,
+    "text": "1,798 per 100,000 residents"
+   }
+  },
+  {
+   "key": "063005",
+   "name": "Teltower Damm",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Zehlendorf Süd/Lichterfelde West",
+   "rank": 32,
+   "score": 71.5,
+   "tier": "middle",
+   "centroid": [
+    52.42533,
+    13.26057
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1728.5,
+    "text": "1,728 per 100,000 residents"
+   }
+  },
+  {
+   "key": "075010",
+   "name": "Mariendorf Nord",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Mariendorf",
+   "rank": 33,
+   "score": 70.4,
+   "tier": "middle",
+   "centroid": [
+    52.44604,
+    13.38797
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2039.5,
+    "text": "2,040 per 100,000 residents"
+   }
+  },
+  {
+   "key": "064008",
+   "name": "Zehlendorf Nord",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Zehlendorf Nord/Wannsee",
+   "rank": 34,
+   "score": 70.1,
+   "tier": "middle",
+   "centroid": [
+    52.44751,
+    13.26021
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1675.1,
+    "text": "1,675 per 100,000 residents"
+   }
+  },
+  {
+   "key": "052004",
+   "name": "Brunsbütteler Damm",
+   "district": "Spandau",
+   "area_group": "Wilhelmstadt / Staaken",
+   "rank": 35,
+   "score": 69.9,
+   "tier": "middle",
+   "centroid": [
+    52.53485,
+    13.1502
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1899.3,
+    "text": "1,899 per 100,000 residents"
+   }
+  },
+  {
+   "key": "093009",
+   "name": "Altglienicke",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 3",
+   "rank": 36,
+   "score": 69.7,
+   "tier": "middle",
+   "centroid": [
+    52.40992,
+    13.53811
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1977.4,
+    "text": "1,977 per 100,000 residents"
+   }
+  },
+  {
+   "key": "103007",
+   "name": "Biesdorf",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Biesdorf",
+   "rank": 37,
+   "score": 69.2,
+   "tier": "middle",
+   "centroid": [
+    52.51098,
+    13.55987
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1610.5,
+    "text": "1,610 per 100,000 residents"
+   }
+  },
+  {
+   "key": "084012",
+   "name": "Rudow",
+   "district": "Neukölln",
+   "area_group": "Buckow Nord/Rudow",
+   "rank": 38,
+   "score": 68.8,
+   "tier": "middle",
+   "centroid": [
+    52.4174,
+    13.49489
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1790.1,
+    "text": "1,790 per 100,000 residents"
+   }
+  },
+  {
+   "key": "037016",
+   "name": "Prenzlauer Berg Süd",
+   "district": "Pankow",
+   "area_group": "Südlicher Prenzlauer Berg",
+   "rank": 39,
+   "score": 68.0,
+   "tier": "middle",
+   "centroid": [
+    52.53357,
+    13.42859
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2348.7,
+    "text": "2,349 per 100,000 residents"
+   }
+  },
+  {
+   "key": "076013",
+   "name": "Marienfelde Süd",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Marienfelde / Lichtenrade",
+   "rank": 40,
+   "score": 67.5,
+   "tier": "middle",
+   "centroid": [
+    52.4099,
+    13.35264
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2189.4,
+    "text": "2,189 per 100,000 residents"
+   }
+  },
+  {
+   "key": "073006",
+   "name": "Friedenau Ost",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Friedenau",
+   "rank": 41,
+   "score": 67.2,
+   "tier": "middle",
+   "centroid": [
+    52.46897,
+    13.34226
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2332.4,
+    "text": "2,332 per 100,000 residents"
+   }
+  },
+  {
+   "key": "051002",
+   "name": "Falkenhagener Feld",
+   "district": "Spandau",
+   "area_group": "Spandau Mitte / Nord",
+   "rank": 42,
+   "score": 67.0,
+   "tier": "middle",
+   "centroid": [
+    52.54896,
+    13.1688
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2337.3,
+    "text": "2,337 per 100,000 residents"
+   }
+  },
+  {
+   "key": "034007",
+   "name": "Pankow Zentrum",
+   "district": "Pankow",
+   "area_group": "Südliches Pankow",
+   "rank": 43,
+   "score": 66.5,
+   "tier": "middle",
+   "centroid": [
+    52.57304,
+    13.41108
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2020.5,
+    "text": "2,020 per 100,000 residents"
+   }
+  },
+  {
+   "key": "114011",
+   "name": "Friedrichsfelde Süd",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Mitte",
+   "rank": 44,
+   "score": 66.4,
+   "tier": "middle",
+   "centroid": [
+    52.49743,
+    13.51069
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2087.7,
+    "text": "2,088 per 100,000 residents"
+   }
+  },
+  {
+   "key": "035009",
+   "name": "Weißensee",
+   "district": "Pankow",
+   "area_group": "Südliches Weißensee",
+   "rank": 45,
+   "score": 66.0,
+   "tier": "middle",
+   "centroid": [
+    52.55291,
+    13.44911
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2391.4,
+    "text": "2,391 per 100,000 residents"
+   }
+  },
+  {
+   "key": "064007",
+   "name": "Zehlendorf Südwest",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Zehlendorf Nord/Wannsee",
+   "rank": 46,
+   "score": 65.5,
+   "tier": "middle",
+   "centroid": [
+    52.42507,
+    13.18586
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1961.2,
+    "text": "1,961 per 100,000 residents"
+   }
+  },
+  {
+   "key": "091004",
+   "name": "Johannisthal",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 1",
+   "rank": 47,
+   "score": 65.3,
+   "tier": "middle",
+   "centroid": [
+    52.44354,
+    13.50542
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2389.7,
+    "text": "2,390 per 100,000 residents"
+   }
+  },
+  {
+   "key": "044008",
+   "name": "Schmargendorf",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Wilmersdorf Süd",
+   "rank": 48,
+   "score": 64.9,
+   "tier": "middle",
+   "centroid": [
+    52.47439,
+    13.30308
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2143.8,
+    "text": "2,144 per 100,000 residents"
+   }
+  },
+  {
+   "key": "093010",
+   "name": "Bohnsdorf",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 3",
+   "rank": 49,
+   "score": 64.2,
+   "tier": "middle",
+   "centroid": [
+    52.39954,
+    13.57047
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2024.3,
+    "text": "2,024 per 100,000 residents"
+   }
+  },
+  {
+   "key": "036013",
+   "name": "Helmholtzplatz",
+   "district": "Pankow",
+   "area_group": "Nördlicher Prenzlauer Berg",
+   "rank": 50,
+   "score": 63.6,
+   "tier": "middle",
+   "centroid": [
+    52.54375,
+    13.41914
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2360.8,
+    "text": "2,361 per 100,000 residents"
+   }
+  },
+  {
+   "key": "102006",
+   "name": "Hellersdorf Süd",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Hellersdorf",
+   "rank": 51,
+   "score": 63.3,
+   "tier": "middle",
+   "centroid": [
+    52.52327,
+    13.58878
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2418.7,
+    "text": "2,419 per 100,000 residents"
+   }
+  },
+  {
+   "key": "033005",
+   "name": "Blankenburg/Heinersdorf/Märchenland",
+   "district": "Pankow",
+   "area_group": "Nördliches Weißensee",
+   "rank": 52,
+   "score": 62.6,
+   "tier": "middle",
+   "centroid": [
+    52.57997,
+    13.44862
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 1935.0,
+    "text": "1,935 per 100,000 residents"
+   }
+  },
+  {
+   "key": "036012",
+   "name": "Prenzlauer Berg Nord",
+   "district": "Pankow",
+   "area_group": "Nördlicher Prenzlauer Berg",
+   "rank": 53,
+   "score": 61.2,
+   "tier": "middle",
+   "centroid": [
+    52.54834,
+    13.42899
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2421.8,
+    "text": "2,422 per 100,000 residents"
+   }
+  },
+  {
+   "key": "114009",
+   "name": "Neu-Lichtenberg",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Mitte",
+   "rank": 54,
+   "score": 59.6,
+   "tier": "middle",
+   "centroid": [
+    52.50527,
+    13.49745
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2575.6,
+    "text": "2,576 per 100,000 residents"
+   }
+  },
+  {
+   "key": "113006",
+   "name": "Fennpfuhl",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Nord",
+   "rank": 55,
+   "score": 59.5,
+   "tier": "middle",
+   "centroid": [
+    52.5288,
+    13.47377
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2362.9,
+    "text": "2,363 per 100,000 residents"
+   }
+  },
+  {
+   "key": "075011",
+   "name": "Mariendorf Süd",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Mariendorf",
+   "rank": 55,
+   "score": 59.5,
+   "tier": "middle",
+   "centroid": [
+    52.4307,
+    13.39277
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2250.4,
+    "text": "2,250 per 100,000 residents"
+   }
+  },
+  {
+   "key": "126011",
+   "name": "Märkisches Viertel Nord",
+   "district": "Reinickendorf",
+   "area_group": "Märkisches Viertel",
+   "rank": 57,
+   "score": 58.7,
+   "tier": "middle",
+   "centroid": [
+    52.60183,
+    13.35549
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2750.0,
+    "text": "2,750 per 100,000 residents"
+   }
+  },
+  {
+   "key": "092007",
+   "name": "Adlershof",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 2",
+   "rank": 58,
+   "score": 58.4,
+   "tier": "middle",
+   "centroid": [
+    52.43891,
+    13.54508
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2363.6,
+    "text": "2,364 per 100,000 residents"
+   }
+  },
+  {
+   "key": "093011",
+   "name": "Grünau",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 3",
+   "rank": 59,
+   "score": 57.4,
+   "tier": "middle",
+   "centroid": [
+    52.41841,
+    13.57879
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2424.7,
+    "text": "2,425 per 100,000 residents"
+   }
+  },
+  {
+   "key": "111002",
+   "name": "Neu-Hohenschönhausen Nord",
+   "district": "Lichtenberg",
+   "area_group": "Hohenschönhausen Nord",
+   "rank": 60,
+   "score": 56.3,
+   "tier": "middle",
+   "centroid": [
+    52.56893,
+    13.51872
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2845.8,
+    "text": "2,846 per 100,000 residents"
+   }
+  },
+  {
+   "key": "114010",
+   "name": "Friedrichsfelde Nord",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Mitte",
+   "rank": 61,
+   "score": 54.3,
+   "tier": "middle",
+   "centroid": [
+    52.51037,
+    13.52051
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2613.0,
+    "text": "2,613 per 100,000 residents"
+   }
+  },
+  {
+   "key": "092008",
+   "name": "Köllnische Vorstadt/Spindlersfeld",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 2",
+   "rank": 62,
+   "score": 53.6,
+   "tier": "middle",
+   "centroid": [
+    52.44319,
+    13.56625
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2871.8,
+    "text": "2,872 per 100,000 residents"
+   }
+  },
+  {
+   "key": "102005",
+   "name": "Hellersdorf Ost",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Hellersdorf",
+   "rank": 63,
+   "score": 53.1,
+   "tier": "middle",
+   "centroid": [
+    52.53303,
+    13.61394
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3007.2,
+    "text": "3,007 per 100,000 residents"
+   }
+  },
+  {
+   "key": "052005",
+   "name": "Heerstraße (Spandau)",
+   "district": "Spandau",
+   "area_group": "Wilhelmstadt / Staaken",
+   "rank": 64,
+   "score": 52.6,
+   "tier": "middle",
+   "centroid": [
+    52.52082,
+    13.16231
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2672.2,
+    "text": "2,672 per 100,000 residents"
+   }
+  },
+  {
+   "key": "091003",
+   "name": "Baumschulenweg",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 1",
+   "rank": 65,
+   "score": 52.2,
+   "tier": "middle",
+   "centroid": [
+    52.46377,
+    13.48378
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2715.1,
+    "text": "2,715 per 100,000 residents"
+   }
+  },
+  {
+   "key": "101003",
+   "name": "Marzahn Süd",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Marzahn",
+   "rank": 66,
+   "score": 52.1,
+   "tier": "middle",
+   "centroid": [
+    52.5374,
+    13.55592
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2488.2,
+    "text": "2,488 per 100,000 residents"
+   }
+  },
+  {
+   "key": "092005",
+   "name": "Oberschöneweide",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 2",
+   "rank": 66,
+   "score": 52.1,
+   "tier": "middle",
+   "centroid": [
+    52.46384,
+    13.52067
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2962.9,
+    "text": "2,963 per 100,000 residents"
+   }
+  },
+  {
+   "key": "074008",
+   "name": "Tempelhof Südwest",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Tempelhof",
+   "rank": 68,
+   "score": 52.0,
+   "tier": "middle",
+   "centroid": [
+    52.45932,
+    13.37518
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2633.2,
+    "text": "2,633 per 100,000 residents"
+   }
+  },
+  {
+   "key": "112005",
+   "name": "Alt-Hohenschönhausen Süd",
+   "district": "Lichtenberg",
+   "area_group": "Hohenschönhausen Süd",
+   "rank": 69,
+   "score": 51.5,
+   "tier": "middle",
+   "centroid": [
+    52.53932,
+    13.49437
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2613.9,
+    "text": "2,614 per 100,000 residents"
+   }
+  },
+  {
+   "key": "115012",
+   "name": "Rummelsburger Bucht",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Süd",
+   "rank": 70,
+   "score": 50.7,
+   "tier": "middle",
+   "centroid": [
+    52.49667,
+    13.48297
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2573.6,
+    "text": "2,574 per 100,000 residents"
+   }
+  },
+  {
+   "key": "125009",
+   "name": "Waidmannslust/Wittenau/Lübars",
+   "district": "Reinickendorf",
+   "area_group": "Wittenau/Borsigwalde",
+   "rank": 71,
+   "score": 49.2,
+   "tier": "middle",
+   "centroid": [
+    52.59623,
+    13.33052
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2506.8,
+    "text": "2,507 per 100,000 residents"
+   }
+  },
+  {
+   "key": "094015",
+   "name": "Altstadt Köpenick",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 4",
+   "rank": 72,
+   "score": 49.0,
+   "tier": "middle",
+   "centroid": [
+    52.44259,
+    13.57971
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3113.4,
+    "text": "3,113 per 100,000 residents"
+   }
+  },
+  {
+   "key": "011004",
+   "name": "Brunnenstraße Süd",
+   "district": "Mitte",
+   "area_group": "Zentrum",
+   "rank": 72,
+   "score": 49.0,
+   "tier": "middle",
+   "centroid": [
+    52.53385,
+    13.3948
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2644.4,
+    "text": "2,644 per 100,000 residents"
+   }
+  },
+  {
+   "key": "044007",
+   "name": "Grunewald",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Wilmersdorf Süd",
+   "rank": 74,
+   "score": 47.9,
+   "tier": "middle",
+   "centroid": [
+    52.48543,
+    13.28189
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2980.9,
+    "text": "2,981 per 100,000 residents"
+   }
+  },
+  {
+   "key": "053007",
+   "name": "Haselhorst",
+   "district": "Spandau",
+   "area_group": "Haselhorst / Siemensstadt",
+   "rank": 75,
+   "score": 47.6,
+   "tier": "middle",
+   "centroid": [
+    52.54753,
+    13.23492
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2776.9,
+    "text": "2,777 per 100,000 residents"
+   }
+  },
+  {
+   "key": "025007",
+   "name": "Frankfurter Allee Nord",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Friedrichshain Ost",
+   "rank": 76,
+   "score": 47.5,
+   "tier": "middle",
+   "centroid": [
+    52.51917,
+    13.46055
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3008.2,
+    "text": "3,008 per 100,000 residents"
+   }
+  },
+  {
+   "key": "091002",
+   "name": "Plänterwald",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 1",
+   "rank": 77,
+   "score": 47.4,
+   "tier": "middle",
+   "centroid": [
+    52.47945,
+    13.4759
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2675.2,
+    "text": "2,675 per 100,000 residents"
+   }
+  },
+  {
+   "key": "045011",
+   "name": "Volkspark Wilmersdorf",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Wilmersdorf Zentrum",
+   "rank": 78,
+   "score": 47.3,
+   "tier": "middle",
+   "centroid": [
+    52.48638,
+    13.3253
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2647.1,
+    "text": "2,647 per 100,000 residents"
+   }
+  },
+  {
+   "key": "035010",
+   "name": "Weißensee Ost",
+   "district": "Pankow",
+   "area_group": "Südliches Weißensee",
+   "rank": 79,
+   "score": 45.8,
+   "tier": "middle",
+   "centroid": [
+    52.55819,
+    13.47312
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3185.7,
+    "text": "3,186 per 100,000 residents"
+   }
+  },
+  {
+   "key": "031001",
+   "name": "Buch",
+   "district": "Pankow",
+   "area_group": "Buch",
+   "rank": 80,
+   "score": 45.4,
+   "tier": "middle",
+   "centroid": [
+    52.63421,
+    13.49709
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3199.1,
+    "text": "3,199 per 100,000 residents"
+   }
+  },
+  {
+   "key": "061001",
+   "name": "Schloßstraße",
+   "district": "Steglitz-Zehlendorf",
+   "area_group": "Steglitz",
+   "rank": 81,
+   "score": 44.6,
+   "tier": "middle",
+   "centroid": [
+    52.46165,
+    13.31772
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2531.5,
+    "text": "2,532 per 100,000 residents"
+   }
+  },
+  {
+   "key": "083010",
+   "name": "Gropiusstadt Ost",
+   "district": "Neukölln",
+   "area_group": "Gropiusstadt",
+   "rank": 82,
+   "score": 42.4,
+   "tier": "middle",
+   "centroid": [
+    52.42349,
+    13.47484
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3242.6,
+    "text": "3,243 per 100,000 residents"
+   }
+  },
+  {
+   "key": "012005",
+   "name": "Moabit West",
+   "district": "Mitte",
+   "area_group": "Moabit",
+   "rank": 83,
+   "score": 42.2,
+   "tier": "middle",
+   "centroid": [
+    52.52764,
+    13.33402
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3009.0,
+    "text": "3,009 per 100,000 residents"
+   }
+  },
+  {
+   "key": "126010",
+   "name": "Rollbergesiedlung",
+   "district": "Reinickendorf",
+   "area_group": "Märkisches Viertel",
+   "rank": 84,
+   "score": 42.0,
+   "tier": "middle",
+   "centroid": [
+    52.60598,
+    13.3338
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3187.4,
+    "text": "3,187 per 100,000 residents"
+   }
+  },
+  {
+   "key": "053008",
+   "name": "Siemensstadt",
+   "district": "Spandau",
+   "area_group": "Haselhorst / Siemensstadt",
+   "rank": 84,
+   "score": 42.0,
+   "tier": "middle",
+   "centroid": [
+    52.54161,
+    13.26515
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2933.7,
+    "text": "2,934 per 100,000 residents"
+   }
+  },
+  {
+   "key": "072003",
+   "name": "Schöneberg Südwest",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Schöneberg Süd",
+   "rank": 86,
+   "score": 41.9,
+   "tier": "middle",
+   "centroid": [
+    52.4856,
+    13.34243
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3034.8,
+    "text": "3,035 per 100,000 residents"
+   }
+  },
+  {
+   "key": "083009",
+   "name": "Gropiusstadt West",
+   "district": "Neukölln",
+   "area_group": "Gropiusstadt",
+   "rank": 87,
+   "score": 41.8,
+   "tier": "middle",
+   "centroid": [
+    52.42907,
+    13.45826
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2864.0,
+    "text": "2,864 per 100,000 residents"
+   }
+  },
+  {
+   "key": "043004",
+   "name": "Schloss Charlottenburg",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Charlottenburg Zentrum",
+   "rank": 88,
+   "score": 41.5,
+   "tier": "middle",
+   "centroid": [
+    52.51221,
+    13.29312
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3015.2,
+    "text": "3,015 per 100,000 residents"
+   }
+  },
+  {
+   "key": "111003",
+   "name": "Neu-Hohenschönhausen Süd",
+   "district": "Lichtenberg",
+   "area_group": "Hohenschönhausen Nord",
+   "rank": 89,
+   "score": 40.6,
+   "tier": "middle",
+   "centroid": [
+    52.56732,
+    13.50191
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3335.9,
+    "text": "3,336 per 100,000 residents"
+   }
+  },
+  {
+   "key": "084011",
+   "name": "Buckow Nord",
+   "district": "Neukölln",
+   "area_group": "Buckow Nord/Rudow",
+   "rank": 90,
+   "score": 40.3,
+   "tier": "middle",
+   "centroid": [
+    52.43854,
+    13.46226
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3016.3,
+    "text": "3,016 per 100,000 residents"
+   }
+  },
+  {
+   "key": "036011",
+   "name": "Prenzlauer Berg Nordwest",
+   "district": "Pankow",
+   "area_group": "Nördlicher Prenzlauer Berg",
+   "rank": 91,
+   "score": 40.1,
+   "tier": "middle",
+   "centroid": [
+    52.55055,
+    13.40757
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3252.6,
+    "text": "3,253 per 100,000 residents"
+   }
+  },
+  {
+   "key": "112004",
+   "name": "Alt-Hohenschönhausen Nord",
+   "district": "Lichtenberg",
+   "area_group": "Hohenschönhausen Süd",
+   "rank": 92,
+   "score": 39.3,
+   "tier": "middle",
+   "centroid": [
+    52.55276,
+    13.50414
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 2934.6,
+    "text": "2,935 per 100,000 residents"
+   }
+  },
+  {
+   "key": "095019",
+   "name": "Dammvorstadt",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 5",
+   "rank": 92,
+   "score": 39.3,
+   "tier": "middle",
+   "centroid": [
+    52.45418,
+    13.57865
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3019.4,
+    "text": "3,019 per 100,000 residents"
+   }
+  },
+  {
+   "key": "024005",
+   "name": "Karl-Marx-Allee Nord",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Friedrichshain West",
+   "rank": 94,
+   "score": 38.8,
+   "tier": "middle",
+   "centroid": [
+    52.52163,
+    13.43923
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3235.6,
+    "text": "3,236 per 100,000 residents"
+   }
+  },
+  {
+   "key": "042003",
+   "name": "Westend",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Charlottenburg West",
+   "rank": 95,
+   "score": 38.3,
+   "tier": "middle",
+   "centroid": [
+    52.51407,
+    13.26871
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3210.7,
+    "text": "3,211 per 100,000 residents"
+   }
+  },
+  {
+   "key": "101001",
+   "name": "Marzahn Nord",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Marzahn",
+   "rank": 96,
+   "score": 38.1,
+   "tier": "middle",
+   "centroid": [
+    52.56754,
+    13.56835
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3467.3,
+    "text": "3,467 per 100,000 residents"
+   }
+  },
+  {
+   "key": "121001",
+   "name": "Reginhardstraße",
+   "district": "Reinickendorf",
+   "area_group": "Reinickendorf Ost",
+   "rank": 97,
+   "score": 37.1,
+   "tier": "middle",
+   "centroid": [
+    52.56842,
+    13.37132
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3806.0,
+    "text": "3,806 per 100,000 residents"
+   }
+  },
+  {
+   "key": "122005",
+   "name": "Tegel",
+   "district": "Reinickendorf",
+   "area_group": "Tegel",
+   "rank": 98,
+   "score": 36.9,
+   "tier": "middle",
+   "centroid": [
+    52.58953,
+    13.2791
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3269.8,
+    "text": "3,270 per 100,000 residents"
+   }
+  },
+  {
+   "key": "122003",
+   "name": "Auguste-Viktoria-Allee",
+   "district": "Reinickendorf",
+   "area_group": "Tegel",
+   "rank": 99,
+   "score": 36.7,
+   "tier": "middle",
+   "centroid": [
+    52.57116,
+    13.31731
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3427.5,
+    "text": "3,428 per 100,000 residents"
+   }
+  },
+  {
+   "key": "082006",
+   "name": "Britz Nord",
+   "district": "Neukölln",
+   "area_group": "Britz/Buckow",
+   "rank": 99,
+   "score": 36.7,
+   "tier": "middle",
+   "centroid": [
+    52.45756,
+    13.43849
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3095.3,
+    "text": "3,095 per 100,000 residents"
+   }
+  },
+  {
+   "key": "101002",
+   "name": "Marzahn Mitte",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Marzahn",
+   "rank": 101,
+   "score": 36.0,
+   "tier": "middle",
+   "centroid": [
+    52.55219,
+    13.56293
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3347.3,
+    "text": "3,347 per 100,000 residents"
+   }
+  },
+  {
+   "key": "102004",
+   "name": "Hellersdorf Nord",
+   "district": "Marzahn-Hellersdorf",
+   "area_group": "Hellersdorf",
+   "rank": 102,
+   "score": 35.1,
+   "tier": "middle",
+   "centroid": [
+    52.54143,
+    13.60014
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3816.5,
+    "text": "3,816 per 100,000 residents"
+   }
+  },
+  {
+   "key": "082007",
+   "name": "Britz",
+   "district": "Neukölln",
+   "area_group": "Britz/Buckow",
+   "rank": 103,
+   "score": 34.9,
+   "tier": "middle",
+   "centroid": [
+    52.44179,
+    13.44158
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3050.9,
+    "text": "3,051 per 100,000 residents"
+   }
+  },
+  {
+   "key": "081004",
+   "name": "Rixdorf",
+   "district": "Neukölln",
+   "area_group": "Neukölln",
+   "rank": 104,
+   "score": 34.5,
+   "tier": "middle",
+   "centroid": [
+    52.47816,
+    13.44708
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3259.1,
+    "text": "3,259 per 100,000 residents"
+   }
+  },
+  {
+   "key": "072004",
+   "name": "Schöneberg Südost",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Schöneberg Süd",
+   "rank": 104,
+   "score": 34.5,
+   "tier": "middle",
+   "centroid": [
+    52.48456,
+    13.35772
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3342.4,
+    "text": "3,342 per 100,000 residents"
+   }
+  },
+  {
+   "key": "071002",
+   "name": "Schöneberg Nordost",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Schöneberg Nord",
+   "rank": 106,
+   "score": 33.5,
+   "tier": "middle",
+   "centroid": [
+    52.4927,
+    13.3601
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3640.4,
+    "text": "3,640 per 100,000 residents"
+   }
+  },
+  {
+   "key": "037015",
+   "name": "Prenzlauer Berg Südwest",
+   "district": "Pankow",
+   "area_group": "Südlicher Prenzlauer Berg",
+   "rank": 107,
+   "score": 32.9,
+   "tier": "middle",
+   "centroid": [
+    52.53521,
+    13.41377
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3325.4,
+    "text": "3,325 per 100,000 residents"
+   }
+  },
+  {
+   "key": "121002",
+   "name": "Alt-Reinickendorf",
+   "district": "Reinickendorf",
+   "area_group": "Reinickendorf Ost",
+   "rank": 108,
+   "score": 32.7,
+   "tier": "middle",
+   "centroid": [
+    52.56976,
+    13.3488
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3350.3,
+    "text": "3,350 per 100,000 residents"
+   }
+  },
+  {
+   "key": "074007",
+   "name": "Tempelhof Nord",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Tempelhof",
+   "rank": 109,
+   "score": 32.6,
+   "tier": "middle",
+   "centroid": [
+    52.47836,
+    13.3782
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3834.5,
+    "text": "3,834 per 100,000 residents"
+   }
+  },
+  {
+   "key": "081001",
+   "name": "Schillerpromenade",
+   "district": "Neukölln",
+   "area_group": "Neukölln",
+   "rank": 110,
+   "score": 32.2,
+   "tier": "middle",
+   "centroid": [
+    52.47343,
+    13.42411
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3292.9,
+    "text": "3,293 per 100,000 residents"
+   }
+  },
+  {
+   "key": "074009",
+   "name": "Tempelhof Südost",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Tempelhof",
+   "rank": 110,
+   "score": 32.2,
+   "tier": "middle",
+   "centroid": [
+    52.46281,
+    13.39737
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3461.1,
+    "text": "3,461 per 100,000 residents"
+   }
+  },
+  {
+   "key": "122004",
+   "name": "Tegel-Süd/Flughafensee",
+   "district": "Reinickendorf",
+   "area_group": "Tegel",
+   "rank": 112,
+   "score": 28.7,
+   "tier": "middle",
+   "centroid": [
+    52.56909,
+    13.28036
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3962.8,
+    "text": "3,963 per 100,000 residents"
+   }
+  },
+  {
+   "key": "043005",
+   "name": "Mierendorffplatz",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Charlottenburg Zentrum",
+   "rank": 113,
+   "score": 27.8,
+   "tier": "middle",
+   "centroid": [
+    52.52632,
+    13.30491
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3711.7,
+    "text": "3,712 per 100,000 residents"
+   }
+  },
+  {
+   "key": "113007",
+   "name": "Alt-Lichtenberg",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Nord",
+   "rank": 114,
+   "score": 27.5,
+   "tier": "middle",
+   "centroid": [
+    52.51906,
+    13.49468
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3815.0,
+    "text": "3,815 per 100,000 residents"
+   }
+  },
+  {
+   "key": "051003",
+   "name": "Spandau Mitte",
+   "district": "Spandau",
+   "area_group": "Spandau Mitte / Nord",
+   "rank": 114,
+   "score": 27.5,
+   "tier": "middle",
+   "centroid": [
+    52.54386,
+    13.20222
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4155.4,
+    "text": "4,155 per 100,000 residents"
+   }
+  },
+  {
+   "key": "052006",
+   "name": "Wilhelmstadt",
+   "district": "Spandau",
+   "area_group": "Wilhelmstadt / Staaken",
+   "rank": 114,
+   "score": 27.5,
+   "tier": "middle",
+   "centroid": [
+    52.5218,
+    13.19626
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3709.2,
+    "text": "3,709 per 100,000 residents"
+   }
+  },
+  {
+   "key": "113008",
+   "name": "Frankfurter Allee Süd (Lichtenberg)",
+   "district": "Lichtenberg",
+   "area_group": "Lichtenberg Nord",
+   "rank": 117,
+   "score": 25.1,
+   "tier": "worst",
+   "centroid": [
+    52.5108,
+    13.48189
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3690.0,
+    "text": "3,690 per 100,000 residents"
+   }
+  },
+  {
+   "key": "022002",
+   "name": "Tempelhofer Vorstadt",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Kreuzberg Süd",
+   "rank": 118,
+   "score": 25.0,
+   "tier": "worst",
+   "centroid": [
+    52.49132,
+    13.39674
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3459.4,
+    "text": "3,459 per 100,000 residents"
+   }
+  },
+  {
+   "key": "045009",
+   "name": "Halensee",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Wilmersdorf Zentrum",
+   "rank": 119,
+   "score": 24.9,
+   "tier": "worst",
+   "centroid": [
+    52.49723,
+    13.29913
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4009.9,
+    "text": "4,010 per 100,000 residents"
+   }
+  },
+  {
+   "key": "014009",
+   "name": "Parkviertel",
+   "district": "Mitte",
+   "area_group": "Wedding",
+   "rank": 120,
+   "score": 24.5,
+   "tier": "worst",
+   "centroid": [
+    52.55403,
+    13.34377
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4290.1,
+    "text": "4,290 per 100,000 residents"
+   }
+  },
+  {
+   "key": "036014",
+   "name": "Prenzlauer Berg Ost",
+   "district": "Pankow",
+   "area_group": "Nördlicher Prenzlauer Berg",
+   "rank": 121,
+   "score": 22.7,
+   "tier": "worst",
+   "centroid": [
+    52.53499,
+    13.44907
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3637.2,
+    "text": "3,637 per 100,000 residents"
+   }
+  },
+  {
+   "key": "042002",
+   "name": "Heerstraße (Charlottenburg)",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Charlottenburg West",
+   "rank": 122,
+   "score": 22.2,
+   "tier": "worst",
+   "centroid": [
+    52.50765,
+    13.2392
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3576.5,
+    "text": "3,576 per 100,000 residents"
+   }
+  },
+  {
+   "key": "025008",
+   "name": "Frankfurter Allee Süd (Friedrichshain)",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Friedrichshain Ost",
+   "rank": 123,
+   "score": 21.8,
+   "tier": "worst",
+   "centroid": [
+    52.50743,
+    13.46376
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4323.7,
+    "text": "4,324 per 100,000 residents"
+   }
+  },
+  {
+   "key": "043006",
+   "name": "Otto-Suhr-Allee/Kantstraße",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Charlottenburg Zentrum",
+   "rank": 123,
+   "score": 21.8,
+   "tier": "worst",
+   "centroid": [
+    52.51304,
+    13.31348
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 3735.9,
+    "text": "3,736 per 100,000 residents"
+   }
+  },
+  {
+   "key": "081005",
+   "name": "Köllnische Heide",
+   "district": "Neukölln",
+   "area_group": "Neukölln",
+   "rank": 125,
+   "score": 20.9,
+   "tier": "worst",
+   "centroid": [
+    52.46839,
+    13.46964
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4378.2,
+    "text": "4,378 per 100,000 residents"
+   }
+  },
+  {
+   "key": "092006",
+   "name": "Niederschöneweide",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 2",
+   "rank": 126,
+   "score": 20.4,
+   "tier": "worst",
+   "centroid": [
+    52.45254,
+    13.52567
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4253.6,
+    "text": "4,254 per 100,000 residents"
+   }
+  },
+  {
+   "key": "013007",
+   "name": "Osloer Straße",
+   "district": "Mitte",
+   "area_group": "Gesundbrunnen",
+   "rank": 127,
+   "score": 19.5,
+   "tier": "worst",
+   "centroid": [
+    52.55807,
+    13.3867
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4722.9,
+    "text": "4,723 per 100,000 residents"
+   }
+  },
+  {
+   "key": "041001",
+   "name": "Charlottenburg Nord",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Charlottenburg Nord",
+   "rank": 128,
+   "score": 19.4,
+   "tier": "worst",
+   "centroid": [
+    52.53805,
+    13.29188
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4172.3,
+    "text": "4,172 per 100,000 residents"
+   }
+  },
+  {
+   "key": "081003",
+   "name": "Reuterstraße",
+   "district": "Neukölln",
+   "area_group": "Neukölln",
+   "rank": 129,
+   "score": 17.4,
+   "tier": "worst",
+   "centroid": [
+    52.48745,
+    13.43319
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4553.5,
+    "text": "4,554 per 100,000 residents"
+   }
+  },
+  {
+   "key": "014010",
+   "name": "Wedding Zentrum",
+   "district": "Mitte",
+   "area_group": "Wedding",
+   "rank": 130,
+   "score": 17.1,
+   "tier": "worst",
+   "centroid": [
+    52.54832,
+    13.36424
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4788.9,
+    "text": "4,789 per 100,000 residents"
+   }
+  },
+  {
+   "key": "012006",
+   "name": "Moabit Ost",
+   "district": "Mitte",
+   "area_group": "Moabit",
+   "rank": 131,
+   "score": 16.3,
+   "tier": "worst",
+   "centroid": [
+    52.52718,
+    13.35367
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4864.9,
+    "text": "4,865 per 100,000 residents"
+   }
+  },
+  {
+   "key": "081002",
+   "name": "Neuköllner Mitte/Zentrum",
+   "district": "Neukölln",
+   "area_group": "Neukölln",
+   "rank": 132,
+   "score": 15.2,
+   "tier": "worst",
+   "centroid": [
+    52.4733,
+    13.43477
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4459.6,
+    "text": "4,460 per 100,000 residents"
+   }
+  },
+  {
+   "key": "021001",
+   "name": "Südliche Friedrichstadt",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Kreuzberg Nord",
+   "rank": 133,
+   "score": 14.6,
+   "tier": "worst",
+   "centroid": [
+    52.50205,
+    13.39926
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 5223.5,
+    "text": "5,224 per 100,000 residents"
+   }
+  },
+  {
+   "key": "091001",
+   "name": "Alt-Treptow",
+   "district": "Treptow-Köpenick",
+   "area_group": "Treptow-Köpenick 1",
+   "rank": 134,
+   "score": 14.2,
+   "tier": "worst",
+   "centroid": [
+    52.49049,
+    13.44982
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4615.0,
+    "text": "4,615 per 100,000 residents"
+   }
+  },
+  {
+   "key": "013008",
+   "name": "Brunnenstraße Nord",
+   "district": "Mitte",
+   "area_group": "Gesundbrunnen",
+   "rank": 135,
+   "score": 13.9,
+   "tier": "worst",
+   "centroid": [
+    52.54283,
+    13.38565
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 4522.1,
+    "text": "4,522 per 100,000 residents"
+   }
+  },
+  {
+   "key": "024006",
+   "name": "Karl-Marx-Allee Süd",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Friedrichshain West",
+   "rank": 136,
+   "score": 11.3,
+   "tier": "worst",
+   "centroid": [
+    52.51394,
+    13.43918
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 6216.1,
+    "text": "6,216 per 100,000 residents"
+   }
+  },
+  {
+   "key": "023003",
+   "name": "Nördliche Luisenstadt",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Kreuzberg Ost",
+   "rank": 137,
+   "score": 9.3,
+   "tier": "worst",
+   "centroid": [
+    52.5021,
+    13.42615
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 6724.6,
+    "text": "6,725 per 100,000 residents"
+   }
+  },
+  {
+   "key": "011003",
+   "name": "Alexanderplatz",
+   "district": "Mitte",
+   "area_group": "Zentrum",
+   "rank": 138,
+   "score": 8.2,
+   "tier": "worst",
+   "centroid": [
+    52.51885,
+    13.40802
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 6622.1,
+    "text": "6,622 per 100,000 residents"
+   }
+  },
+  {
+   "key": "011001",
+   "name": "Tiergarten Süd",
+   "district": "Mitte",
+   "area_group": "Zentrum",
+   "rank": 139,
+   "score": 7.7,
+   "tier": "worst",
+   "centroid": [
+    52.50413,
+    13.35955
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 8448.0,
+    "text": "8,448 per 100,000 residents"
+   }
+  },
+  {
+   "key": "011002",
+   "name": "Regierungsviertel",
+   "district": "Mitte",
+   "area_group": "Zentrum",
+   "rank": 140,
+   "score": 6.3,
+   "tier": "worst",
+   "centroid": [
+    52.51184,
+    13.39396
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 9328.4,
+    "text": "9,328 per 100,000 residents"
+   }
+  },
+  {
+   "key": "023004",
+   "name": "Südliche Luisenstadt",
+   "district": "Friedrichshain-Kreuzberg",
+   "area_group": "Kreuzberg Ost",
+   "rank": 141,
+   "score": 5.8,
+   "tier": "worst",
+   "centroid": [
+    52.49667,
+    13.43503
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 6288.5,
+    "text": "6,288 per 100,000 residents"
+   }
+  },
+  {
+   "key": "071001",
+   "name": "Schöneberg Nordwest",
+   "district": "Tempelhof-Schöneberg",
+   "area_group": "Schöneberg Nord",
+   "rank": 142,
+   "score": 4.4,
+   "tier": "worst",
+   "centroid": [
+    52.49847,
+    13.34976
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 7515.2,
+    "text": "7,515 per 100,000 residents"
+   }
+  },
+  {
+   "key": "045010",
+   "name": "Lietzenburger Straße",
+   "district": "Charlottenburg-Wilmersdorf",
+   "area_group": "Wilmersdorf Zentrum",
+   "rank": 143,
+   "score": 3.6,
+   "tier": "worst",
+   "centroid": [
+    52.49906,
+    13.32003
+   ],
+   "headline": {
+    "metric": "crime_kiez",
+    "label": "Neighbourhood offences",
+    "raw": 6876.4,
+    "text": "6,876 per 100,000 residents"
+   }
+  }
+ ]
+}

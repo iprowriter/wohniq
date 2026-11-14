@@ -43,7 +43,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 # Treat each top-level folder as an importable package.
-packages = ["app", "core", "search", "scam", "enrich", "data", "evals", "lifestyle"]
+packages = ["app", "core", "search", "scam", "enrich", "data", "evals", "lifestyle", "neighborhoods"]
 
 # --- Tooling config (single source of truth) ---
 

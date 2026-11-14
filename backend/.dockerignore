@@ -14,3 +14,8 @@ data/lifestyle/raw/*
 
 # Local eval outputs
 evals/results/
+
+# Berlin Neighbourhoods raw source files (~160 MB; only `make neighborhoods-data` reads
+# them — the API ships the generated data/neighborhoods/neighborhoods.json).
+data/neighborhoods/raw/*
+!data/neighborhoods/raw/README.md

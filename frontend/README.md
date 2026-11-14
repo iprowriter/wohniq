@@ -33,3 +33,13 @@ npm run typecheck
 
 `tests/fixtures/lifestyle-catalog.json` is the real catalog response, exported by the
 backend (`make lifestyle-fixture`); a backend test fails if it goes stale.
+
+## Berlin Neighborhoods (`/neighborhoods`)
+
+All 143 areas ranked by a category (or a weighted overall score): list + shaded Leaflet/OSM map, map ↔ list selection, area detail with sources, weights, search/district filter, URL state. Data from `GET /api/v1/neighborhoods/*` (see `docs/NEIGHBORHOODS.md`).
+
+- `lib/neighborhoods/logic.ts`: pure logic (weights, URL state, filtering/ordering, rank colours, badges, source labels)
+- `lib/neighborhoods/api.ts`: API client (plain GETs; no personal data)
+- `components/neighborhoods/`: category tabs, list row, detail panel, weights panel, map, header link
+
+Tests: `tests/neighborhoods.test.ts` runs against real responses in `tests/fixtures/neighborhoods-*.json` (`make neighborhoods-fixture`; a backend test fails if they go stale). `e2e/neighborhoods.spec.ts` holds the Playwright journeys.
