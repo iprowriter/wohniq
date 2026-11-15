@@ -45,3 +45,4 @@ backend/data/lifestyle/raw/*
 # Official source files for Berlin Neighbourhoods (`make neighborhoods-data`); see backend/data/neighborhoods/raw/README.md
 backend/data/neighborhoods/raw/*
 !backend/data/neighborhoods/raw/README.md
+assets/reference-*.png

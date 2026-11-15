@@ -1,6 +1,12 @@
 """/search — the end-to-end pipeline (T2.8 + T4.3): parse → retrieve → rank → explain,
 now enriched with commute (F5) and neighborhood (F6).
 
+Areas: requested Berlin areas are a hard filter (retrieval). If nothing matches inside
+them, we fall back to the closest matching listings within NEARBY_MAX_KM and say so
+(`notices`), and every result carries an `area_match` label ("In Mitte" / "Near Mitte ·
+2.1 km"). When the budget is what empties the results, a `budget_too_low` notice
+recommends the minimum budget that would show flats (search/diagnostics.py).
+
 Enrichment strategy (enrich top-k): rank the candidate pool on the cheap factors first
 (relevance, budget, quiet-from-Kiez), take the page, then enrich *only* those listings
 with commute + neighborhood and re-rank — so we don't pay ~20 Overpass/transit lookups
@@ -20,24 +26,54 @@ from pydantic import BaseModel, Field
 
 from app.repository import ListingRepository, get_repository
 from core.logging import get_logger
-from data.kieze import KIEZE
+from data.kieze import BERLIN_BBOX, KIEZE
 from data.models import Listing, Photo, RiskAssessment
 from enrich.commute_parse import CommuteResult
 from enrich.neighborhood_parse import DEFAULT_RADIUS_M
+from search.areas import NEARBY_MAX_KM, matching_area, nearest_area
 from search.criteria import SearchCriteria
+from search.diagnostics import (
+    BUDGET_TOO_LOW,
+    NO_LISTINGS_IN_AREA,
+    Notice,
+    budget_advice,
+    budget_notice,
+    nearby_notice,
+    no_listings_notice,
+    no_results_notice,
+    partial_budget_notice,
+    requirements_phrase,
+)
+from search.explain_rules import MatchContext
 from search.explanation import Explanation, explain
 from search.parser import parse_query
-from search.ranking import RankCriteria, RankingInput, rank, score_listing
+from search.ranking import (
+    IN_AREA,
+    NEARBY,
+    OUTSIDE,
+    RankCriteria,
+    RankingInput,
+    rank,
+    score_listing,
+)
+from search.retrieval import RetrievalResult
 
 logger = get_logger(__name__)
 router = APIRouter(tags=["search"])
 
 _NIGHTLIFE = {k.name: k.nightlife for k in KIEZE}
 
+# Listings examined when looking for nearby flats or diagnosing the budget. The whole
+# catalogue is ~100 listings; this keeps the extra passes bounded if it grows.
+DIAGNOSIS_LIMIT = 500
+
 
 class SearchRequest(BaseModel):
     query: str
     limit: int = Field(default=6, ge=1, le=20)
+    # Replaces the budget parsed from `query` — used by the "raise your budget to €X"
+    # hint so the user's own words don't have to be rewritten.
+    max_warm_rent: int | None = Field(default=None, ge=100, le=20000)
 
 
 class PhotoOut(BaseModel):
@@ -51,6 +87,28 @@ class FactorOut(BaseModel):
     score: float
     weight: float
     detail: str
+    highlight: str = ""
+
+
+class AreaMatchOut(BaseModel):
+    """Where a result is relative to the areas the user asked for."""
+
+    status: str  # in_area | nearby | outside
+    area: str  # the requested area it's in, or the nearest one
+    distance_km: float | None = None  # from that area's centre (nearby/outside only)
+    label: str  # "In Mitte", "Near Mitte · 2.1 km"
+
+
+class NoticeOut(BaseModel):
+    """Why results are missing or come from elsewhere, with a concrete way forward."""
+
+    kind: str  # budget_too_low | budget_too_low_in_some_areas | nearby_results | ...
+    title: str
+    message: str
+    suggested_budget: int | None = None
+    comfortable_budget: int | None = None
+    options_at_suggested: int | None = None
+    options_at_comfortable: int | None = None
 
 
 class CommuteOut(BaseModel):
@@ -104,6 +162,7 @@ class SearchResultItem(BaseModel):
     commute: CommuteOut | None = None
     neighborhood: NeighborhoodOut | None = None
     risk: RiskOut | None = None
+    area_match: AreaMatchOut | None = None
 
 
 class SearchResponse(BaseModel):
@@ -111,6 +170,8 @@ class SearchResponse(BaseModel):
     results: list[SearchResultItem]
     # Shown under the criteria when commute times are estimated or unavailable.
     commute_note: str | None = None
+    # Empty / fallback explanations: budget too low, nothing in the area (nearby shown).
+    notices: list[NoticeOut] = Field(default_factory=list)
 
 
 def _to_risk_out(row: RiskAssessment | None) -> RiskOut | None:
@@ -182,30 +243,202 @@ def _to_listing_out(listing: Listing, photos: list[Photo]) -> ListingOut:
     )
 
 
+# --- Area fit, ranking inputs, explanation context -------------------------------------
+
+AreaFit = tuple[str, str, float | None]  # (status, area, km from its centre)
+
+
+def _area_fit(listing: Listing, areas: list[str]) -> AreaFit | None:
+    """In one of `areas`, near one (≤ NEARBY_MAX_KM from its centre), or outside."""
+    if not areas:
+        return None
+    hit = matching_area(listing.kiez, listing.district, areas)
+    if hit is not None:
+        return (IN_AREA, hit, None)
+    if listing.lat is None or listing.lng is None:
+        return None
+    near = nearest_area(listing.lat, listing.lng, areas)
+    if near is None:
+        return None
+    name, km = near
+    return (NEARBY if km <= NEARBY_MAX_KM else OUTSIDE, name, round(km, 1))
+
+
+def _to_area_match_out(fit: AreaFit | None, kiez: str) -> AreaMatchOut | None:
+    if fit is None:
+        return None
+    status, area, km = fit
+    if status == IN_AREA:
+        label = f"In {area}" if kiez == area else f"In {area} · {kiez}"
+    elif status == NEARBY:
+        label = f"Near {area} · {km:.1f} km"
+    else:
+        label = f"Outside your areas · {km:.1f} km from {area}"
+    return AreaMatchOut(status=status, area=area, distance_km=km, label=label)
+
+
+def _rank_criteria(criteria: SearchCriteria) -> RankCriteria:
+    return RankCriteria(
+        max_warm_rent=criteria.max_warm_rent,
+        quiet_priority=criteria.quiet_priority,
+        desired_amenities=tuple(criteria.desired_amenities),
+        areas=tuple(criteria.areas),
+    )
+
+
+def _rank_input(
+    listing: Listing,
+    distance: float,
+    fit: AreaFit | None,
+    *,
+    neighborhood=None,
+    commute: CommuteResult | None = None,
+) -> RankingInput:
+    return RankingInput(
+        warmmiete_eur=listing.warmmiete_eur,
+        distance=distance,
+        nightlife=_NIGHTLIFE.get(listing.kiez),
+        available_amenities=neighborhood.available_amenities if neighborhood else None,
+        commute_minutes=commute.minutes if commute else None,
+        commute_source=commute.source if commute else "live",
+        commute_changes=commute.changes if commute else None,
+        listing_id=str(listing.id),
+        kiez=listing.kiez,
+        area_status=fit[0] if fit else None,
+        area_name=fit[1] if fit else None,
+        area_distance_km=fit[2] if fit else None,
+    )
+
+
+def _match_context(listing: Listing, criteria: SearchCriteria) -> MatchContext:
+    return MatchContext(
+        kiez=listing.kiez,
+        rooms=float(listing.rooms) if listing.rooms is not None else None,
+        size_m2=listing.size_m2,
+        warm_rent=listing.warmmiete_eur,
+        furnished=listing.furnished,
+        asked_min_rooms=criteria.min_rooms,
+        asked_min_size_m2=criteria.min_size_m2,
+        asked_furnished=criteria.furnished,
+    )
+
+
+def _to_notice_out(notice: Notice) -> NoticeOut:
+    return NoticeOut(**vars(notice))
+
+
+# --- Empty-result handling: budget diagnosis + nearby fallback ----------------------------
+
+
+def _diagnose(
+    repo: ListingRepository, criteria: SearchCriteria, query: str, *, found: bool
+) -> list[Notice]:
+    """Explain missing results: is the budget the blocker, and what would fix it?"""
+    budget = criteria.max_warm_rent
+    if found and not (budget and criteria.areas):
+        return []
+    requirements = requirements_phrase(criteria.min_rooms, criteria.min_size_m2, criteria.furnished)
+
+    # Everything matching the user's other requirements (same areas), at any price.
+    relaxed = criteria.model_copy(update={"max_warm_rent": None})
+    candidates = [r.listing for r in repo.retrieve(relaxed, query, limit=DIAGNOSIS_LIMIT)]
+    risk = repo.risk_by_listing([x.id for x in candidates])
+    # Never let a likely scam (often suspiciously cheap) set the recommended budget.
+    trusted = [
+        x for x in candidates if getattr(risk.get(str(x.id)), "band", None) != "high"
+    ]
+
+    if not found:
+        if not candidates:
+            if criteria.areas:
+                return [no_listings_notice(criteria.areas, requirements)]
+            return [no_results_notice(requirements)]
+        advice = budget_advice(budget, [x.warmmiete_eur for x in trusted])
+        return [budget_notice(advice, criteria.areas, requirements)] if advice else []
+
+    # Results exist, but maybe some requested areas are entirely above budget.
+    blocked: dict[str, int] = {}
+    for area in criteria.areas:
+        rents = [
+            x.warmmiete_eur
+            for x in trusted
+            if matching_area(x.kiez, x.district, [area]) is not None
+        ]
+        if rents and min(rents) > budget:
+            blocked[area] = min(rents)
+    notice = partial_budget_notice(budget, blocked)
+    return [notice] if notice else []
+
+
+def _nearby_pool(
+    repo: ListingRepository, criteria: SearchCriteria, query: str, size: int
+) -> tuple[list[RetrievalResult], tuple[str, float] | None]:
+    """Closest listings outside the requested areas (within NEARBY_MAX_KM), same filters.
+
+    Also returns (Kiez, km) of the closest match beyond that radius, so an empty page
+    can still point somewhere.
+    """
+    wide = criteria.model_copy(update={"areas": []})
+    scored: list[tuple[float, RetrievalResult]] = []
+    closest: tuple[str, float] | None = None
+    for r in repo.retrieve(wide, query, limit=DIAGNOSIS_LIMIT):
+        fit = _area_fit(r.listing, criteria.areas)
+        if fit is None or fit[0] == IN_AREA:
+            continue
+        km = fit[2] or 0.0
+        if fit[0] == NEARBY:
+            scored.append((km, r))
+        elif closest is None or km < closest[1]:
+            closest = (r.listing.kiez, km)
+    scored.sort(key=lambda pair: (pair[0], pair[1].distance))
+    return [r for _, r in scored[:size]], closest
+
+
 @router.post("/search", response_model=SearchResponse)
 def search(
     req: SearchRequest, repo: ListingRepository = Depends(get_repository)
 ) -> SearchResponse:
     criteria = parse_query(req.query)
-    rank_criteria = RankCriteria(
-        max_warm_rent=criteria.max_warm_rent,
-        quiet_priority=criteria.quiet_priority,
-        desired_amenities=tuple(criteria.desired_amenities),
-    )
+    if req.max_warm_rent is not None:
+        criteria = criteria.model_copy(update={"max_warm_rent": req.max_warm_rent})
+    rank_criteria = _rank_criteria(criteria)
 
-    pool = repo.retrieve(criteria, req.query, limit=max(req.limit * 3, 20))
+    pool_size = max(req.limit * 3, 20)
+    pool = repo.retrieve(criteria, req.query, limit=pool_size)
+    notices = _diagnose(repo, criteria, req.query, found=bool(pool))
+    if not pool and criteria.areas:
+        # Nothing inside the requested areas: show the closest matches, clearly labelled.
+        pool, closest = _nearby_pool(repo, criteria, req.query, pool_size)
+        kinds = {n.kind for n in notices}
+        # The nearby notice says "no listings in X" itself; don't show it twice.
+        notices = [n for n in notices if n.kind != NO_LISTINGS_IN_AREA]
+        if pool or BUDGET_TOO_LOW not in kinds:  # the budget hint explains an empty page
+            notices.append(
+                nearby_notice(
+                    criteria.areas,
+                    len(pool),
+                    NEARBY_MAX_KM,
+                    none_in_area=NO_LISTINGS_IN_AREA in kinds,
+                    requirements=requirements_phrase(
+                        criteria.min_rooms, criteria.min_size_m2, criteria.furnished
+                    ),
+                    closest=closest,
+                )
+            )
+    elif not pool and not notices:
+        notices.append(
+            no_results_notice(
+                requirements_phrase(criteria.min_rooms, criteria.min_size_m2, criteria.furnished)
+            )
+        )
+
     listings_by_id = {str(r.listing.id): r.listing for r in pool}
     distance_by_id = {str(r.listing.id): r.distance for r in pool}
+    fit_by_id = {str(r.listing.id): _area_fit(r.listing, criteria.areas) for r in pool}
 
-    # Pass 1 — cheap factors (relevance, budget, quiet-from-Kiez) to pick the page.
+    # Pass 1 — cheap factors (relevance, area, budget, quiet-from-Kiez) to pick the page.
     cheap_inputs = [
-        RankingInput(
-            warmmiete_eur=r.listing.warmmiete_eur,
-            distance=r.distance,
-            nightlife=_NIGHTLIFE.get(r.listing.kiez),
-            listing_id=str(r.listing.id),
-        )
-        for r in pool
+        _rank_input(r.listing, r.distance, fit_by_id[str(r.listing.id)]) for r in pool
     ]
     page = rank(cheap_inputs, rank_criteria)[: req.limit]
 
@@ -222,15 +455,12 @@ def search(
         if commute is not None:
             commute_by_id[inp.listing_id] = commute
         enriched_inputs.append(
-            RankingInput(
-                warmmiete_eur=listing.warmmiete_eur,
-                distance=distance_by_id[inp.listing_id],
-                nightlife=_NIGHTLIFE.get(listing.kiez),
-                available_amenities=neighborhood.available_amenities if neighborhood else None,
-                commute_minutes=commute.minutes if commute else None,
-                commute_source=commute.source if commute else "live",
-                commute_changes=commute.changes if commute else None,
-                listing_id=inp.listing_id,
+            _rank_input(
+                listing,
+                distance_by_id[inp.listing_id],
+                fit_by_id[inp.listing_id],
+                neighborhood=neighborhood,
+                commute=commute,
             )
         )
     ranked = rank(enriched_inputs, rank_criteria)
@@ -249,7 +479,7 @@ def search(
                 listing=_to_listing_out(listing, photos_by_set.get(listing.photo_set_id, [])),
                 score=round(result.total, 4),
                 factors=[FactorOut(**vars(f)) for f in result.factors],
-                explanation=explain(result),
+                explanation=explain(result, context=_match_context(listing, criteria)),
                 risk=_to_risk_out(risk_by_id.get(inp.listing_id)),
                 commute=_to_commute_out(commute),
                 neighborhood=(
@@ -257,20 +487,28 @@ def search(
                     if neighborhood
                     else None
                 ),
+                area_match=_to_area_match_out(fit_by_id[inp.listing_id], listing.kiez),
             )
         )
 
     # Privacy (ADR-0012): never log the query text or parsed values (budget, work
-    # location, …) — only which fields were understood and how many results we returned.
+    # location, areas, …) — only which fields were understood, how many results we
+    # returned and which kinds of notice were shown.
     logger.info(
-        "search results=%d parsed_fields=%s",
+        "search results=%d parsed_fields=%s notices=%s",
         len(results),
         sorted(k for k, v in criteria.model_dump().items() if v not in (None, False, [], "")),
+        [n.kind for n in notices],
     )
     commute_note = _commute_note(
         criteria.work_location, [commute_by_id.get(i.listing_id) for i, _ in ranked]
     )
-    return SearchResponse(criteria=criteria, results=results, commute_note=commute_note)
+    return SearchResponse(
+        criteria=criteria,
+        results=results,
+        commute_note=commute_note,
+        notices=[_to_notice_out(n) for n in notices],
+    )
 
 
 # --- Listing detail (T5.1) ------------------------------------------------------
@@ -318,6 +556,62 @@ class ListingDetailResponse(BaseModel):
     listing: ListingDetailOut
     risk: RiskOut | None = None
     neighborhood: NeighborhoodDetailOut | None = None
+
+
+class MapListingOut(BaseModel):
+    """Just what the homepage map needs: a point, a price and the card details."""
+
+    id: str
+    title: str
+    kiez: str
+    district: str | None
+    lat: float
+    lng: float
+    rooms: float
+    size_m2: int
+    warmmiete_eur: int
+    photo_url: str | None = None  # cover photo (first of the set)
+    risk_band: str | None = None  # low | caution | high
+
+
+# Every listing inside Berlin; the map aggregates medians client-side from these.
+MAP_LISTINGS_LIMIT = 2000
+
+
+@router.get("/listings/map", response_model=list[MapListingOut])
+def get_map_listings(repo: ListingRepository = Depends(get_repository)) -> list[MapListingOut]:
+    """All available listings as map points (declared before /listings/{listing_id})."""
+    rows = repo.listings_in_bbox(
+        BERLIN_BBOX["lat_min"],
+        BERLIN_BBOX["lng_min"],
+        BERLIN_BBOX["lat_max"],
+        BERLIN_BBOX["lng_max"],
+        limit=MAP_LISTINGS_LIMIT,
+    )
+    if not rows:
+        return []
+    photos_by_set = repo.photos_by_set([x.photo_set_id for x in rows])
+    risk_by_id = repo.risk_by_listing([x.id for x in rows])
+    out: list[MapListingOut] = []
+    for x in rows:
+        photos = photos_by_set.get(x.photo_set_id, [])
+        risk = risk_by_id.get(str(x.id))
+        out.append(
+            MapListingOut(
+                id=str(x.id),
+                title=x.title,
+                kiez=x.kiez,
+                district=x.district,
+                lat=x.lat,
+                lng=x.lng,
+                rooms=float(x.rooms),
+                size_m2=x.size_m2,
+                warmmiete_eur=x.warmmiete_eur,
+                photo_url=photos[0].source_url if photos else None,
+                risk_band=risk.band if risk else None,
+            )
+        )
+    return out
 
 
 @router.get("/listings/random", response_model=list[ListingOut])
@@ -439,15 +733,7 @@ def compare(
     ordered = [found[x] for x in req.listing_ids]  # preserve requested order
 
     criteria = parse_query(req.query) if req.query else None
-    rank_criteria = (
-        RankCriteria(
-            max_warm_rent=criteria.max_warm_rent,
-            quiet_priority=criteria.quiet_priority,
-            desired_amenities=tuple(criteria.desired_amenities),
-        )
-        if criteria
-        else None
-    )
+    rank_criteria = _rank_criteria(criteria) if criteria else None
     photos_by_set = repo.photos_by_set([x.photo_set_id for x in ordered])
     risk_by_id = repo.risk_by_listing([x.id for x in ordered])
 
@@ -463,23 +749,20 @@ def compare(
         fit_score: float | None = None
         factors: list[FactorOut] = []
         explanation: Explanation | None = None
-        if rank_criteria is not None:
+        if rank_criteria is not None and criteria is not None:
             result = score_listing(
-                RankingInput(
-                    warmmiete_eur=listing.warmmiete_eur,
-                    distance=0.0,  # no per-listing query vector here; relevance is constant
-                    nightlife=_NIGHTLIFE.get(listing.kiez),
-                    available_amenities=neighborhood.available_amenities if neighborhood else None,
-                    commute_minutes=commute.minutes if commute else None,
-                    commute_source=commute.source if commute else "live",
-                    commute_changes=commute.changes if commute else None,
-                    listing_id=str(listing.id),
+                _rank_input(
+                    listing,
+                    0.0,  # no per-listing query vector here; relevance is constant
+                    _area_fit(listing, criteria.areas),
+                    neighborhood=neighborhood,
+                    commute=commute,
                 ),
                 rank_criteria,
             )
             fit_score = round(result.total, 4)
             factors = [FactorOut(**vars(f)) for f in result.factors]
-            explanation = explain(result)
+            explanation = explain(result, context=_match_context(listing, criteria))
 
         items.append(
             ComparisonItem(

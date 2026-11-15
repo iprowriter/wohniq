@@ -30,3 +30,197 @@ body {
 .lm-range {
   accent-color: #4f46e5;
 }
+
+/* ── Homepage "See on the map" (components/map/ListingsMap.tsx) ─────────────────────────
+   Markers are 0×0 Leaflet divIcons; the visible element is centred on the point. */
+.wq-marker {
+  background: none;
+  border: none;
+}
+.wq-marker:focus {
+  outline: none;
+}
+.wq-pill,
+.wq-stack,
+.wq-area {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
+  user-select: none;
+  transition:
+    transform 0.12s ease,
+    background-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+/* Listing price pill */
+.wq-pill {
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 15px;
+  color: #fff;
+  background: #6d28d9;
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(46, 16, 101, 0.35);
+}
+.wq-marker:hover .wq-pill--default,
+.wq-marker:focus-visible .wq-pill--default {
+  background: #5b21b6;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+.wq-pill--visited {
+  color: #4c1d95;
+  background: #ddd6fe;
+  border-color: #fff;
+}
+.wq-marker:hover .wq-pill--visited,
+.wq-marker:focus-visible .wq-pill--visited {
+  background: #c4b5fd;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+.wq-pill--selected {
+  color: #6d28d9;
+  background: #fff;
+  border: 2px solid #6d28d9;
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow:
+    0 0 0 4px rgba(109, 40, 217, 0.18),
+    0 4px 12px rgba(46, 16, 101, 0.35);
+}
+.wq-marker:focus-visible .wq-pill,
+.wq-marker:focus-visible .wq-area,
+.wq-marker:focus-visible .wq-stack {
+  outline: 2px solid #a78bfa;
+  outline-offset: 2px;
+}
+
+/* Overlapping listings: a pill-sized stack ("3 flats"), click to zoom in */
+.wq-stack {
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 15px;
+  background: #fff;
+  color: #5b21b6;
+  border: 1.5px solid #7c3aed;
+  box-shadow:
+    3px 3px 0 -1px #ede9fe,
+    3px 3px 0 0.5px #a78bfa,
+    0 2px 6px rgba(46, 16, 101, 0.25);
+}
+.wq-marker:hover .wq-stack {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+/* Median bubbles: neighbourhood / district / Berlin */
+.wq-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 11px 5px;
+  border-radius: 12px;
+  background: #4c1d95;
+  color: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 14px rgba(46, 16, 101, 0.4);
+  line-height: 1.15;
+}
+.wq-marker:hover .wq-area {
+  background: #5b21b6;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+.wq-area__name {
+  font-size: 10.5px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+.wq-area__price {
+  font-size: 14px;
+  font-weight: 800;
+}
+.wq-area__price small {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+.wq-area__meta {
+  font-size: 10px;
+  opacity: 0.75;
+}
+.wq-area--city {
+  padding: 10px 18px 11px;
+  border-radius: 18px;
+}
+.wq-area--city .wq-area__name {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.wq-area--city .wq-area__price {
+  font-size: 22px;
+}
+.wq-area--city .wq-area__meta {
+  font-size: 11px;
+}
+
+/* The listing card (a Leaflet popup without Leaflet's chrome) */
+.wq-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.28);
+}
+.wq-popup .leaflet-popup-content {
+  margin: 0;
+  width: 264px !important;
+  font-family: inherit;
+  line-height: normal;
+}
+.wq-popup .leaflet-popup-tip {
+  box-shadow: none;
+}
+.leaflet-container a.wq-card-link {
+  color: #fff;
+  background: #6d28d9;
+}
+.leaflet-container a.wq-card-link:hover {
+  background: #5b21b6;
+}
+.wq-listings-map {
+  font-family: inherit;
+}
+
+/* Map legend swatches (same look as the markers, static) */
+.wq-legend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 18px;
+  padding: 0 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  border-radius: 9999px;
+}
+.wq-legend--pill {
+  color: #fff;
+  background: #6d28d9;
+}
+.wq-legend--stack {
+  color: #5b21b6;
+  background: #fff;
+  border: 1.5px solid #7c3aed;
+  box-shadow: 2px 2px 0 -0.5px #a78bfa;
+}
+.wq-legend--area {
+  color: #fff;
+  background: #4c1d95;
+  border-radius: 6px;
+}

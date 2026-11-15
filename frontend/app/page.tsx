@@ -1,11 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getRandomListings, search } from "@/lib/api";
-import type { ListingOut, SearchResponse, SearchResultItem } from "@/lib/types";
+import { getMapListings, getRandomListings, search } from "@/lib/api";
+import type { SearchResponse, SearchResultItem } from "@/lib/types";
+import type { Bounds, MapListing } from "@/lib/map/listingsMap";
+import {
+  EXPLORE_COUNT,
+  exploreSubtitle,
+  listingsForView,
+  mapToCardsNote,
+  pickExploreCards,
+  type ExploreCard,
+  type ExploreStatus,
+} from "@/lib/map/exploreCards";
 import { CriteriaChips } from "@/components/CriteriaChips";
+import { SearchNotices } from "@/components/SearchNotices";
 import { ResultCard } from "@/components/ResultCard";
-import { FeaturedCard } from "@/components/FeaturedCard";
+import { FeaturedCard, type CardListing } from "@/components/FeaturedCard";
+import { ListingsMapSection } from "@/components/map/ListingsMapSection";
 import { ComparisonModal } from "@/components/ComparisonModal";
 import { LifestyleEntryBar } from "@/components/lifestyle/LifestyleEntryBar";
 import { LifestyleFeatureCard } from "@/components/lifestyle/LifestyleFeatureCard";
@@ -59,13 +71,26 @@ function MarketingCard({
 }
 
 const MAX_COMPARE = 4;
+// Random listings fetched on load: the first EXPLORE_COUNT are shown, the rest are spare
+// fillers for when a map area has fewer than EXPLORE_COUNT listings.
+const EXPLORE_POOL = 12;
 
 export default function Home() {
   const [query, setQuery] = useState("");
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [featured, setFeatured] = useState<ListingOut[]>([]);
+  // Explore Berlin: always EXPLORE_COUNT cards; follows the map once the user moves it.
+  const [pool, setPool] = useState<CardListing[]>([]);
+  const [cards, setCards] = useState<ExploreCard<CardListing>[]>([]);
+  const [exploreStatus, setExploreStatus] = useState<ExploreStatus>({ kind: "random" });
+  const [mapListings, setMapListings] = useState<MapListing[] | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const lastView = useRef<{ bounds: Bounds; zoom: number } | null>(null);
+  const exploreRef = useRef<HTMLElement>(null);
+  // Latest values for async callbacks (debounced map moves, fetches resolving later).
+  const latest = useRef({ pool, cards, mapListings });
+  latest.current = { pool, cards, mapListings };
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [compareOpen, setCompareOpen] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -92,12 +117,52 @@ export default function Home() {
       setQuery(cached.query);
       setData(cached.data);
     }
-    getRandomListings(6)
-      .then(setFeatured)
-      .catch(() => {/* silently ignore — featured listings are best-effort */});
+    loadRandomCards();
+    getMapListings()
+      .then(setMapListings)
+      .catch((e) => setMapError(e instanceof Error ? e.message : "Failed to load the map"));
   }, []);
 
-  async function runSearch(q: string) {
+  /** Fresh random pool; shows its first cards, or re-picks for the current map area. */
+  function loadRandomCards() {
+    getRandomListings(EXPLORE_POOL)
+      .then((fresh) => {
+        setPool(fresh);
+        if (lastView.current && latest.current.mapListings) {
+          // Refresh while following the map: re-roll for the same view.
+          syncCardsToMap(lastView.current.bounds, lastView.current.zoom, fresh, []);
+        } else {
+          setCards(fresh.slice(0, EXPLORE_COUNT).map((listing) => ({ listing, tag: null })));
+          setExploreStatus({ kind: "random" });
+        }
+      })
+      .catch(() => {/* silently ignore — featured listings are best-effort */});
+  }
+
+  /** Explore Berlin follows the map: the listings in view first, fillers after. */
+  function syncCardsToMap(
+    bounds: Bounds,
+    zoom: number,
+    fillers: CardListing[] = latest.current.pool,
+    previous: ExploreCard<CardListing>[] = latest.current.cards,
+  ) {
+    const mapListings = latest.current.mapListings;
+    if (!mapListings) return;
+    lastView.current = { bounds, zoom };
+    const { cards: next, status } = pickExploreCards<CardListing>({
+      inView: listingsForView(mapListings, bounds, zoom),
+      pool: fillers,
+      all: mapListings,
+      previous,
+    });
+    setCards(next);
+    setExploreStatus(status);
+  }
+
+  const shownInView = cards.filter((c) => c.tag === "in-view").length;
+
+  /** `budget` re-runs the query with a raised budget (from a "budget too low" hint). */
+  async function runSearch(q: string, budget?: number) {
     const trimmed = q.trim();
     if (!trimmed) return;
     setLoading(true);
@@ -105,7 +170,7 @@ export default function Home() {
     setSelectedIds(new Set());
     setCompareOpen(false);
     try {
-      const result = await search(trimmed);
+      const result = await search(trimmed, 6, budget);
       setData(result);
       saveCache(trimmed, result);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
@@ -180,13 +245,20 @@ export default function Home() {
 
         {/* ── Search results ── */}
         {data ? (
-          <section ref={resultsRef} className="py-10">
+          // scroll-mt: the auto-scroll to results must stop below the sticky header (57 px),
+          // or it hides the "Understood as" chips.
+          <section ref={resultsRef} className="scroll-mt-16 py-10">
             <div className="mb-4">
               <CriteriaChips criteria={data.criteria} />
               {data.commute_note && (
                 <p className="mt-2 text-xs text-gray-500">{data.commute_note}</p>
               )}
             </div>
+            <SearchNotices
+              notices={data.notices ?? []}
+              busy={loading}
+              onRaiseBudget={(budget) => void runSearch(query, budget)}
+            />
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-gray-500">
                 {data.results.length} result{data.results.length === 1 ? "" : "s"} · ranked by fit
@@ -237,33 +309,54 @@ export default function Home() {
               />
             </section>
 
-            {/* ── Featured listings ── */}
-            <section className="pb-12">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Explore Berlin</h2>
+            {/* ── Featured listings (follow the map below) ── */}
+            <section ref={exploreRef} className="scroll-mt-16 pb-12" data-testid="explore">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                {/* min-w-0: lets the subtitle shrink instead of widening the page on phones. */}
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-lg font-semibold">Explore Berlin</h2>
+                  {/* Fixed height (two lines on phones, one from sm), so the section never
+                      changes height as the text changes. */}
+                  <p
+                    className="mt-0.5 line-clamp-2 h-10 text-sm text-gray-500 sm:line-clamp-1 sm:h-5"
+                    aria-live="polite"
+                    data-testid="explore-subtitle"
+                  >
+                    {exploreSubtitle(exploreStatus, shownInView)}
+                  </p>
+                </div>
                 <button
                   type="button"
-                  onClick={() => getRandomListings(6).then(setFeatured).catch(() => {})}
-                  className="text-xs text-gray-400 hover:text-gray-700"
+                  onClick={loadRandomCards}
+                  className="mt-1 flex-shrink-0 text-xs text-gray-400 hover:text-gray-700"
                 >
                   Refresh ↻
                 </button>
               </div>
 
-              {featured.length === 0 ? (
+              {cards.length === 0 ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
+                  {Array.from({ length: EXPLORE_COUNT }).map((_, i) => (
                     <div key={i} className="h-64 animate-pulse rounded-2xl bg-gray-100" />
                   ))}
                 </div>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {featured.map((listing) => (
-                    <FeaturedCard key={listing.id} listing={listing} />
+                  {cards.map((c) => (
+                    <FeaturedCard key={c.listing.id} listing={c.listing} tag={c.tag} />
                   ))}
                 </div>
               )}
             </section>
+
+            {/* ── See on the map ── */}
+            <ListingsMapSection
+              listings={mapListings}
+              error={mapError}
+              onUserViewChange={(bounds, zoom) => syncCardsToMap(bounds, zoom)}
+              cardsNote={mapToCardsNote(exploreStatus, shownInView)}
+              onCardsNoteClick={() => exploreRef.current?.scrollIntoView({ behavior: "smooth" })}
+            />
           </>
         )}
       </div>

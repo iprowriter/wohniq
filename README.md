@@ -14,13 +14,17 @@ Berlin's rental market is scarce, fast-moving, and scam-prone. Traditional porta
 
 **Primary flow:**
 1. User types a natural-language query.
-2. Gemini Flash parses it into a validated `SearchCriteria` object (budget, rooms, work location, amenities, etc.).
-3. Hard constraints filter the listing DB; pgvector cosine search surfaces semantically relevant candidates.
+2. Gemini Flash parses it into a validated `SearchCriteria` object (budget, rooms, work location, Berlin areas incl. nicknames like "P'berg", amenities, etc.).
+3. Hard constraints (budget, rooms, size, requested areas) filter the listing DB; pgvector cosine search surfaces semantically relevant candidates. If nothing matches inside the requested areas, the closest flats nearby are shown and labelled; if the budget is what empties the page, the app says so and recommends a minimum budget ([ADR-0014](docs/adr/0014-area-aware-search.md)).
 4. A deterministic scoring function ranks results by commute fit, budget fit, neighborhood match, and amenity match.
 5. Real-time enrichment fetches public-transport commute times (BVG/VBB API) and POI counts (OSM Overpass).
 6. A hybrid scam engine runs on every listing: price z-score, pHash duplicate detection, and an LLM text pass produce a fused 0–100 risk score with evidence.
 7. Results render as cards with a natural-language explanation grounded in the score breakdown, a risk badge, and a neighborhood map.
 8. Users can select 2–4 listings for a side-by-side comparison.
+
+### See on the map — every listing, and what an area costs
+
+Under "Explore Berlin" on the homepage, every listing sits on the OpenStreetMap map as a purple price pill (warm rent). Click one for a card with photo, rent, location, rooms and size; the pill stays marked. Zoom out and listings cluster into the **median rent of each neighbourhood** (z12), then **each district** (z11), and once other cities are on screen (z ≤ 10) into a single **Berlin median**. A switcher jumps straight to any level. Tiers, thresholds and why: [ADR-0015](docs/adr/0015-homepage-listings-map.md).
 
 ### Lifestyle Match — find your Kiez, not just a flat
 
@@ -197,7 +201,7 @@ Plus parser self-checks against each publication, a byte-for-byte rebuild test, 
 |---|---|
 | [`docs/SPEC.md`](docs/SPEC.md) | Product spec — *what* WohnIQ does, features F1–F8, acceptance criteria |
 | [`docs/adr/`](docs/adr/) | Architecture decision records — *why* we chose things |
-| [`docs/system_prompts.md`](docs/system_prompts.md) | Versioned product LLM prompts (`parser.v1`, `scam_text.v1`, `explain.v1`) |
+| [`docs/system_prompts.md`](docs/system_prompts.md) | Versioned product LLM prompts (`parser.v2`, `scam_text.v1`, `explain.v2`) |
 | [`AGENTS.md`](AGENTS.md) | Operating manual — conventions, golden rules, working loop |
 | [`TASKS.md`](TASKS.md) | Ordered task plan with milestone status |
 | `backend/core/llm.py` | Central LLM client with validation, retry, fallback, and observability |
@@ -205,7 +209,9 @@ Plus parser self-checks against each publication, a byte-for-byte rebuild test, 
 | `backend/scam/` | Rule signals, pHash duplicate detection, LLM text pass, fusion |
 | `backend/enrich/` | Commute (BVG/VBB) and neighborhood (OSM) enrichment, both cached |
 | `backend/evals/` | Parser eval harness, ranking sanity eval, scam eval + confusion matrix |
-| `frontend/` | Next.js app — search box, result cards, risk badge, comparison, Leaflet map |
+| `frontend/` | Next.js app — search box, result cards, risk badge, comparison, Leaflet maps |
+| `frontend/lib/map/`, `frontend/components/map/` | Homepage "See on the map": zoom tiers, medians, pill stacking (pure, tested) + Leaflet UI |
+| `backend/search/areas.py`, `backend/search/diagnostics.py` | Berlin area gazetteer (districts, Kieze, nicknames) and empty-result / budget diagnosis |
 | [`docs/LIFESTYLE_MATCH.md`](docs/LIFESTYLE_MATCH.md) | Lifestyle Match — flow, factors, scoring, privacy, evaluation, DoD checklist |
 | `backend/lifestyle/` | Lifestyle Match engine: questionnaire, weights, scoring, explanations, persona (pure) |
 | `backend/data/lifestyle/` | Region profile build from official data (`make lifestyle-data`) + shipped `regions.json` |

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field, field_validator
 
+from search.areas import canonical_areas
 from search.parse_rules import CANONICAL_AMENITIES
 
 
@@ -21,7 +22,18 @@ class SearchCriteria(BaseModel):
     quiet_priority: bool = False
     desired_amenities: list[str] = Field(default_factory=list)
     furnished: bool | None = None
+    # Berlin areas the user wants to LIVE in (canonical names from search/areas.py,
+    # e.g. ["Mitte", "Prenzlauer Berg"]). Empty = anywhere. These are a hard filter.
+    areas: list[str] = Field(default_factory=list)
+    # Areas the user explicitly doesn't want ("anything but Neukölln").
+    excluded_areas: list[str] = Field(default_factory=list)
     notes: str | None = None
+
+    @field_validator("areas", "excluded_areas")
+    @classmethod
+    def _only_known_areas(cls, value: list[str]) -> list[str]:
+        """Map names/nicknames ("P'berg", "Xberg") to canonical areas; drop unknown ones."""
+        return canonical_areas(value)
 
     @field_validator("desired_amenities")
     @classmethod

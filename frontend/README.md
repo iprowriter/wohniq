@@ -43,3 +43,18 @@ All 143 areas ranked by a category (or a weighted overall score): list + shaded 
 - `components/neighborhoods/`: category tabs, list row, detail panel, weights panel, map, header link
 
 Tests: `tests/neighborhoods.test.ts` runs against real responses in `tests/fixtures/neighborhoods-*.json` (`make neighborhoods-fixture`; a backend test fails if they go stale). `e2e/neighborhoods.spec.ts` holds the Playwright journeys.
+
+## Homepage map ("See on the map")
+
+Every listing from `GET /api/v1/listings/map` as a price pill; zooming out clusters into
+neighbourhood, district and Berlin median rents (tiers: `lib/map/listingsMap.ts`,
+decision record: `docs/adr/0015-homepage-listings-map.md`).
+
+- `lib/map/listingsMap.ts` — pure logic: zoom tiers, medians, area clusters, pill stacking
+  (tested in `tests/listings-map.test.ts`)
+- `components/map/ListingsMap.tsx` — Leaflet map (pills, bubbles, card popup, tier switcher)
+- `components/map/ListingMapCard.tsx` — the card shown above a clicked pill
+- `components/map/ListingsMapSection.tsx` — homepage section (data loading, lazy Leaflet)
+
+E2E journeys for this and the area-aware search: `e2e/search-and-map.spec.ts`. In a sandbox
+without the Playwright browser download: `PW_CHROMIUM_PATH=/path/to/chrome npm run test:e2e`.

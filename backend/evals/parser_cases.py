@@ -1,9 +1,11 @@
-"""20 canonical parser eval cases (pure data).
+"""Canonical parser eval cases (pure data): the original 20 plus area cases.
 
 Each case has a query and an `expected` partial criteria dict — only the fields we
 can assert unambiguously. Cases deliberately include hard ones: vague vibe queries,
 under-specified requests (where budget/size must stay null — no hallucinating), and
-amenity/transport/quiet phrasing variety.
+amenity/transport/quiet phrasing variety. Area cases (parser.v2) check that Berlin
+districts, nicknames and lists survive parsing, and that workplaces / avoided areas
+never become places to live.
 """
 
 from __future__ import annotations
@@ -31,7 +33,7 @@ CASES: list[EvalCase] = [
     ),
     EvalCase(
         "2-room flat around 60m² in Kreuzberg, furnished",
-        {"min_rooms": 2, "min_size_m2": 60, "furnished": True},
+        {"min_rooms": 2, "min_size_m2": 60, "furnished": True, "areas": ["Kreuzberg"]},
     ),
     EvalCase(
         "Somewhere I can bike to work, not too loud, max 1200 euros",
@@ -47,7 +49,7 @@ CASES: list[EvalCase] = [
     ),
     EvalCase(
         "1-room near Friedrichshain, good transport links",
-        {"min_rooms": 1, "transport_priority": True},
+        {"min_rooms": 1, "transport_priority": True, "areas": ["Friedrichshain"]},
     ),
     EvalCase(
         "I need a furnished apartment with a gym nearby, 2.5 rooms",
@@ -122,6 +124,33 @@ CASES: list[EvalCase] = [
             "min_rooms": 3,
             "max_warm_rent": 2000,
             "transport_priority": True,
+            "areas": [],
         },
+    ),
+    # --- Areas (parser.v2) ---------------------------------------------------------
+    EvalCase(
+        "a quiet flat in Mitte, Spandau, Lichtenberg, Treptow",
+        {
+            "quiet_priority": True,
+            "areas": ["Mitte", "Spandau", "Lichtenberg", "Treptow"],
+            "work_location": None,
+        },
+    ),
+    EvalCase(
+        "quiet apartment in Prenzlauerberg",
+        {"quiet_priority": True, "areas": ["Prenzlauer Berg"]},
+    ),
+    EvalCase(
+        "I work in Mitte, looking for a 2-room in P'berg, anything but Neukölln",
+        {
+            "work_location": "Mitte",
+            "min_rooms": 2,
+            "areas": ["Prenzlauer Berg"],
+            "excluded_areas": ["Neukölln"],
+        },
+    ),
+    EvalCase(
+        "flat in Xberg or Kreuzkölln under 1.2k",
+        {"max_warm_rent": 1200, "areas": ["Kreuzberg", "Kreuzkölln"]},
     ),
 ]
