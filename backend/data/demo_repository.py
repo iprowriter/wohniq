@@ -37,6 +37,7 @@ from enrich.commute import estimate_commute_to
 from enrich.commute_parse import CommuteResult
 from enrich.neighborhood import _from_cache, _location_key
 from enrich.neighborhood_parse import NeighborhoodResult
+from search.areas import matching_area
 from search.criteria import SearchCriteria
 from search.filters import build_hard_filters
 from search.retrieval import RetrievalResult
@@ -86,6 +87,17 @@ def _distance(query_tokens: set[str], listing_tokens: set[str]) -> float:
         return 0.5
     overlap = len(query_tokens & listing_tokens) / len(query_tokens)
     return 0.5 * (1.0 - overlap)
+
+
+def _in_areas(listing: Listing, criteria: SearchCriteria) -> bool:
+    """Same area semantics as retrieval.area_conditions (SQL), in Python."""
+    if criteria.areas and matching_area(listing.kiez, listing.district, criteria.areas) is None:
+        return False
+    if criteria.excluded_areas and matching_area(
+        listing.kiez, listing.district, criteria.excluded_areas
+    ):
+        return False
+    return True
 
 
 def _load_json(name: str) -> list[dict]:
@@ -207,6 +219,7 @@ class DemoRepository:
             RetrievalResult(x, _distance(query_tokens, self._tokens[x.id]))
             for x in self._listings.values()
             if all(_OPS[op](getattr(x, col), value) for col, op, value in filters)
+            and _in_areas(x, criteria)
         ]
         results.sort(key=lambda r: (r.distance, str(r.listing.id)))  # deterministic
         return results[:limit]

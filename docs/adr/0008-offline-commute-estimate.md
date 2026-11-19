@@ -1,6 +1,8 @@
 # ADR-0008 — Offline commute estimate from straight-line distance and published speeds
 
-**Status:** Accepted, amended by [ADR-0009](0009-route-based-commute-estimate.md) · **Date:** 2026-11-06
+**Status:** Accepted, amended by [ADR-0009](0009-route-based-commute-estimate.md) and [ADR-0014](0014-area-aware-search.md) · **Date:** 2026-11-06
+
+> ADR-0014 reverses decision 6 for Berlin area names: "quiet flat near Mitte" now means *live* in Mitte (an area filter), not *commute* to Mitte, unless the text says it's the workplace.
 
 > ADR-0009 adds a route-based estimate over the VBB network, used whenever it has been downloaded. The straight-line estimate described here remains the fallback, and decisions 3–4 (weight 1.0, minutes only) still apply to it.
 

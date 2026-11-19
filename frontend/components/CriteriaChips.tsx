@@ -10,7 +10,10 @@ function Chip({ children }: { children: React.ReactNode }) {
 
 export function CriteriaChips({ criteria }: { criteria: SearchCriteria }) {
   const chips: string[] = [];
-  if (criteria.work_location) chips.push(`near ${criteria.work_location}`);
+  const areas = criteria.areas ?? [];
+  if (areas.length) chips.push(`in ${areas.join(" / ")}`);
+  for (const a of criteria.excluded_areas ?? []) chips.push(`not ${a}`);
+  if (criteria.work_location) chips.push(`work near ${criteria.work_location}`);
   if (criteria.max_warm_rent) chips.push(`≤ €${criteria.max_warm_rent} warm`);
   if (criteria.min_rooms) chips.push(`${criteria.min_rooms}+ rooms`);
   if (criteria.min_size_m2) chips.push(`${criteria.min_size_m2}+ m²`);

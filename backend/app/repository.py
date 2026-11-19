@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 
 from core.config import settings
 from core.db import get_sessionmaker
+from core.embeddings import embed_query
 from data.models import Listing, Photo, RiskAssessment
 from enrich.commute import get_commute
 from enrich.commute_parse import CommuteResult
@@ -64,6 +65,14 @@ class SqlRepository:
 
     def __init__(self, session: Session) -> None:
         self.session = session
+        # One repository per request: a search may retrieve more than once (nearby
+        # fallback, budget check), so embed the query once. Never outlives the request.
+        self._query_vectors: dict[str, list[float]] = {}
+
+    def _embed(self, text: str) -> list[float]:
+        if text not in self._query_vectors:
+            self._query_vectors[text] = embed_query(text)
+        return self._query_vectors[text]
 
     def random_listings(self, n: int) -> list[Listing]:
         return list(self.session.scalars(select(Listing).order_by(func.random()).limit(n)))
@@ -93,7 +102,7 @@ class SqlRepository:
     def retrieve(
         self, criteria: SearchCriteria, query_text: str, *, limit: int
     ) -> list[RetrievalResult]:
-        return retrieve(self.session, criteria, query_text, limit=limit)
+        return retrieve(self.session, criteria, query_text, limit=limit, embedder=self._embed)
 
     def photos_by_set(self, set_ids: Sequence[uuid.UUID]) -> dict[uuid.UUID, list[Photo]]:
         if not set_ids:

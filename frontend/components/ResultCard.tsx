@@ -17,8 +17,30 @@ interface Props {
   selectionDisabled?: boolean;
 }
 
+function AreaBadge({ match }: { match: NonNullable<SearchResultItem["area_match"]> }) {
+  const inArea = match.status === "in_area";
+  return (
+    <span
+      data-testid="area-badge"
+      title={
+        inArea
+          ? `In ${match.area}, an area you asked for`
+          : `Not in the areas you asked for: ${match.distance_km?.toFixed(1)} km from ${match.area}`
+      }
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+        inArea ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
+      }`}
+    >
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+        <path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" />
+      </svg>
+      {match.label}
+    </span>
+  );
+}
+
 export function ResultCard({ item, selected = false, onToggleSelect, selectionDisabled = false }: Props) {
-  const { listing, explanation, commute, neighborhood, risk } = item;
+  const { listing, explanation, commute, neighborhood, risk, area_match } = item;
   const cover = listing.photos[0];
   const isHighRisk = risk?.band === "high";
 
@@ -64,6 +86,11 @@ export function ResultCard({ item, selected = false, onToggleSelect, selectionDi
               <p className="mt-0.5 text-sm text-gray-500">
                 {listing.kiez} · {listing.size_m2} m² · {listing.rooms} rooms
               </p>
+              {area_match && (
+                <div className="mt-1">
+                  <AreaBadge match={area_match} />
+                </div>
+              )}
             </div>
             <RiskBadge risk={risk} />
           </div>

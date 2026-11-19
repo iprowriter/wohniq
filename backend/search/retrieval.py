@@ -1,8 +1,9 @@
 """Retrieval (F2): turn SearchCriteria + the raw query into a candidate shortlist.
 
 Two stages, two tools (the design point of T2.4):
-  * Hard constraints (budget, rooms, size) become SQL WHERE filters — exact, non-
-    negotiable. A listing over budget is excluded, not down-weighted.
+  * Hard constraints (budget, rooms, size, requested/excluded areas) become SQL WHERE
+    filters — exact, non-negotiable. A listing over budget or outside the requested
+    areas is excluded, not down-weighted.
   * The fuzzy "vibe" of the request is matched semantically: we embed the raw query
     and order survivors by cosine distance to each listing's embedding (pgvector,
     HNSW index).
@@ -18,11 +19,12 @@ import operator
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from core.embeddings import embed_query
 from data.models import Listing, ListingEmbedding
+from search.areas import area_sql_terms
 from search.criteria import SearchCriteria
 from search.filters import build_hard_filters
 
@@ -60,6 +62,26 @@ def retrieve(
         criteria.max_warm_rent, criteria.min_rooms, criteria.min_size_m2
     ):
         stmt = stmt.where(_OPS[op](_COLUMNS[column], value))
+    for condition in area_conditions(criteria):
+        stmt = stmt.where(condition)
     stmt = stmt.order_by(distance).limit(limit)
 
     return [RetrievalResult(listing=row[0], distance=row[1]) for row in session.execute(stmt)]
+
+
+def area_conditions(criteria: SearchCriteria) -> list:
+    """SQL conditions for the requested and excluded areas (see search/areas.py).
+
+    A listing is in an area when its Kiez is one the area covers, or — for whole
+    districts ("Friedrichshain-Kreuzberg", "Bezirk Mitte") — when its Bezirk matches.
+    """
+    conditions = []
+    if criteria.areas:
+        kieze, districts = area_sql_terms(criteria.areas)
+        conditions.append(or_(Listing.kiez.in_(kieze), Listing.district.in_(districts)))
+    if criteria.excluded_areas:
+        kieze, districts = area_sql_terms(criteria.excluded_areas)
+        conditions.append(~Listing.kiez.in_(kieze))
+        if districts:
+            conditions.append(or_(Listing.district.is_(None), ~Listing.district.in_(districts)))
+    return conditions

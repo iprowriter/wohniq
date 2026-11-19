@@ -12,6 +12,33 @@ export interface FactorOut {
   score: number;
   weight: number;
   detail: string;
+  highlight?: string; // short phrase used in the summary
+}
+
+/** Where a result lies relative to the areas the user asked for. */
+export interface AreaMatchOut {
+  status: "in_area" | "nearby" | "outside";
+  area: string; // requested area it's in, or the nearest one
+  distance_km?: number | null; // from that area's centre (nearby/outside only)
+  label: string; // "In Mitte", "Near Mitte · 2.1 km"
+}
+
+export type NoticeKind =
+  | "budget_too_low"
+  | "budget_too_low_in_some_areas"
+  | "nearby_results"
+  | "no_listings_in_area"
+  | "no_results";
+
+/** Why results are missing or come from elsewhere, with a concrete way forward. */
+export interface SearchNotice {
+  kind: NoticeKind;
+  title: string;
+  message: string;
+  suggested_budget?: number | null; // minimum warm rent that shows at least one flat
+  comfortable_budget?: number | null; // shows a few flats to choose from
+  options_at_suggested?: number | null;
+  options_at_comfortable?: number | null;
 }
 
 export interface CommuteOut {
@@ -73,6 +100,7 @@ export interface SearchResultItem {
   commute?: CommuteOut | null;
   neighborhood?: NeighborhoodOut | null;
   risk?: RiskOut | null;
+  area_match?: AreaMatchOut | null;
 }
 
 export interface SearchCriteria {
@@ -84,6 +112,8 @@ export interface SearchCriteria {
   quiet_priority: boolean;
   desired_amenities: string[];
   furnished?: boolean | null;
+  areas?: string[]; // Berlin areas to live in (hard filter)
+  excluded_areas?: string[];
   notes?: string | null;
 }
 
@@ -91,6 +121,7 @@ export interface SearchResponse {
   criteria: SearchCriteria;
   results: SearchResultItem[];
   commute_note?: string | null;
+  notices?: SearchNotice[];
 }
 
 // Detail page types
