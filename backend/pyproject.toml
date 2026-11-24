@@ -34,7 +34,7 @@ dev = [
     # XLSX/PDF sources. Not runtime deps — the API reads the generated JSON.
     "openpyxl>=3.1",
     "pypdf>=4.0",
-    "pdfplumber>=0.11",  # glyph x-positions for the Umweltgerechtigkeit table
+    "pdfplumber>=0.11",  # glyph x-positions (Umweltgerechtigkeit table, Mietspiegel checklist)
 ]
 
 [build-system]
@@ -43,7 +43,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 # Treat each top-level folder as an importable package.
-packages = ["app", "core", "search", "scam", "enrich", "data", "evals", "lifestyle", "neighborhoods"]
+packages = ["app", "core", "search", "scam", "enrich", "data", "evals", "lifestyle", "neighborhoods", "berlin"]
 
 # --- Tooling config (single source of truth) ---
 

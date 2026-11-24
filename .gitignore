@@ -46,3 +46,6 @@ backend/data/lifestyle/raw/*
 backend/data/neighborhoods/raw/*
 !backend/data/neighborhoods/raw/README.md
 assets/reference-*.png
+
+# Berlin open data built from Berlin Visualized raw files (`make berlin-data`, ADR-0016)
+backend/data/berlin/build/

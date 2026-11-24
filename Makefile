@@ -3,7 +3,7 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture eval-neighborhoods test test-all lint frontend-test format frontend-dev
+.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture berlin-data berlin-load eval-neighborhoods test test-all lint frontend-test format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
@@ -26,6 +26,8 @@ help:
 	@echo "demo-stops     Download VBB stops + peak network for offline commute estimates (once, online)"
 	@echo "lifestyle-data Rebuild Lifestyle Match region profiles from the official files in data/lifestyle/raw/"
 	@echo "neighborhoods-data Rebuild the Berlin Neighbourhoods bundle from data/neighborhoods/raw/"
+	@echo "berlin-data    Build rent index, addresses, stops, schools… from Berlin Visualized raw files (BERLIN_RAW_DIR)"
+	@echo "berlin-load    Load the berlin-data build into Supabase (needs make migrate)"
 	@echo "neighborhoods-fixture Refresh the frontend's neighbourhoods contract fixture from the API"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "test-all       Run pytest including slow tests (e.g. Lifestyle data rebuild)"
@@ -98,6 +100,12 @@ lifestyle-fixture:
 
 neighborhoods-data:
 	cd backend && uv run python -m data.neighborhoods.build_index $(ARGS)
+
+berlin-data:
+	cd backend && uv run python -m data.berlin.build $(ARGS)
+
+berlin-load:
+	cd backend && uv run python -m data.berlin.load $(ARGS)
 
 neighborhoods-fixture:
 	cd backend && uv run python -m data.neighborhoods.export_fixture

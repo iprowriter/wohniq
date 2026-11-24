@@ -123,6 +123,7 @@ def _to_listing(s) -> Listing:
         available_from=s.available_from,
         floor=s.floor,
         total_floors=s.total_floors,
+        year_built=s.year_built,
         anmeldung_possible=s.anmeldung_possible,
         photo_set_id=s.photo_set_id,
     )

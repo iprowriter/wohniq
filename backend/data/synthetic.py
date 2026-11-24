@@ -16,6 +16,7 @@ Produces three kinds of listing:
 
 from __future__ import annotations
 
+import hashlib
 import random
 import uuid
 from dataclasses import dataclass
@@ -94,6 +95,7 @@ class SyntheticListing:
     is_scam: bool = False
     scam_type: str | None = None
     is_hard_negative: bool = False  # manifest-only; not a DB column
+    year_built: int | None = None  # derived from the id (year_built_for), not from rng
 
     @property
     def warmmiete_eur(self) -> int:
@@ -102,6 +104,39 @@ class SyntheticListing:
     @property
     def eur_per_m2(self) -> float:
         return self.kaltmiete_eur / self.size_m2
+
+
+# Building-age mix for the synthetic stock: roughly Berlin's rental housing (old Altbau,
+# post-war, GDR/West-Berlin 1970s–80s, little 2002–2013, a recent new-build wave). Bands
+# follow the Mietspiegel 2026 building-age rows; 2014+ new builds are rent-brake exempt.
+_BUILD_BANDS: tuple[tuple[int, int, float], ...] = (
+    (1870, 1918, 0.24),
+    (1919, 1949, 0.13),
+    (1950, 1964, 0.13),
+    (1965, 1972, 0.08),
+    (1973, 1990, 0.17),
+    (1991, 2001, 0.10),
+    (2002, 2013, 0.04),
+    (2014, 2024, 0.11),
+)
+
+
+def year_built_for(listing_id: uuid.UUID) -> int:
+    """Deterministic building year from the listing id.
+
+    Hash-based on purpose: it consumes nothing from the generator's rng, so adding it left
+    every other field (and every scam label) of the seeded listings unchanged.
+    """
+    digest = hashlib.sha256(listing_id.bytes).digest()
+    u = int.from_bytes(digest[:8], "big") / 2**64
+    v = int.from_bytes(digest[8:16], "big") / 2**64
+    edge = 0.0
+    for start, end, weight in _BUILD_BANDS:
+        edge += weight
+        if u < edge:
+            return start + int(v * (end - start + 1))
+    start, end, _ = _BUILD_BANDS[-1]
+    return start + int(v * (end - start + 1))
 
 
 def _make_listing(
@@ -239,6 +274,8 @@ def generate_listings(
         if listing.scam_type == "photo_reuse" and genuine:
             listing.photo_set_id = rng.choice(genuine).photo_set_id
 
+    for listing in listings:
+        listing.year_built = year_built_for(listing.id)
     return listings
 
 

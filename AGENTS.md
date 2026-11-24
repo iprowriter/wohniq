@@ -75,6 +75,8 @@ npm run lint                                      # lint
 cd backend && uv run alembic upgrade head         # apply DB migrations (or: make migrate)
 uv run python -m data.seed_listings               # generate synthetic listings
 uv run python -m data.seed_images                 # assign Pexels photos (incl. scam dupes)
+make berlin-data                                  # Berlin open data build (needs BERLIN_RAW_DIR, ADR-0016)
+make berlin-load                                  # load that build into Supabase (after make migrate)
 ```
 
 Schema is **SQLAlchemy 2.0 models** (`backend/data/models.py`) — the single source of truth — with **Alembic** migrations in `backend/data/migrations/` (ADR-0006). Change the models, then `uv run alembic revision --autogenerate -m "..."`, review the generated file, and `alembic upgrade head`. Never edit an applied revision. **Rule of thumb:** ORM for CRUD; raw SQL (`text()`) for the pgvector search and ranking queries.
