@@ -90,6 +90,8 @@ class DestinationOut(BaseModel):
     name: str
     short: str
     kind: str
+    lat: float | None = None  # drawn on the explorer map
+    lng: float | None = None
 
 
 class SourceOut(BaseModel):
@@ -409,7 +411,7 @@ def catalog(response: Response) -> CatalogOut:
             for a in ATTRIBUTES
         ],
         destinations=[
-            DestinationOut(id=d.id, name=d.name, short=d.short, kind=d.kind)
+            DestinationOut(id=d.id, name=d.name, short=d.short, kind=d.kind, lat=d.lat, lng=d.lng)
             for d in bundle.destinations
         ],
         sources=[SourceOut(**s.model_dump()) for s in bundle.sources.values()],

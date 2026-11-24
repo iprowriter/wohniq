@@ -295,3 +295,49 @@ body {
   .print-only { display: block !important; }
 }
 .print-only { display: none; }
+
+/* Lifestyle explorer map (components/lifestyle/explorer). */
+.lm-rank {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #fff;
+  color: #0d1321;
+  border: 2px solid #0d1321;
+  font: 700 12px/1 var(--font-geist-sans), system-ui, sans-serif;
+  box-shadow: 0 1px 4px rgba(13, 19, 33, 0.3);
+  cursor: pointer;
+}
+.lm-rank--active {
+  background: #0d1321;
+  color: #fff;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+.lm-dest {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border: 3px solid #0f6b5e;
+}
+.lm-dest-label {
+  background: #fff;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(13, 19, 33, 0.25);
+  color: #0f6b5e;
+  font-weight: 600;
+  padding: 2px 6px;
+}
+.lm-dest-label::before {
+  display: none;
+}
