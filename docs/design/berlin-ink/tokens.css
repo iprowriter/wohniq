@@ -1,0 +1,82 @@
+/*
+ * WohnIQ "Berlin Ink" design tokens.
+ * Every colour, size and radius used in design/screens/*.html comes from this list.
+ * The screens inline these values (they are static mockups); the real app should
+ * import this file (or map it into Tailwind) instead of hard-coding hex values.
+ */
+:root {
+  /* Surfaces */
+  --color-ink: #0D1321;            /* header, hero, dark cards, primary-dark buttons */
+  --color-ground: #F4F5F7;         /* page background */
+  --color-surface: #FFFFFF;        /* cards, inputs */
+  --color-chip: #EEF0F4;           /* neutral chips, empty bar tracks */
+  --color-placeholder: #E9ECF2;    /* photo placeholders */
+  --color-placeholder-strong: #E2E6ED;
+  --color-placeholder-alt: #E7EAF0;
+  --color-accent-tint: #EEF1FF;    /* icon tiles, "as you asked" area fill */
+
+  /* Text */
+  --color-text: #0D1321;
+  --color-text-body: #3B4352;
+  --color-text-muted: #5B6475;
+  --color-text-on-ink: #FFFFFF;
+  --color-text-on-ink-muted: #C9D0DC;
+  --color-text-on-ink-soft: #E6EAF1;
+  --color-text-faint: #9AA3B2;
+
+  /* Lines */
+  --color-line: #E3E6EC;
+  --color-line-strong: #DDE1E8;
+  --color-input-border: #CFD5DF;
+
+  /* Accent (actions, links, the user's own value on a scale) */
+  --color-accent: #2747E6;
+  --color-accent-hover: #1A33B3;
+  --color-accent-on-ink: #8FA4FF;   /* eyebrow text on ink */
+  --color-accent-logo: #6F8BFF;     /* logo mark outline */
+  --color-accent-soft: #C9D3FF;
+
+  /* Verdicts: describe, never alarm. Only two states plus neutral. */
+  --color-ok-text: #0F6B5E;        /* "Fair rent", "Low risk" */
+  --color-ok-strong: #0B4F45;
+  --color-ok-body: #0F4F45;        /* body copy inside an ok panel */
+  --color-ok-bg: #E3F4F0;
+  --color-ok-bar: #BFE3D9;         /* the rent-index range on scales */
+  --color-warn-text: #8A3F06;      /* "Above index", rent-brake limit marker */
+  --color-warn-bg: #FCEFD9;
+
+  /* Live data */
+  --color-live: #3DD9B3;
+  --color-live-text: #9FF0DC;
+
+  /* Transit line badges (BVG colours) */
+  --color-line-u8: #1C5FA8;
+  --color-line-tram: #B3261E;
+
+  /* Map placeholder */
+  --color-map-land: #EBEEF3;
+  --color-map-water: #B9C8E8;
+  --color-map-green: #D3E7DA;
+
+  /* Type */
+  --font-sans: Geist, Inter, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --font-numbers: tabular-nums;    /* font-variant-numeric for every price and count */
+  --text-display: 64px;            /* home hero h1, letter-spacing -0.04em (results hero: 56px) */
+  --text-h1: 44px;                 /* page titles, -0.03em (listing title: 38px; phone: 26px) */
+  --text-h2: 22px;
+  --text-h3: 17px;
+  --text-body: 16px;
+  --text-small: 14px;
+  --text-caption: 12px;
+
+  /* Shape and spacing */
+  --radius-sm: 8px;
+  --radius-md: 12px;               /* buttons, inputs */
+  --radius-lg: 16px;               /* cards */
+  --radius-xl: 20px;               /* hero search box, large cards */
+  --radius-pill: 999px;
+  --tap-min: 44px;                 /* minimum height of anything clickable */
+  --page-max: 1280px;
+  --page-gutter: 32px;             /* 18px on phones */
+}
