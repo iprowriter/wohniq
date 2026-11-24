@@ -7,9 +7,39 @@ run it. Tests that need a network pass one in explicitly (see tests/gtfs_fixture
 
 import pytest
 
+import berlin
 import enrich.commute as commute
 
 
 @pytest.fixture(autouse=True)
 def no_local_transit_network(monkeypatch):
     monkeypatch.setattr(commute, "get_network", lambda: None)
+
+
+_local_berlin = None
+
+
+@pytest.fixture(autouse=True)
+def offline_berlin_data(monkeypatch):
+    """Berlin data in tests is always the local build (or absent), never Supabase.
+
+    `.env` usually has a real DATABASE_URL; without this, any API test outside demo mode
+    would query the live database through the listing enrichment. The parity test builds
+    its own Postgres repository explicitly.
+    """
+    from berlin.files import BuildMissing, is_built
+
+    def local_only():
+        global _local_berlin
+        if not is_built():
+            raise BuildMissing("no Berlin build in this checkout")
+        if _local_berlin is None:
+            from berlin.local import LocalBerlinData
+
+            _local_berlin = LocalBerlinData()
+        return _local_berlin
+
+    monkeypatch.setattr(berlin, "get_berlin_data", local_only)
+    import app.main as main
+
+    monkeypatch.setattr(main, "_warm_listing_locations", lambda data: None)

@@ -19,7 +19,18 @@ def get_berlin_data() -> BerlinData:
         from berlin.local import LocalBerlinData
 
         return LocalBerlinData()  # raises files.BuildMissing if `make berlin-data` hasn't run
-    from berlin.postgres import PostgresBerlinData
-    from core.db import get_engine
+    from sqlalchemy import create_engine
 
-    return PostgresBerlinData(get_engine())
+    from berlin.postgres import PostgresBerlinData
+
+    # Its own small pool: a place profile runs ~9 short queries at once. No pre-ping (it
+    # doubles every round trip to Supabase); PostgresBerlinData retries a dropped
+    # connection once instead, and connections are recycled before Supabase idles them out.
+    engine = create_engine(
+        settings.sqlalchemy_url,
+        pool_size=10,
+        max_overflow=5,
+        pool_recycle=240,
+        pool_pre_ping=False,
+    )
+    return PostgresBerlinData(engine)

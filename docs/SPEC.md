@@ -77,7 +77,7 @@ Summarize each listing's Kiez: cafes, parks, supermarkets, nightlife, transport.
 
 ### F7 — Scam / risk detection *(showpiece)*
 Hybrid engine producing an explained 0–100 risk score and Low/Caution/High band per listing. See ADR-0002.
-- **AC1.** Deterministic signals (price z-score vs. Kiez median, pHash photo duplication, metadata rules) run with no API cost.
+- **AC1.** Deterministic signals (price vs. the Mietspiegel's lowest value for the flat, falling back to the Kiez median; pHash photo duplication with at least 4 photos shared with one listing; metadata rules) run with no API cost. See ADR-0017.
 - **AC2.** An LLM pass extracts fuzzy text signals (off-platform payment, landlord-abroad, urgency, no-Anmeldung) as validated structured output with evidence quotes.
 - **AC3.** Fused score is explainable: output lists the contributing signals with evidence.
 - **AC4.** Evaluated against the labeled synthetic set with a reported precision/recall + confusion matrix in the repo.
@@ -102,6 +102,20 @@ All 143 Berlin areas as a ranked list next to an OSM map, re-rankable by categor
 - **AC3.** Areas are ranked Berlin-wide; a category switcher (crime, road safety, affluence, education, healthcare, amenities, parks, transport, environment, parking, affordability, weighted overall) re-ranks the list and recolours the map; best-first / worst-first.
 - **AC4.** Every figure cites its source, period and method; category caveats are shown; missing data is marked pending, never scored as zero.
 - **AC5.** Deterministic, no LLM; labels describe the measure, never the residents; no "avoid" wording.
+
+### F11 — Rent check
+Every listing and any Berlin address checked against the Berliner Mietspiegel 2026 and the rent brake. See ADR-0016/0017.
+- **AC1.** A listing shows the index range, the rent-brake limit (index mean + 10 %, labelled an estimate) and a verdict: within the limit, above it (with € per m² and per month), below the index, or a new build without a limit.
+- **AC2.** For any of the 400,505 residential addresses, the user enters size, building age and cold rent, optionally an energy value and the official checklist; the result follows the brochure's method (its worked example, €7.30 → €7.75, is a test).
+- **AC3.** The flat's rent and features are computed in the browser and never sent to the server or put in a URL.
+- **AC4.** The rent-brake exemptions and "not legal advice" are shown with every verdict; every figure cites the Mietspiegel row.
+- **AC5.** Works offline (demo mode) and live (Supabase) with the same answers.
+
+### F12 — Around this flat & Right now
+- **AC1.** For any point: nearest S/U-Bahn (walking minutes), schools within 1 km, Kitas and places within 500 m, nearest park ≥ 1 ha and playgrounds, air quality at the nearest station, road accidents within 300 m, recorded crime for the district region, and the location class — each with its source and its position among Berlin's 542 planning areas (crime: 143 regions).
+- **AC2.** Wording describes and never judges ("closer than", "more than in", "higher than in"); no area is coloured or ranked by who lives there.
+- **AC3.** A listing's street, planning area, rent check and profile all come from the same matched address.
+- **AC4.** Right now always lists the six nearest stops with transport types and walking minutes, without a network; with one, live departures at the nearest S/U-Bahn station and bus/tram stop, labelled live.
 
 ## 6. User flows
 

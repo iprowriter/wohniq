@@ -22,3 +22,4 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0014](0014-area-aware-search.md) | Area-aware search: Berlin areas are a hard filter, with a labelled nearby fallback | Accepted (amends 0008 decision 6) |
 | [0015](0015-homepage-listings-map.md) | Homepage listings map: zoom tiers, median clusters and price pills | Accepted |
 | [0016](0016-berlin-open-data-in-supabase.md) | Berlin open data in Supabase (PostGIS), with offline build files | Accepted |
+| [0017](0017-rent-check-and-scam-price-signal.md) | Rent check against the Mietspiegel, and the scam price signal that uses it | Accepted (amends 0002) |

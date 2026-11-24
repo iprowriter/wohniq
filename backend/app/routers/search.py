@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import date
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -137,6 +138,43 @@ class RiskOut(BaseModel):
     signals: list[RiskSignalOut] = Field(default_factory=list)
 
 
+class ListingLocationOut(BaseModel):
+    """The listing matched to the nearest real address in its district (ADR-0016).
+
+    Only the street is shown: the listing is synthetic, so no house number."""
+
+    street: str
+    postcode: str
+    district: str
+    planning_area: str | None = None
+    district_region: str | None = None
+    location_class: str  # simple | medium | good (Mietspiegel)
+    east: bool
+    rail_stop: str | None = None  # nearest S/U-Bahn station
+    rail_modes: list[str] = Field(default_factory=list)
+    rail_walk_minutes: int | None = None
+
+
+class RentOut(BaseModel):
+    """Rent check against the Mietspiegel 2026 (ADR-0017). An estimate: listings don't
+    know their checklist features, so the comparable rent is the index mean."""
+
+    verdict: str  # within_limit | above_limit | below_index | new_build | not_covered
+    verdict_text: str
+    explanation: str
+    estimate: bool = True
+    covered: bool
+    asked: float | None = None  # €/m² net cold
+    low: float | None = None
+    mean: float | None = None
+    high: float | None = None
+    limit: float | None = None
+    over_per_m2: float | None = None
+    over_per_month: float | None = None
+    row: int | None = None
+    period: str | None = None
+
+
 class ListingOut(BaseModel):
     id: str
     title: str
@@ -152,6 +190,9 @@ class ListingOut(BaseModel):
     furnished: bool
     available_from: date | None
     photos: list[PhotoOut] = Field(default_factory=list)
+    year_built: int | None = None
+    location: ListingLocationOut | None = None
+    rent: RentOut | None = None
 
 
 class SearchResultItem(BaseModel):
@@ -240,7 +281,49 @@ def _to_listing_out(listing: Listing, photos: list[Photo]) -> ListingOut:
             PhotoOut(url=p.source_url, room_type=p.room_type, attribution=p.attribution)
             for p in photos
         ],
+        year_built=listing.year_built,
+        **_berlin_fields(listing),
     )
+
+
+def _berlin_fields(listing: Listing) -> dict:
+    """location + rent for a listing; empty when the Berlin data isn't available."""
+    from berlin import get_berlin_data
+    from berlin.files import BuildMissing
+    from berlin.listings import listing_location, listing_rent
+
+    try:
+        data = get_berlin_data()
+        location = listing_location(data, listing)
+        rent = listing_rent(data, listing, location)
+    except BuildMissing:
+        return {}
+    except Exception:  # noqa: BLE001 - enrichment must never break search
+        logger.warning("Berlin context unavailable for a listing", exc_info=True)
+        return {}
+    out: dict = {}
+    if location is not None:
+        out["location"] = ListingLocationOut(
+            **{k: v for k, v in location.to_dict().items() if k in ListingLocationOut.model_fields}
+        )
+    if rent is not None:
+        r = rent.result
+        out["rent"] = RentOut(
+            verdict=r.verdict,
+            verdict_text=rent.verdict_text,
+            explanation=rent.explanation,
+            covered=r.covered,
+            asked=r.asked,
+            low=r.low,
+            mean=r.mean,
+            high=r.high,
+            limit=r.limit,
+            over_per_m2=r.over_per_m2,
+            over_per_month=r.over_per_month,
+            row=r.row["row"] if r.row else None,
+            period=r.period,
+        )
+    return out
 
 
 # --- Area fit, ranking inputs, explanation context -------------------------------------
@@ -542,6 +625,7 @@ class ListingDetailOut(BaseModel):
     total_floors: int | None
     anmeldung_possible: bool
     photos: list[PhotoOut] = Field(default_factory=list)
+    year_built: int | None = None
 
 
 class NeighborhoodDetailOut(BaseModel):
@@ -556,6 +640,8 @@ class ListingDetailResponse(BaseModel):
     listing: ListingDetailOut
     risk: RiskOut | None = None
     neighborhood: NeighborhoodDetailOut | None = None
+    location: ListingLocationOut | None = None
+    rent: RentOut | None = None
 
 
 class MapListingOut(BaseModel):
@@ -685,10 +771,40 @@ def get_listing(
                 PhotoOut(url=p.source_url, room_type=p.room_type, attribution=p.attribution)
                 for p in photos
             ],
+            year_built=listing.year_built,
         ),
         risk=_to_risk_out(risk_by_id.get(str(listing.id))),
         neighborhood=neighborhood_detail,
+        **_berlin_fields(listing),
     )
+
+
+@router.get("/listings/{listing_id}/around")
+def get_listing_around(
+    listing_id: str, repo: Annotated[ListingRepository, Depends(get_repository)]
+) -> dict:
+    """Around this flat: the place profile at the listing, with its matched location class."""
+    from berlin import get_berlin_data
+    from berlin.files import BuildMissing
+    from berlin.listings import listing_location
+    from berlin.profile import build_profile
+
+    try:
+        uid = uuid.UUID(listing_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid listing id") from None
+    listing = repo.get_listing(uid)
+    if listing is None:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    try:
+        data = get_berlin_data()
+    except BuildMissing:
+        raise HTTPException(status_code=503, detail="Berlin data not built") from None
+    location = listing_location(data, listing)
+    if location is None:
+        return build_profile(data, listing.lat, listing.lng).to_dict()
+    # Measured at the matched address, like the location and rent (one point, one story).
+    return build_profile(data, location.lat, location.lng, location.location_class).to_dict()
 
 
 # --- Comparison (F8) ------------------------------------------------------------

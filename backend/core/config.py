@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     # set; see `demo_mode` for the full precedence. Empty/unset means "not forced".
     wohniq_demo: bool = False
 
+    # "Right now" live departures from transport.rest (WOHNIQ_LIVE_DEPARTURES). The only
+    # network call demo mode may make; set to 0 for a fully offline demo. Without a
+    # connection the nearest-stops list is shown either way (berlin/departures.py).
+    wohniq_live_departures: bool = True
+
     @field_validator("wohniq_demo", mode="before")
     @classmethod
     def _parse_demo_flag(cls, value: object) -> bool:

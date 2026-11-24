@@ -10,6 +10,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.routers import berlin as berlin_router
 from app.routers import lifestyle as lifestyle_router
 from app.routers import neighborhoods as neighborhoods_router
 from app.routers import search as search_router
@@ -18,6 +19,25 @@ from core.logging import configure_logging, get_logger
 
 configure_logging()
 logger = get_logger(__name__)
+
+
+def _warm_listing_locations(berlin) -> None:
+    """Match every listing to its address in the background (live mode: ~1 query batch per
+    listing), so the first search doesn't wait. Offline it takes milliseconds anyway."""
+    import threading
+
+    from app.repository import get_repository_for_warmup
+    from berlin.listings import warm_listing_locations
+
+    def run() -> None:
+        try:
+            listings = get_repository_for_warmup()
+            n = warm_listing_locations(berlin, listings)
+            logger.info("Berlin data: matched %d listings to their addresses.", n)
+        except Exception:  # noqa: BLE001 - warm-up is best effort
+            logger.warning("Listing address warm-up failed", exc_info=True)
+
+    threading.Thread(target=run, name="berlin-warmup", daemon=True).start()
 
 
 @asynccontextmanager
@@ -53,8 +73,20 @@ async def lifespan(app: FastAPI):
                 )
         else:
             print("✓  LIVE MODE: using DATABASE_URL.")
+        from berlin import get_berlin_data
+        from berlin.files import BuildMissing
         from neighborhoods.bundle import get_bundle as get_neighbourhoods
 
+        try:
+            berlin = get_berlin_data()  # offline: loads the build files now (≈ 1 s)
+            n_rows = len(berlin.rent_rows())
+            print(f"✓  Berlin data: rent index ({n_rows} rows), addresses, stops and area data.")
+            _warm_listing_locations(berlin)
+        except BuildMissing:
+            print(
+                "⚠  Berlin data not built: rent check and Around this flat are unavailable. "
+                "Run `make berlin-data` (ADR-0016)."
+            )
         hoods = get_neighbourhoods()  # validate the bundle now, not on first request
         print(
             f"✓  Berlin Neighbourhoods: {len(hoods.regions)} areas, "
@@ -98,6 +130,7 @@ def health() -> dict[str, str]:
 api_v1.include_router(search_router.router)
 api_v1.include_router(lifestyle_router.router)
 api_v1.include_router(neighborhoods_router.router)
+api_v1.include_router(berlin_router.router)
 app.include_router(api_v1)
 
 if settings.demo_mode:

@@ -11,6 +11,7 @@ from functools import cached_property
 
 from sqlalchemy import bindparam, text
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import DBAPIError, OperationalError
 
 from berlin.repository import POINT_LAYERS, Address, AirStation, Area, Park, Stop
 from berlin.text import search_key
@@ -46,16 +47,34 @@ def _address(row) -> Address:
 
 
 class PostgresBerlinData:
+    remote = True  # berlin/measures.py runs a point's queries concurrently
+
     def __init__(self, engine: Engine):
         self.engine = engine
+        self._documents: dict[str, object] = {}
+
+    def _run(self, fn):
+        # One retry: a pooled connection Supabase closed while idle fails once, then works.
+        try:
+            with self.engine.connect() as c:
+                return fn(c)
+        except (OperationalError, DBAPIError) as exc:
+            if not getattr(exc, "connection_invalidated", False) and not isinstance(
+                exc, OperationalError
+            ):
+                raise
+            with self.engine.connect() as c:
+                return fn(c)
 
     def _all(self, sql: str, **params):
-        with self.engine.connect() as c:
-            return c.execute(text(sql), params).all()
+        return self._run(lambda c: c.execute(text(sql), params).all())
 
     def _document(self, name: str):
-        rows = self._all("SELECT content FROM berlin_dataset WHERE name = :n", n=name)
-        return rows[0].content if rows else None
+        # The documents only change with `make berlin-load`; restart the API after a load.
+        if name not in self._documents:
+            rows = self._all("SELECT content FROM berlin_dataset WHERE name = :n", n=name)
+            self._documents[name] = rows[0].content if rows else None
+        return self._documents[name]
 
     # --- addresses ----------------------------------------------------------------------
 
@@ -155,8 +174,7 @@ class PostgresBerlinData:
         if modes:
             sql = sql.bindparams(bindparam("modes"))
             params["modes"] = sorted(modes)
-        with self.engine.connect() as c:
-            rows = c.execute(sql, params).all()
+        rows = self._run(lambda c: c.execute(sql, params).all())
         return [Stop(r.id, r.name, tuple(r.modes), r.lat, r.lng, float(r.d)) for r in rows]
 
     def within(self, layer: str, lat: float, lng: float, radius_m: float) -> list[dict]:
