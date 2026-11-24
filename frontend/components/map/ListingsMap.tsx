@@ -11,7 +11,6 @@ import {
   MapContainer,
   Marker,
   Popup,
-  TileLayer,
   ZoomControl,
   useMap,
   useMapEvents,
@@ -35,6 +34,7 @@ import {
   type MapTier,
 } from "@/lib/map/listingsMap";
 import { ListingMapCard } from "./ListingMapCard";
+import { OfflineBasemap } from "@/components/map/OfflineBasemap";
 
 const TILE_TIMEOUT_MS = 4000; // no tile by then → clean background + Berlin outlines
 
@@ -134,8 +134,6 @@ export function ListingsMap({ listings, onUserViewChange }: Props) {
   const [tilesOk, setTilesOk] = useState<boolean | null>(null);
   const [shapes, setShapes] = useState<AreaCollection | null>(null);
   const anyTileLoaded = useRef(false);
-  const wasOffline = useRef(false);
-  const tileLayer = useRef<L.TileLayer>(null);
   const icons = useRef(new Map<string, L.DivIcon>());
 
   const userMoved = useRef(false);
@@ -178,7 +176,6 @@ export function ListingsMap({ listings, onUserViewChange }: Props) {
     return () => clearTimeout(timer);
   }, []);
   const offline = tilesOk === false;
-  if (offline) wasOffline.current = true;
   useEffect(() => {
     if (offline && !shapes) getAreaShapes().then(setShapes).catch(() => {});
   }, [offline, shapes]);
@@ -264,22 +261,10 @@ export function ListingsMap({ listings, onUserViewChange }: Props) {
             }}
             onMoveStart={cancelPendingUserView}
           />
-          <TileLayer
-            ref={tileLayer}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            eventHandlers={{
-              tileload: () => {
-                anyTileLoaded.current = true;
-                setTilesOk(true);
-                if (wasOffline.current) {
-                  wasOffline.current = false;
-                  tileLayer.current?.redraw(); // connection back: re-request failed tiles
-                }
-              },
-              tileerror: () => {
-                if (!anyTileLoaded.current) setTilesOk(false);
-              },
+          <OfflineBasemap
+            onStatus={(ok) => {
+              anyTileLoaded.current = ok;
+              setTilesOk(ok);
             }}
           />
           {offline && shapes && (
@@ -377,7 +362,7 @@ export function ListingsMap({ listings, onUserViewChange }: Props) {
       </div>
       {offline && (
         <p className="mt-1.5 text-xs text-gray-500">
-          Map background needs an internet connection. Outlines show Berlin&apos;s areas.
+          The offline map file isn't available on this server. Outlines show Berlin&apos;s areas.
         </p>
       )}
     </div>

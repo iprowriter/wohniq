@@ -4,18 +4,66 @@
 
 :root {
   color-scheme: light;
+
+  /* Berlin Ink design tokens (docs/design/berlin-ink/tokens.css). */
+  --color-ink: #0d1321;
+  --color-ground: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-chip: #eef0f4;
+  --color-placeholder: #e9ecf2;
+  --color-accent-tint: #eef1ff;
+  --color-text: #0d1321;
+  --color-text-body: #3b4352;
+  --color-text-muted: #5b6475;
+  --color-text-on-ink: #ffffff;
+  --color-text-on-ink-muted: #c9d0dc;
+  --color-text-on-ink-soft: #e6eaf1;
+  --color-text-faint: #6b7385; /* tokens.css #9AA3B2 is below 4.5:1 on white; darkened */
+  --color-line: #e3e6ec;
+  --color-line-strong: #dde1e8;
+  --color-input-border: #cfd5df;
+  --color-accent: #2747e6;
+  --color-accent-hover: #1a33b3;
+  --color-accent-on-ink: #8fa4ff;
+  --color-accent-logo: #6f8bff;
+  --color-accent-soft: #c9d3ff;
+  --color-ok-text: #0f6b5e;
+  --color-ok-strong: #0b4f45;
+  --color-ok-body: #0f4f45;
+  --color-ok-bg: #e3f4f0;
+  --color-ok-bar: #bfe3d9;
+  --color-warn-text: #8a3f06;
+  --color-warn-bg: #fcefd9;
+  --color-live: #3dd9b3;
+  --color-live-text: #9ff0dc;
+  --color-map-land: #ebeef3;
+  --color-map-water: #b9c8e8;
+  --color-map-green: #d3e7da;
 }
 
 body {
-  background: #f7f7f5;
-  color: #1a1a18;
+  background: var(--color-ground);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible keyboard focus everywhere (design: accessible). */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Maps: the offline base map's land colour behind tiles, not Leaflet's grey. */
+.leaflet-container {
+  background: var(--color-map-land);
+  font-family: inherit;
 }
 
 /* Neighborhood map without its tile background (offline): a clean surface instead of
    Leaflet's grey, so the amenity markers, search circle and scale bar read clearly. */
 .wohniq-map-offline .leaflet-container {
-  background: #f8fafc;
-  outline: 1px solid #e5e7eb;
+  background: var(--color-ground);
+  outline: 1px solid var(--color-line);
 }
 
 /* Lifestyle Match: honour the user's reduced-motion setting. */

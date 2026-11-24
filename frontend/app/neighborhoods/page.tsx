@@ -281,7 +281,7 @@ function NeighborhoodsPage() {
           </aside>
 
           {/* ── Ranked list ── */}
-          <main className="min-w-0 lg:order-1" aria-busy={loading}>
+          <div className="min-w-0 lg:order-1" aria-busy={loading}>
             <div className="mb-3">
               <h2 className="text-lg font-semibold text-gray-900">
                 {info ? (
@@ -455,7 +455,7 @@ function NeighborhoodsPage() {
               </Link>
               .
             </p>
-          </main>
+          </div>
         </div>
       )}
     </>

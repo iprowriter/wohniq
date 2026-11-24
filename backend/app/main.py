@@ -111,6 +111,8 @@ app.add_middleware(
     allow_origins=settings.cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    # The offline map is read with HTTP range requests (berlin.pmtiles, ADR-0019).
+    expose_headers=["Content-Range", "Content-Length", "Accept-Ranges", "ETag"],
 )
 
 # Feature routers (search, scam, listings) get included here as they're built.
@@ -127,11 +129,40 @@ def health() -> dict[str, str]:
     }
 
 
+@api_v1.get("/status")
+def status() -> dict:
+    """What the header badge shows: data mode, and whether live departures are reachable."""
+    from berlin.departures import departures_reachable
+    from berlin.files import is_built
+
+    live = settings.wohniq_live_departures and departures_reachable()
+    return {
+        "mode": "demo" if settings.demo_mode else "live",
+        "berlin_data": is_built() or not settings.demo_mode,
+        "map_tiles": (
+            f"{MAP_URL_PREFIX}/berlin.pmtiles"
+            if MAP_DIR.joinpath("berlin.pmtiles").is_file()
+            else None
+        ),
+        "online": live,
+    }
+
+
 api_v1.include_router(search_router.router)
 api_v1.include_router(lifestyle_router.router)
 api_v1.include_router(neighborhoods_router.router)
 api_v1.include_router(berlin_router.router)
 app.include_router(api_v1)
+
+# The offline base map from the Berlin data build (`make berlin-data`), read by the
+# frontend with range requests. Absent on a server without the build; the frontend then
+# uses NEXT_PUBLIC_MAP_TILES_URL (e.g. the file in Supabase Storage).
+from berlin.files import BUILD_DIR as _BERLIN_BUILD  # noqa: E402
+from berlin.files import MAP_DIR as _MAP_SUBDIR  # noqa: E402
+
+MAP_URL_PREFIX = "/tiles"
+MAP_DIR = _BERLIN_BUILD / _MAP_SUBDIR
+app.mount(MAP_URL_PREFIX, StaticFiles(directory=MAP_DIR, check_dir=False), name="tiles")
 
 if settings.demo_mode:
     # Local copies of listing photos (`make demo-photos`), so the demo needs no CDN.

@@ -42,12 +42,16 @@ async function clickArea(page: Page, key: string) {
   throw new Error(`area ${key} is not clickable on the map`);
 }
 
+/** The main navigation; on phones it sits behind the header's menu button. */
+async function mainNav(page: Page) {
+  const menu = page.getByRole("button", { name: "Open menu" });
+  if (await menu.isVisible()) await menu.click();
+  return page.getByRole("navigation", { name: "Main" });
+}
+
 async function openFromMenu(page: Page) {
   await page.goto("/");
-  await page
-    .getByRole("navigation")
-    .getByRole("link", { name: /Neighborhoods/ })
-    .click();
+  await (await mainNav(page)).getByRole("link", { name: "Neighbourhoods" }).click();
   await expect(page).toHaveURL(/\/neighborhoods$/);
   await expect(rows(page)).toHaveCount(143);
 }
@@ -160,7 +164,7 @@ test("no horizontal overflow and the menu entry is reachable", async ({ page }) 
   await expect(rows(page)).toHaveCount(143);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
-  await expect(page.getByRole("navigation").getByRole("link", { name: /Neighborhoods/ })).toHaveAttribute(
+  await expect((await mainNav(page)).getByRole("link", { name: "Neighbourhoods" })).toHaveAttribute(
     "aria-current",
     "page",
   );

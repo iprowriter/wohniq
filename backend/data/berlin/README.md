@@ -50,4 +50,5 @@ social-monitoring data.
 | `addresses.csv.gz` | id, street, house number, postcode, district, location class, East, planning area, lat/lng, search key (sorted by key; ids follow that order) |
 | `areas.json` | Planning areas and district regions (outlines simplified to 3 m), crime rates |
 | `stops.json`, `schools.json`, `kitas.json`, `parks.json`, `playgrounds.json`, `air.json`, `accidents.csv.gz` | The point and park layers |
+| `map/berlin.pmtiles` | The offline base map (Protomaps basemap from OpenStreetMap, z0–15), copied from Berlin Visualized's `data/map/` after a checksum check; served at `/tiles/berlin.pmtiles` |
 | `area_stats.json` | For each planning area, the median of every measure in `berlin/measures.py` over up to 60 of its addresses |

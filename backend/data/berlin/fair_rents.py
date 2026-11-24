@@ -9,8 +9,9 @@ below the index at all. This picks, by a hash of the id (stable, no rng):
   * every price-bait scam → 35–55 % below the lowest index value for that flat.
 
 It writes `data/demo/rent_overrides.json` (committed: it's synthetic listing data, like
-risk.json), which `data.synthetic` applies (generate_listings, generate_catalogue), so
-the demo and the database agree. `--apply-db` also updates the seeded rows; re-score afterwards (`make score`).
+risk.json), which `data.synthetic` applies (generate_listings, generate_catalogue),
+so the demo and the database agree. `--apply-db` also updates the seeded rows; re-score
+afterwards (`make score`).
 
     uv run python -m data.berlin.fair_rents [--apply-db]
 """

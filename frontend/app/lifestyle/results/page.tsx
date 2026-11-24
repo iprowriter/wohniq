@@ -216,7 +216,7 @@ export default function LifestyleResultsPage() {
         </aside>
 
         {/* ── Ranked areas ── */}
-        <main className="min-w-0 lg:order-1" aria-busy={loading}>
+        <div className="min-w-0 lg:order-1" aria-busy={loading}>
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-xl font-semibold text-gray-900">
               {data ? `Your top ${shown.length} of ${data.scores.length} Berlin areas` : "Ranking Berlin's areas…"}
@@ -283,7 +283,7 @@ export default function LifestyleResultsPage() {
               <PrivacyNote text={catalog.privacy} compact />
             </div>
           )}
-        </main>
+        </div>
       </div>
 
       <ListingsPanel region={flatsFor} budget={answers?.budget_eur ?? 0} onClose={closeFlats} />

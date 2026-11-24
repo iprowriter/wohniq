@@ -194,6 +194,18 @@ SOURCES: tuple[Source, ...] = (
 
 BY_ID: dict[str, Source] = {s.id: s for s in SOURCES}
 
+# The offline base map (Protomaps basemap v4 from OpenStreetMap, z0–15, Berlin), next to
+# the raw folder in Berlin Visualized (data/map). Copied into the build and served by the
+# API at /tiles/berlin.pmtiles; every map in the app draws from it (ADR-0019).
+MAP_FILE = "berlin.pmtiles"
+MAP_SHA256 = "3b744d4725ff31e472878eb35fafc9858bab2c4d68910cccee113827a390609c"
+MAP_ATTRIBUTION = "© OpenStreetMap contributors · Protomaps"
+
+
+def map_path(root: Path | None = None) -> Path:
+    return (root or raw_dir()).parent / "map" / MAP_FILE
+
+
 # Optional input: the VBB timetable extract (`make demo-stops`) gives each stop its
 # transport types. Without it every stop is labelled "Stop".
 VBB_FILES = ("network_rides.csv", "network_boardings.csv", "network_stations.csv")

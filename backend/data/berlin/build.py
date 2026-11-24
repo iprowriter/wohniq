@@ -15,6 +15,7 @@ import argparse
 import csv
 import json
 import re
+import shutil
 import statistics
 import sys
 import time
@@ -510,6 +511,28 @@ def build_area_stats(build_dir: Path) -> dict:
     return {"measures": list(AREA_MEASURES), "sample_per_area": STATS_SAMPLE, "areas": stats}
 
 
+# --- offline map ----------------------------------------------------------------------
+
+
+def copy_map(raw: Path, out: Path) -> dict:
+    """Copy berlin.pmtiles into the build (skipped when an identical copy is there)."""
+    src = sources.map_path(raw)
+    dest = out / files.MAP_DIR / sources.MAP_FILE
+    if not src.is_file():
+        raise BuildError(f"offline map not found: {src}")
+    if (
+        dest.is_file()
+        and dest.stat().st_size == src.stat().st_size
+        and (sources.sha256(dest) == sources.MAP_SHA256)
+    ):
+        return {"map": str(dest.relative_to(out)), "copied": False}
+    if sources.sha256(src) != sources.MAP_SHA256:
+        raise BuildError(f"{src.name}: checksum doesn't match the recorded one")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, dest)
+    return {"map": str(dest.relative_to(out)), "copied": True}
+
+
 # --- main -----------------------------------------------------------------------------
 
 
@@ -572,13 +595,16 @@ def build(raw: Path, out: Path) -> dict:
         "district_regions": len(bzr),
     }
 
+    log("Offline map …")
+    report["map"] = copy_map(raw, out)
+
     log("Typical values for the 542 planning areas (this takes a minute) …")
     files.write_json(files.AREA_STATS, build_area_stats(out), out)
 
     manifest = {
         "built_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "build_seconds": round(time.monotonic() - t0),
-        "inputs": {s.id: s.sha256 for s in sources.SOURCES},
+        "inputs": {s.id: s.sha256 for s in sources.SOURCES} | {"map": sources.MAP_SHA256},
         "report": report,
     }
     files.write_json(files.MANIFEST, manifest, out)  # last: marks the build complete

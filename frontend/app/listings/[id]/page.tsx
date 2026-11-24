@@ -20,7 +20,7 @@ function euro(n: number) {
 
 function Skeleton() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-2xl px-4 py-10">
       <div className="animate-pulse space-y-4">
         <div className="h-56 rounded-xl bg-gray-100" />
         <div className="h-5 w-2/3 rounded bg-gray-100" />
@@ -28,7 +28,7 @@ function Skeleton() {
         <div className="h-32 rounded-xl bg-gray-100" />
         <div className="h-24 rounded-xl bg-gray-100" />
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -71,12 +71,12 @@ export default function ListingDetailPage() {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-2xl px-4 py-10">
+      <div className="mx-auto max-w-2xl px-4 py-10">
         <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700">
           ← Back to search
         </Link>
         <p className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
-      </main>
+      </div>
     );
   }
 
@@ -97,7 +97,7 @@ export default function ListingDetailPage() {
   ];
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-2xl px-4 py-10">
       <div className="mb-5">
         <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700">
           ← Back to search
@@ -322,6 +322,6 @@ export default function ListingDetailPage() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

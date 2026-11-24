@@ -28,6 +28,7 @@ PLAYGROUNDS = "playgrounds.json"
 AIR = "air.json"
 ACCIDENTS = "accidents.csv.gz"
 AREA_STATS = "area_stats.json"
+MAP_DIR = "map"  # build/map/berlin.pmtiles, served at /tiles/berlin.pmtiles
 
 ADDRESS_COLUMNS = (
     "id",

@@ -82,6 +82,26 @@ class RightNow:
 
 _cache: dict[str, tuple[float, list[Departure]]] = {}
 _lock = threading.Lock()
+_reachable: tuple[float, bool] | None = None
+REACHABLE_CACHE_S = 60.0
+
+
+def departures_reachable() -> bool:
+    """Whether the live departures API answers (cached for a minute; 2 s timeout)."""
+    global _reachable
+    now = time.monotonic()
+    if _reachable and now - _reachable[0] < REACHABLE_CACHE_S:
+        return _reachable[1]
+    ok = False
+    for base in API_BASES:
+        try:
+            ok = httpx.get(f"{base}/stops/900100003", timeout=2.0).status_code < 500
+        except httpx.HTTPError:
+            ok = False
+        if ok:
+            break
+    _reachable = (now, ok)
+    return ok
 
 
 def api_stop_id(stop_id: str) -> str:

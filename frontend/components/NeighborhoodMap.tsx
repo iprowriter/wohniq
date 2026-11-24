@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import {
   MapContainer,
-  TileLayer,
   Circle,
   CircleMarker,
   Popup,
@@ -12,6 +11,7 @@ import {
   useMap,
 } from "react-leaflet";
 import type { PoiOut } from "@/lib/types";
+import { OfflineBasemap } from "@/components/map/OfflineBasemap";
 
 const CATEGORY_COLORS: Record<string, string> = {
   cafes: "#f97316",
@@ -22,8 +22,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   transit: "#3b82f6",
 };
 
-// If no map tile has loaded by then, assume the map background is unavailable (e.g. a
-// network that hangs instead of failing). Tiles that arrive later switch back.
+// If the offline map file hasn't answered by then, show the plain fallback (a server
+// without the Berlin build, ADR-0019). An answer that arrives later switches back.
 const TILE_TIMEOUT_MS = 4000;
 
 /** Zoom out (once) so the whole amenity search area is visible; at the default zoom the
@@ -48,8 +48,6 @@ export function NeighborhoodMap({ lat, lng, pois, radiusM = 500 }: Props) {
   // null = still loading, true = tiles load, false = map background unavailable
   const [tilesOk, setTilesOk] = useState<boolean | null>(null);
   const anyTileLoaded = useRef(false);
-  const wasOffline = useRef(false);
-  const tileLayer = useRef<L.TileLayer>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -59,7 +57,6 @@ export function NeighborhoodMap({ lat, lng, pois, radiusM = 500 }: Props) {
   }, []);
 
   const offline = tilesOk === false;
-  if (offline) wasOffline.current = true;
 
   return (
     // The offline look is applied via this wrapper: MapContainer ignores className/style
@@ -71,24 +68,10 @@ export function NeighborhoodMap({ lat, lng, pois, radiusM = 500 }: Props) {
         style={{ height: "300px", width: "100%", borderRadius: "12px" }}
         scrollWheelZoom={false}
       >
-        <TileLayer
-          ref={tileLayer}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          eventHandlers={{
-            tileload: () => {
-              anyTileLoaded.current = true;
-              setTilesOk(true);
-              if (wasOffline.current) {
-                // Connection is back: Leaflet never retries failed tiles, so re-request
-                // everything in view instead of leaving grey gaps.
-                wasOffline.current = false;
-                tileLayer.current?.redraw();
-              }
-            },
-            tileerror: () => {
-              if (!anyTileLoaded.current) setTilesOk(false);
-            },
+        <OfflineBasemap
+          onStatus={(ok) => {
+            anyTileLoaded.current = ok;
+            setTilesOk(ok);
           }}
         />
         {offline && (
@@ -135,7 +118,7 @@ export function NeighborhoodMap({ lat, lng, pois, radiusM = 500 }: Props) {
       {offline && (
         // Caption below the map (not an overlay) so it never hides a marker.
         <p role="status" className="mt-1.5 text-xs text-gray-500">
-          Map background needs an internet connection. Dashed circle: {radiusM} m amenity search
+          The offline map file isn't available on this server. Dashed circle: {radiusM} m amenity search
           area.
         </p>
       )}

@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
-import { GeoJSON, MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
+import { GeoJSON, MapContainer, Marker, Tooltip, useMap } from "react-leaflet";
 import type { RegionCollection, RegionResult, RegionScore } from "@/lib/lifestyle/types";
 import { EXCLUDED_COLOR, SCORE_BANDS, scoreColor } from "@/lib/lifestyle/results";
+import { OfflineBasemap } from "@/components/map/OfflineBasemap";
 
 const TILE_TIMEOUT_MS = 4000; // no tile by then → show outlines on a plain background
 
@@ -100,15 +101,10 @@ export function ResultsMap({ shapes, scores, top, selected, onSelect }: Props) {
         zoomSnap={0.1}
         attributionControl
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · areas: LOR 2021'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          opacity={0.45}
-          eventHandlers={{
-            tileload: () => {
-              anyTile.current = true;
-              setTilesOk(true);
-            },
+        <OfflineBasemap attributionSuffix="areas: LOR 2021"
+          onStatus={(ok) => {
+            anyTile.current = ok;
+            setTilesOk(ok);
           }}
         />
         <GeoJSON
