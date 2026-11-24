@@ -39,7 +39,10 @@ MANIFEST_PATH = Path(__file__).parent.parent / "data" / "generated" / "seed_mani
 
 def _load_hard_negative_ids() -> set[str]:
     if not MANIFEST_PATH.exists():
-        return set()
+        # No seed manifest on this machine: the generator's own labels are the same truth.
+        from data.synthetic import generate_catalogue
+
+        return {str(x.id) for x in generate_catalogue() if x.is_hard_negative}
     manifest = json.loads(MANIFEST_PATH.read_text())
     return {row["id"] for row in manifest if row.get("is_hard_negative")}
 
@@ -91,6 +94,7 @@ def run(*, skip_text: bool = False) -> dict:
             skip_text=skip_text,
             index_low=index_low,
             index_row=index_row,
+            description=x.description,
         )
         predicted = result.band == "high"
         y_true.append(bool(x.is_scam))

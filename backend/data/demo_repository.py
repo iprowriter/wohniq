@@ -1,7 +1,8 @@
 """Offline demo repository — serves the app from bundled fixtures, with zero network.
 
 Sources (all local):
-  * listings       — `generate_listings(seed=42)`, which reproduces the seeded DB rows
+  * listings       — `generate_catalogue()` (the seed-42 hundred + 40 extras), which
+                     reproduces the seeded DB rows
                      exactly (same ids, prices, photo sets); see export_demo_data.py.
   * photos.json    — photo rows. URLs point at a local copy under data/demo/photos/
                      when present (fetch once with `make demo-photos`), else at Pexels.
@@ -32,7 +33,7 @@ from urllib.parse import urlparse
 
 from core.logging import get_logger
 from data.models import Listing, NeighborhoodCache, Photo, RiskAssessment
-from data.synthetic import generate_listings
+from data.synthetic import generate_catalogue
 from enrich.commute import estimate_commute_to
 from enrich.commute_parse import CommuteResult
 from enrich.neighborhood import _from_cache, _location_key
@@ -48,9 +49,8 @@ DEMO_DIR = Path(__file__).parent / "demo"
 PHOTOS_DIR = DEMO_DIR / "photos"
 PHOTOS_URL_PREFIX = "/demo-photos"  # mounted by app.main in demo mode
 
-# Must match how the live DB was seeded (data.seed_listings defaults).
+# Must match how the live DB was seeded (data.seed_listings + data.seed_extra_listings).
 DEMO_SEED = 42
-DEMO_COUNT = 100
 
 _OPS = {"<=": operator.le, ">=": operator.ge}
 _WORD = re.compile(r"[a-zäöüß]+")
@@ -135,7 +135,7 @@ class DemoRepository:
     """In-memory, read-only implementation of app.repository.ListingRepository."""
 
     def __init__(self) -> None:
-        listings = [_to_listing(s) for s in generate_listings(DEMO_COUNT, seed=DEMO_SEED)]
+        listings = [_to_listing(s) for s in generate_catalogue()]
         self._listings: dict[uuid.UUID, Listing] = {x.id: x for x in listings}
 
         self._photos: dict[uuid.UUID, list[dict]] = {}

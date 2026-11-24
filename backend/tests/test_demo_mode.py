@@ -194,7 +194,7 @@ def test_llm_uses_fallback_without_calling_gemini(monkeypatch):
 def test_fixtures_are_complete_and_consistent():
     repo = DemoRepository()  # raises if generator and fixtures drifted
     listings = list(repo._listings.values())
-    assert len(listings) == 100
+    assert len(listings) == 140  # the original 100 + 40 extras (ADR-0018)
     # Every featured listing can render a complete detail page.
     assert len(repo._featured) >= 6
     for x in repo._featured:

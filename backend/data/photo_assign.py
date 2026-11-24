@@ -59,3 +59,56 @@ def assign_photos(
                 }
             )
     return rows
+
+
+def assign_from_existing(
+    new_set_ids: Sequence,
+    existing_rows: list[dict],
+    *,
+    seed: int = 4242,
+    max_shared: int = 2,
+    tries: int = 500,
+) -> list[dict]:
+    """Photo rows for new sets, drawn from photos already in use (no new downloads).
+
+    Each new set gets one photo per room type and shares at most `max_shared` photos with
+    any other set, existing or new, so honest listings never look like a photo copy (the
+    scam signal needs 4 shared photos, ADR-0017). Deterministic for a seed.
+    """
+    pools: dict[str, list[dict]] = {}
+    seen: set[str] = set()
+    for r in sorted(existing_rows, key=lambda r: (r["room_type"], r["source_url"])):
+        if r["source_url"] not in seen:
+            seen.add(r["source_url"])
+            pools.setdefault(r["room_type"], []).append(r)
+    missing = [rt for rt in ROOM_TYPES if not pools.get(rt)]
+    if missing:
+        raise ValueError(f"no existing photos for room type(s): {missing}")
+
+    sets: dict[str, set[str]] = {}
+    for r in existing_rows:
+        sets.setdefault(str(r["photo_set_id"]), set()).add(r["source_url"])
+
+    rng = random.Random(seed)
+    rows: list[dict] = []
+    for set_id in sorted(new_set_ids, key=str):
+        for _ in range(tries):
+            picks = [rng.choice(pools[rt]) for rt in ROOM_TYPES]
+            urls = {p["source_url"] for p in picks}
+            if all(len(urls & other) <= max_shared for other in sets.values()):
+                break
+        else:
+            raise ValueError(f"couldn't find photos for set {set_id} sharing <= {max_shared}")
+        sets[str(set_id)] = urls
+        for position, (room_type, photo) in enumerate(zip(ROOM_TYPES, picks, strict=True)):
+            rows.append(
+                {
+                    "photo_set_id": set_id,
+                    "source_url": photo["source_url"],
+                    "room_type": room_type,
+                    "position": position,
+                    "phash": photo.get("phash"),
+                    "attribution": photo.get("attribution"),
+                }
+            )
+    return rows

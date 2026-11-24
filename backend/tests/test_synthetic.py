@@ -84,11 +84,11 @@ def test_payment_scams_carry_textual_signals():
 def test_rent_overrides_apply_by_id_and_keep_the_deposit_rule():
     import json
 
-    from data.synthetic import OVERRIDES_PATH
+    from data.synthetic import OVERRIDES_PATH, generate_catalogue
 
     overrides = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
-    raw = {str(x.id): x for x in generate_listings(100, seed=42, apply_overrides=False)}
-    done = {str(x.id): x for x in generate_listings(100, seed=42)}
+    raw = {str(x.id): x for x in generate_catalogue(apply_overrides=False)}
+    done = {str(x.id): x for x in generate_catalogue()}
     assert overrides and set(overrides) <= set(raw)
     for listing_id, x in done.items():
         if listing_id in overrides:
@@ -100,3 +100,21 @@ def test_rent_overrides_apply_by_id_and_keep_the_deposit_rule():
         assert (x.photo_set_id, x.is_scam, x.scam_type) == (
             raw[listing_id].photo_set_id, raw[listing_id].is_scam, raw[listing_id].scam_type
         )
+
+
+def test_catalogue_keeps_the_original_hundred_and_adds_forty():
+    from collections import Counter
+
+    from data.synthetic import generate_catalogue
+
+    cat = generate_catalogue(reference_date=REF)
+    base = generate_listings(100, seed=42, reference_date=REF)
+    assert len(cat) == 140 and len({x.id for x in cat}) == 140
+    assert cat[:100] == base
+    kinds = Counter(
+        x.scam_type or ("tricky" if x.is_hard_negative else "honest") for x in cat[100:]
+    )
+    assert kinds == {"honest": 14, "tricky": 10, "advance_fee": 5, "overseas_landlord": 4,
+                     "photo_reuse": 3, "subtle": 2, "fake_platform": 2}
+    genuine_sets = {x.photo_set_id for x in base if not x.is_scam}
+    assert all(x.photo_set_id in genuine_sets for x in cat[100:] if x.scam_type == "photo_reuse")

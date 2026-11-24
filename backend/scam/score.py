@@ -70,6 +70,7 @@ def score_all(*, skip_text: bool = False) -> int:
                 skip_text=skip_text,
                 index_low=index_low,
                 index_row=index_row,
+                description=x.description,
             )
             session.add(
                 RiskAssessment(

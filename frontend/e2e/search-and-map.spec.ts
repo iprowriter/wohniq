@@ -118,7 +118,7 @@ test("Definition of Done: the map under Explore Berlin shows prices; a click ope
   expect(headings.indexOf("See on the map")).toBe(headings.indexOf("Explore Berlin") + 1);
 
   await expect(map).toHaveAttribute("data-tier", "listing");
-  await expect(page.getByTestId("map-status")).toContainText(/Showing \d+ of 100 listings/);
+  await expect(page.getByTestId("map-status")).toContainText(/Showing \d+ of 140 listings/);
   const pill = await clickableInMap(page, "[data-testid=map-pill]");
   const price = (await pill.innerText()).trim();
   expect(price).toMatch(/^€\d{1,3}(\.\d{3})?$/); // just the rent
@@ -153,7 +153,7 @@ test("Definition of Done: zooming out clusters into neighbourhood, district and 
   const berlin = page.locator("[data-testid=map-area][data-tier=city]");
   await expect(berlin).toHaveCount(1);
   await expect(berlin).toContainText("Berlin median rent");
-  await expect(berlin).toContainText("100 listings");
+  await expect(berlin).toContainText("140 listings");
   await expect(page.getByTestId("map-status")).toContainText("Berlin median warm rent");
 
   // And back in: the Berlin bubble opens the districts.

@@ -1,6 +1,6 @@
 # ADR-0002 — Scam detection is a hybrid rules + pHash + LLM engine
 
-> Amended by [ADR-0017](0017-rent-check-and-scam-price-signal.md): the price signal now uses the Mietspiegel, and photo reuse needs 4 photos shared with one listing.
+> Amended by [ADR-0017](0017-rent-check-and-scam-price-signal.md): the price signal now uses the Mietspiegel, and photo reuse needs 4 photos shared with one listing. Amended by [ADR-0018](0018-offline-scam-wording-check.md): an offline English/German wording check runs alongside the LLM pass.
 
 **Status:** Accepted · **Date:** 2026-06-15
 

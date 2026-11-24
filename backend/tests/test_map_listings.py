@@ -30,8 +30,8 @@ def test_map_returns_every_listing_with_card_details(client):
     assert resp.status_code == 200  # not swallowed by /listings/{listing_id}
     points = resp.json()
     repo = get_demo_repository()
-    assert len(points) == len(repo._listings) == 100
-    assert len({p["id"] for p in points}) == 100
+    assert len(points) == len(repo._listings) == 140
+    assert len({p["id"] for p in points}) == 140
     for p in points:
         assert BERLIN_BBOX["lat_min"] <= p["lat"] <= BERLIN_BBOX["lat_max"]
         assert BERLIN_BBOX["lng_min"] <= p["lng"] <= BERLIN_BBOX["lng_max"]

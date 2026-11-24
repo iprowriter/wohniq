@@ -11,6 +11,7 @@ help:
 	@echo "migrate-status List applied vs pending migrations"
 	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
 	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
+	@echo "seed-extra     Add the 40 extra listings (ADR-0018) to a seeded database"
 	@echo "embed          Backfill listing embeddings into pgvector"
 	@echo "score          Score all listings into risk_assessment (ARGS='--no-llm')"
 	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
@@ -49,6 +50,9 @@ migrate-status:
 
 seed:
 	cd backend && uv run python -m data.seed_listings $(ARGS)
+
+seed-extra:
+	cd backend && uv run python -m data.seed_extra_listings
 
 seed-images:
 	cd backend && uv run python -m data.seed_images $(ARGS)

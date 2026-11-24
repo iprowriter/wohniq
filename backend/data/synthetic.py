@@ -313,3 +313,124 @@ def manifest_entry(listing: SyntheticListing) -> dict:
         "scam_type": listing.scam_type,
         "is_hard_negative": listing.is_hard_negative,
     }
+
+
+# --- The 40 extra listings (ADR-0018) ---------------------------------------------------
+# Appended to the original 100 (which stay byte-identical): scams whose *wording* gives them
+# away, in English and German; two subtle scams with no telltale phrase; three more photo
+# copies; and honest listings that use the same words innocently, so the offline wording
+# check is tested against both sides. Its own seed, so the first 100 never change.
+
+EXTRA_SEED = 4242
+EXTRA_COUNT = 40
+
+_EXTRA_SCAM_TEXTS: dict[str, tuple[str, ...]] = {
+    "advance_fee": (
+        "To secure the flat, please transfer the deposit of {deposit} € before the viewing. "
+        "After payment I send you the contract by email.",
+        "Bitte überweisen Sie die Kaution vorab, danach schicke ich Ihnen den Schlüssel per "
+        "Post.",
+        "Payment of the first month is required before we can arrange a viewing. Many people "
+        "are interested, so please act today.",
+        "Send the reservation fee by bank transfer and I will hold the apartment for you; a "
+        "viewing is possible after payment.",
+        "Die Besichtigung ist erst nach Eingang der ersten Monatsmiete möglich. Wir "
+        "akzeptieren auch Bitcoin.",
+    ),
+    "overseas_landlord": (
+        "I moved to London for work and can't show the flat. My lawyer will send the keys by "
+        "DHL once you pay the deposit.",
+        "Ich bin zur Zeit beruflich in Spanien und kann die Wohnung nicht zeigen. Die "
+        "Schlüssel schicke ich Ihnen nach Zahlung per DHL.",
+        "I'm abroad as a volunteer right now. Pay via MoneyGram and the keys will arrive by "
+        "courier within two days.",
+        "Currently living overseas. Transfer the first rent and deposit through Western Union, "
+        "then I mail you the keys.",
+    ),
+    "fake_platform": (
+        "Booking is handled by a secure payment service: you pay through the link I send, and "
+        "the money is held until you have the keys.",
+        "Die Zahlung läuft sicher über einen Treuhandservice, ich sende Ihnen den Link. Danach "
+        "erhalten Sie den Schlüssel per Post.",
+    ),
+    "photo_reuse": (
+        "Available now. Write me on WhatsApp for more photos and details.",
+        "Wohnung sofort frei. Melden Sie sich per Nachricht für weitere Infos.",
+        "Great flat, just renovated. Message me if interested.",
+    ),
+    "subtle": (
+        "Nice flat, available immediately. Send me your phone number and I'll call you back.",
+        "Schöne Wohnung, ab sofort frei. Schreiben Sie mir Ihre E-Mail, ich melde mich.",
+    ),
+}
+
+# Honest listings that use the scam words innocently (negated, or someone shows the flat).
+_EXTRA_TRICKY_TEXTS: tuple[str, ...] = (
+    "Please note: we never ask for Western Union or any transfer before you have seen the "
+    "flat. Viewings every Saturday.",
+    "Ich wohne im Ausland, aber meine Schwester zeigt die Wohnung, und den Vertrag "
+    "unterschreiben wir persönlich. Keine Vorauszahlung.",
+    "Kaution erst nach Vertragsunterzeichnung, Schlüsselübergabe persönlich vor Ort.",
+    "Keys are handed over in person at the flat. We don't post keys.",
+    "Many applicants, so we decide after the viewings next week. No payment before signing.",
+    "I'm currently abroad for work; my property manager Herr Schulz shows the flat and you "
+    "sign the contract in person.",
+    "Rent is paid by standing order after the contract is signed. We never accept cash or "
+    "crypto.",
+    "Beware of scams: never transfer money before a viewing. We are a registered "
+    "Hausverwaltung.",
+    "Bitte keine Überweisung vor der Besichtigung. Wir lernen Sie gern persönlich kennen.",
+    "Viewing first, then the contract, then the deposit into a rent deposit account "
+    "(Mietkautionskonto).",
+)
+
+
+def generate_extra_listings(
+    base: list[SyntheticListing],
+    *,
+    seed: int = EXTRA_SEED,
+    reference_date: date | None = None,
+) -> list[SyntheticListing]:
+    """The 40 extra listings. `base` is the original 100 (photo copies take a genuine set)."""
+    rng = random.Random(seed)
+    ref = reference_date or date.today()
+    specs: list[tuple[str, str | None, str]] = []
+    for scam_type, texts in _EXTRA_SCAM_TEXTS.items():
+        specs += [("scam", scam_type, t) for t in texts]
+    specs += [("hard", "wording", t) for t in _EXTRA_TRICKY_TEXTS]
+    n_plain = EXTRA_COUNT - len(specs)
+    specs += [("legit", None, "")] * n_plain
+    rng.shuffle(specs)
+
+    genuine = [x for x in base if not x.is_scam]
+    out: list[SyntheticListing] = []
+    for kind, sub, text in specs:
+        x = _make_listing(rng, ref)  # honest base: Kiez, size, price, contact
+        if kind == "scam":
+            x.is_scam, x.scam_type = True, sub
+            x.contact_text = text.format(deposit=x.deposit_eur)
+            if sub == "photo_reuse":
+                x.photo_set_id = rng.choice(genuine).photo_set_id  # the whole set
+        elif kind == "hard":
+            x.is_hard_negative = True
+            x.contact_text = text
+        out.append(x)
+    return out
+
+
+def generate_catalogue(
+    *, reference_date: date | None = None, apply_overrides: bool = True
+) -> list[SyntheticListing]:
+    """The full demo catalogue: the original 100 listings (seed 42) plus the 40 extras."""
+    base = generate_listings(
+        100, seed=42, reference_date=reference_date, apply_overrides=apply_overrides
+    )
+    extra = generate_extra_listings(base, reference_date=reference_date)
+    overrides = _rent_overrides() if apply_overrides else {}
+    for x in extra:
+        x.year_built = year_built_for(x.id)
+        override = overrides.get(str(x.id))
+        if override:
+            x.kaltmiete_eur = override["kaltmiete_eur"]
+            x.deposit_eur = 3 * x.kaltmiete_eur
+    return base + extra

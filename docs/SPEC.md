@@ -78,7 +78,7 @@ Summarize each listing's Kiez: cafes, parks, supermarkets, nightlife, transport.
 ### F7 — Scam / risk detection *(showpiece)*
 Hybrid engine producing an explained 0–100 risk score and Low/Caution/High band per listing. See ADR-0002.
 - **AC1.** Deterministic signals (price vs. the Mietspiegel's lowest value for the flat, falling back to the Kiez median; pHash photo duplication with at least 4 photos shared with one listing; metadata rules) run with no API cost. See ADR-0017.
-- **AC2.** An LLM pass extracts fuzzy text signals (off-platform payment, landlord-abroad, urgency, no-Anmeldung) as validated structured output with evidence quotes.
+- **AC2.** An offline wording check (English/German, negation-aware; ADR-0018) catches the classic phrases without an API; an LLM pass extracts fuzzy text signals (off-platform payment, landlord-abroad, urgency, no-Anmeldung) as validated structured output with evidence quotes.
 - **AC3.** Fused score is explainable: output lists the contributing signals with evidence.
 - **AC4.** Evaluated against the labeled synthetic set with a reported precision/recall + confusion matrix in the repo.
 

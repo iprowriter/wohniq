@@ -15,6 +15,10 @@
     "kaltmiete_eur": 302,
     "reason": "fair rent within the index range (row 85)"
   },
+  "0f68d64a-c843-416f-b437-387566757d30": {
+    "kaltmiete_eur": 378,
+    "reason": "fair rent within the index range (row 47)"
+  },
   "15b02530-f020-4992-b576-255e98549f22": {
     "kaltmiete_eur": 392,
     "reason": "fair rent within the index range (row 31)"
@@ -22,6 +26,10 @@
   "17efa621-081c-49d4-8274-37eba65f7b8a": {
     "kaltmiete_eur": 202,
     "reason": "price bait: below the index (row 7)"
+  },
+  "2787bdd4-e760-4d8d-8f22-4963be0a25ce": {
+    "kaltmiete_eur": 446,
+    "reason": "fair rent within the index range (row 148)"
   },
   "2c33350c-73b9-41d8-92f5-131ada52d2ee": {
     "kaltmiete_eur": 318,
@@ -102,6 +110,14 @@
   "ce88cb2d-d4e8-4839-bc3e-058be0f3eab0": {
     "kaltmiete_eur": 407,
     "reason": "fair rent within the index range (row 96)"
+  },
+  "d2fcbdf3-f0e2-4946-94e6-1156a99cc7c1": {
+    "kaltmiete_eur": 202,
+    "reason": "fair rent within the index range (row 68)"
+  },
+  "d6dbf846-a145-4398-85f0-98009d574b79": {
+    "kaltmiete_eur": 433,
+    "reason": "fair rent within the index range (row 70)"
   },
   "ddcf8766-a93b-42cd-9c24-220e2cabd7e7": {
     "kaltmiete_eur": 166,

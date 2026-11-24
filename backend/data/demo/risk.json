@@ -7,6 +7,13 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "0234bf17-6c68-44a0-99ee-685f3756d89d",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "04482a22-0308-4a5e-a94d-7b008d388327",
     "score": 0,
     "band": "low",
@@ -18,6 +25,20 @@
     "score": 0,
     "band": "low",
     "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "0ad76224-964f-47ad-8294-28cf61b6cce4",
+    "score": 72,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"To secure the flat, please transfer the deposit of 2253 € before the viewing.\"",
+        "severity": 0.8
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -36,6 +57,26 @@
   },
   {
     "listing_id": "0ea2622b-5048-47ba-bf7b-539b0f9aea4b",
+    "score": 92,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"To reserve the flat, please transfer the Kaution by bank wire before the viewing.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Once I receive the payment I will send the keys by courier.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "0f68d64a-c843-416f-b437-387566757d30",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -57,7 +98,7 @@
   },
   {
     "listing_id": "17efa621-081c-49d4-8274-37eba65f7b8a",
-    "score": 86,
+    "score": 90,
     "band": "high",
     "signals": [
       {
@@ -65,15 +106,55 @@
         "source": "rule",
         "evidence": "€3.37/m² cold is 43% below the lowest rent-index value for this flat (€5.91/m², Mietspiegel 2026, row 7)",
         "severity": 0.9563201102964216
+      },
+      {
+        "name": "urgency_pressure",
+        "source": "rule",
+        "evidence": "\"Incredible price for this area — it won't last!\"",
+        "severity": 0.3
       }
     ],
     "engine_version": "v2"
   },
   {
-    "listing_id": "1d3ca5a4-929d-4377-9cfb-655f82c42e48",
+    "listing_id": "18ce9a13-b78b-40da-8273-2956da8de3c4",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 of 5 photos also appear on another listing",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "1c204b5b-4bf0-4f77-a894-a44b5fbd9cc9",
     "score": 0,
     "band": "low",
     "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "1d3ca5a4-929d-4377-9cfb-655f82c42e48",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.8
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -85,6 +166,27 @@
   },
   {
     "listing_id": "1ee34dc4-3b04-4a8b-805b-fdc94e7ed827",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "231e81f2-bbf3-4d43-ac20-fbbbca816551",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "260186fa-990b-4548-a277-31a0546f6963",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "2627f61b-2475-460d-8fb8-d107b634c958",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -105,6 +207,13 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "2787bdd4-e760-4d8d-8f22-4963be0a25ce",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "28a39779-9c1c-4517-85d2-d0a686295b5d",
     "score": 0,
     "band": "low",
@@ -113,13 +222,47 @@
   },
   {
     "listing_id": "2a26f770-4ddb-4b36-a72c-058884a2576c",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "2a7dc57c-6d9c-4b50-a1fd-41879c3a1e0b",
     "score": 0,
     "band": "low",
     "signals": [],
     "engine_version": "v2"
   },
   {
-    "listing_id": "2a7dc57c-6d9c-4b50-a1fd-41879c3a1e0b",
+    "listing_id": "2aa081a5-2ca5-44d5-912f-a9136d61e719",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "2ac38adf-41b0-4915-ba6d-7ff3d84ae56d",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "2be37a8c-f47d-4f2c-a8a8-ab124b1b7f70",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -140,10 +283,38 @@
     "engine_version": "v2"
   },
   {
-    "listing_id": "31d4ee09-8fd3-4afc-91fd-fa4f0d18ab95",
+    "listing_id": "2e94a795-9e77-4036-8ef9-30e8bc2f0c20",
     "score": 0,
     "band": "low",
     "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "307312af-61f2-4a3e-beff-1c0002b78ffd",
+    "score": 72,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"Send the reservation fee by bank transfer and I will hold the apartment for you; a viewing is possible after payment.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "31d4ee09-8fd3-4afc-91fd-fa4f0d18ab95",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 of 5 photos also appear on another listing",
+        "severity": 1.0
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -155,6 +326,13 @@
   },
   {
     "listing_id": "38d77b9a-e916-4a57-b248-23ab177a8a5f",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "39817de9-3699-415b-9d49-c2652da736c9",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -175,6 +353,13 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "3cecd71f-4504-4843-8025-294ba8023e1b",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "43b38eb4-0390-4c5d-a502-d6a2ca6a2224",
     "score": 0,
     "band": "low",
@@ -182,10 +367,37 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "453f0250-7ef9-4682-90a8-675c18a9faac",
+    "score": 92,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"Bitte überweisen Sie die Kaution vorab, danach schicke ich Ihnen den Schlüssel per Post.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Bitte überweisen Sie die Kaution vorab, danach schicke ich Ihnen den Schlüssel per Post.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "45ff2c83-b495-4b4e-8245-6fb44ab7706e",
-    "score": 0,
-    "band": "low",
-    "signals": [],
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 of 5 photos also appear on another listing",
+        "severity": 1.0
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -204,6 +416,13 @@
   },
   {
     "listing_id": "4b8c5bdc-e8dd-4e5a-9712-fb1621a4344f",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "4d5e013c-da18-49e7-b249-7415eb3f2246",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -245,15 +464,47 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "55c9367a-692d-4db0-8819-4b0a2809d960",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"Die Zahlung läuft sicher über einen Treuhandservice, ich sende Ihnen den Link.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Danach erhalten Sie den Schlüssel per Post.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "568cc69b-1064-405c-b985-c3cf3f76be1d",
-    "score": 54,
-    "band": "caution",
+    "score": 96,
+    "band": "high",
     "signals": [
       {
         "name": "no_anmeldung",
         "source": "rule",
         "evidence": "Anmeldung (legal residence registration) not possible at this address",
         "severity": 0.6
+      },
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"To reserve the flat, please transfer the Kaution by bank wire before the viewing.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Once I receive the payment I will send the keys by courier.\"",
+        "severity": 0.8
       }
     ],
     "engine_version": "v2"
@@ -266,7 +517,62 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "5d8384a1-3708-4f72-9bae-8804b6f583d2",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 of 5 photos also appear on another listing",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "5f710a57-30dc-4129-b352-14148bdd5137",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "6297b08d-d0e8-4233-baa9-2172684bc0f4",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "64bb5854-5739-4664-a8d6-eae93749b22b",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"Transfer the first rent and deposit through Western Union, then I mail you the keys.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Transfer the first rent and deposit through Western Union, then I mail you the keys.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "66d06371-d8e8-4ebb-ba9e-8eefffa361be",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "6855755d-d5d5-4b62-af37-fead0a2fc627",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -309,9 +615,16 @@
   },
   {
     "listing_id": "7194eae2-19ba-47ae-9f61-5a5cb4323070",
-    "score": 0,
-    "band": "low",
-    "signals": [],
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 of 5 photos also appear on another listing",
+        "severity": 1.0
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -323,7 +636,7 @@
   },
   {
     "listing_id": "749176f4-6090-4697-8b1e-3b9dc34b9fbb",
-    "score": 95,
+    "score": 97,
     "band": "high",
     "signals": [
       {
@@ -337,12 +650,25 @@
         "source": "rule",
         "evidence": "Anmeldung (legal residence registration) not possible at this address",
         "severity": 0.6
+      },
+      {
+        "name": "urgency_pressure",
+        "source": "rule",
+        "evidence": "\"Incredible price for this area — it won't last!\"",
+        "severity": 0.3
       }
     ],
     "engine_version": "v2"
   },
   {
     "listing_id": "78ef7666-b7a4-4719-948e-1f6b69ce1e4e",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "7b471481-4d52-40ba-ac26-60947c82a5cb",
     "score": 0,
     "band": "low",
     "signals": [],
@@ -377,6 +703,13 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "825e0e05-c4b4-4e43-b4b7-7ea0eb9f672d",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "84cfee39-bf31-429f-82bb-ad8438d5101f",
     "score": 0,
     "band": "low",
@@ -391,6 +724,26 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "860a92a2-fd4e-4493-becc-d13a266c8dd0",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"Die Besichtigung ist erst nach Eingang der ersten Monatsmiete möglich.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"Wir akzeptieren auch Bitcoin.\"",
+        "severity": 0.85
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "8b040f53-e639-49d4-87c6-8688ecf32053",
     "score": 0,
     "band": "low",
@@ -399,9 +752,22 @@
   },
   {
     "listing_id": "8d38bbd8-fba6-4bf7-8dbc-c65377a7e8b7",
-    "score": 0,
-    "band": "low",
-    "signals": [],
+    "score": 92,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"To reserve the flat, please transfer the Kaution by bank wire before the viewing.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Once I receive the payment I will send the keys by courier.\"",
+        "severity": 0.8
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -413,9 +779,22 @@
   },
   {
     "listing_id": "92070158-f277-4f63-ada5-84175e2ad32d",
-    "score": 0,
-    "band": "low",
-    "signals": [],
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.8
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -441,16 +820,35 @@
   },
   {
     "listing_id": "979c30cf-3326-4887-9058-81dfee9bf3e1",
-    "score": 54,
-    "band": "caution",
+    "score": 96,
+    "band": "high",
     "signals": [
       {
         "name": "no_anmeldung",
         "source": "rule",
         "evidence": "Anmeldung (legal residence registration) not possible at this address",
         "severity": 0.6
+      },
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"To reserve the flat, please transfer the Kaution by bank wire before the viewing.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Once I receive the payment I will send the keys by courier.\"",
+        "severity": 0.8
       }
     ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "98a84de2-5b3f-40f4-8f11-9987cefedcaf",
+    "score": 0,
+    "band": "low",
+    "signals": [],
     "engine_version": "v2"
   },
   {
@@ -503,6 +901,33 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "a2f9d2b2-55f3-4743-8361-4c2cab338d0a",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "a3dd1ecf-49ce-4c6a-87a0-c9d54590f7e9",
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"Pay via MoneyGram and the keys will arrive by courier within two days.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Pay via MoneyGram and the keys will arrive by courier within two days.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "a6846099-f729-4951-8591-31d2bbda0242",
     "score": 0,
     "band": "low",
@@ -535,6 +960,27 @@
     "score": 0,
     "band": "low",
     "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "ac8f1f56-2fa1-4767-ab14-5043d7141ac2",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "ad06e8bd-f601-46b7-ba83-cb94849b3da0",
+    "score": 72,
+    "band": "high",
+    "signals": [
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"Die Schlüssel schicke ich Ihnen nach Zahlung per DHL.\"",
+        "severity": 0.8
+      }
+    ],
     "engine_version": "v2"
   },
   {
@@ -615,6 +1061,20 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "c9fd3e5f-6c90-41e0-a1d2-f16bfcb1f4f1",
+    "score": 76,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"Booking is handled by a secure payment service: you pay through the link I send, and the money is held until you have the keys.\"",
+        "severity": 0.85
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "cc530e36-addc-4e13-ab3b-4d37560c95ee",
     "score": 0,
     "band": "low",
@@ -629,6 +1089,20 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "d2fcbdf3-f0e2-4946-94e6-1156a99cc7c1",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "d3c5f3c2-19a6-4d94-afa9-6b6ebf5e20ee",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "d5c0244d-3735-462d-8184-3b0304dd7054",
     "score": 0,
     "band": "low",
@@ -636,8 +1110,15 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "d6dbf846-a145-4398-85f0-98009d574b79",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "ddcf8766-a93b-42cd-9c24-220e2cabd7e7",
-    "score": 95,
+    "score": 97,
     "band": "high",
     "signals": [
       {
@@ -651,6 +1132,12 @@
         "source": "rule",
         "evidence": "Anmeldung (legal residence registration) not possible at this address",
         "severity": 0.6
+      },
+      {
+        "name": "urgency_pressure",
+        "source": "rule",
+        "evidence": "\"Incredible price for this area — it won't last!\"",
+        "severity": 0.3
       }
     ],
     "engine_version": "v2"
@@ -677,8 +1164,29 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "e0911d93-3f7e-41ba-8a6d-b4891d470a1a",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "e455ec57-d25b-4798-ab03-009a2523754f",
+    "score": 60,
+    "band": "caution",
+    "signals": [
+      {
+        "name": "photo_reuse",
+        "source": "image",
+        "evidence": "5 of 5 photos also appear on another listing",
+        "severity": 1.0
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "e5508ea2-6133-434d-8b0e-8eb1ad371d9e",
-    "score": 95,
+    "score": 97,
     "band": "high",
     "signals": [
       {
@@ -692,6 +1200,12 @@
         "source": "rule",
         "evidence": "Anmeldung (legal residence registration) not possible at this address",
         "severity": 0.6
+      },
+      {
+        "name": "urgency_pressure",
+        "source": "rule",
+        "evidence": "\"Incredible price for this area — it won't last!\"",
+        "severity": 0.3
       }
     ],
     "engine_version": "v2"
@@ -767,6 +1281,20 @@
     "engine_version": "v2"
   },
   {
+    "listing_id": "f4a6179c-f2a3-4a97-81ba-d9bbbe941bb2",
+    "score": 72,
+    "band": "high",
+    "signals": [
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"My lawyer will send the keys by DHL once you pay the deposit.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
     "listing_id": "f7dc67e0-3097-4b2b-86a0-2a9b65ec7acd",
     "score": 60,
     "band": "caution",
@@ -789,9 +1317,42 @@
   },
   {
     "listing_id": "fb2ca025-adf4-462d-a651-529e8268690b",
-    "score": 0,
-    "band": "low",
-    "signals": [],
+    "score": 93,
+    "band": "high",
+    "signals": [
+      {
+        "name": "off_platform_payment",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.85
+      },
+      {
+        "name": "landlord_unavailable",
+        "source": "rule",
+        "evidence": "\"After you send the first month plus deposit via Western Union, I will DHL the keys to you.\"",
+        "severity": 0.8
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "fd6678a6-0eb0-43ed-aaad-59f88094159b",
+    "score": 80,
+    "band": "high",
+    "signals": [
+      {
+        "name": "payment_before_viewing",
+        "source": "rule",
+        "evidence": "\"Payment of the first month is required before we can arrange a viewing.\"",
+        "severity": 0.8
+      },
+      {
+        "name": "urgency_pressure",
+        "source": "rule",
+        "evidence": "\"Many people are interested, so please act today.\"",
+        "severity": 0.3
+      }
+    ],
     "engine_version": "v2"
   },
   {
