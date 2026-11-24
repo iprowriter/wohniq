@@ -81,7 +81,7 @@ export function RightNowCard({ lat, lng }: { lat: number; lng: number }) {
                 {d.direction}
                 <span className="ml-1.5 text-[12px] text-text-on-ink-muted">
                   {d.stop.replace(/^(S\+U|U|S) /, "")}
-                  {d.delay_minutes ? ` · +${d.delay_minutes} min` : ""}
+                  {d.delay_minutes && d.delay_minutes > 0 ? ` · +${d.delay_minutes} min` : ""}
                   {d.cancelled ? " · cancelled" : ""}
                 </span>
               </span>

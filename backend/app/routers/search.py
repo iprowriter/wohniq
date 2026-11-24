@@ -22,7 +22,7 @@ import uuid
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.repository import ListingRepository, get_repository
@@ -805,6 +805,41 @@ def get_listing(
         risk=_to_risk_out(risk_by_id.get(str(listing.id))),
         neighborhood=neighborhood_detail,
         **_berlin_fields(listing),
+    )
+
+
+class ListingCommuteOut(BaseModel):
+    to: str
+    commute: CommuteOut | None = None
+    note: str | None = None
+
+
+@router.get("/listings/{listing_id}/commute", response_model=ListingCommuteOut)
+def get_listing_commute(
+    listing_id: str,
+    repo: Annotated[ListingRepository, Depends(get_repository)],
+    to: str = Query(min_length=2, max_length=80),
+) -> ListingCommuteOut:
+    """Trip time from the listing to a place the user types (live BVG, else an estimate).
+
+    Measured from the matched address, like the rest of the page. The place name is used
+    for this request only and isn't logged (ADR-0012).
+    """
+    try:
+        uid = uuid.UUID(listing_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid listing id") from None
+    listing = repo.get_listing(uid)
+    if listing is None:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    lat, lng = listing.lat, listing.lng
+    loc = _berlin_fields(listing).get("location")
+    if loc is not None and loc.lat is not None:
+        lat, lng = loc.lat, loc.lng
+    place = to.strip()
+    result = repo.commute(lat, lng, place)
+    return ListingCommuteOut(
+        to=place, commute=_to_commute_out(result), note=_commute_note(place, [result])
     )
 
 

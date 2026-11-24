@@ -32,6 +32,7 @@ import {
 } from "@/lib/results";
 import { isFairRent } from "@/lib/listing/chips";
 import { useSaved } from "@/lib/useSaved";
+import { saveLastSearch } from "@/lib/listing/lastSearch";
 import { CriteriaChips } from "@/components/CriteriaChips";
 import { SearchNotices } from "@/components/SearchNotices";
 import { ResultCard } from "@/components/ResultCard";
@@ -318,6 +319,19 @@ function Results({
   const shown = visibleResults(results, params.fair, params.sort);
   const fairCount = results.filter((r) => isFairRent(r.listing.rent)).length;
   const selectedItems = results.filter((r) => compare.has(r.listing.id));
+
+  // Remember this view for the listing pages opened from it (fit score, "Back to …").
+  useEffect(() => {
+    if (!data) return;
+    saveLastSearch({
+      url: `${window.location.pathname}${window.location.search}`,
+      heading: resultsHeading(shown.length, areas),
+      count: shown.length,
+      areas,
+      fit: Object.fromEntries(results.map((r) => [r.listing.id, { score: r.score, summary: r.explanation.summary }])),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, params.fair, params.sort]);
 
   function toggleCompare(id: string) {
     setCompare((prev) => {

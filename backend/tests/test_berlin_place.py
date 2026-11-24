@@ -244,3 +244,13 @@ def test_listings_carry_location_and_rent(client):
     assert detail["location"] == one["location"] and detail["rent"] == one["rent"]
     around = client.get(f"/api/v1/listings/{one['id']}/around").json()
     assert around["planning_area"] == one["location"]["planning_area"]
+
+
+@needs_build
+def test_listing_commute_endpoint(client):
+    lid = client.get("/api/v1/listings/random", params={"n": 1}).json()[0]["id"]
+    ok = client.get(f"/api/v1/listings/{lid}/commute", params={"to": "Alexanderplatz"}).json()
+    assert ok["commute"]["minutes"] > 0 and ok["commute"]["estimated"] is True
+    unknown = client.get(f"/api/v1/listings/{lid}/commute", params={"to": "Nowhereville"}).json()
+    assert unknown["commute"] is None and "Couldn't find" in unknown["note"]
+    assert client.get(f"/api/v1/listings/{lid}/commute", params={"to": "x"}).status_code == 422

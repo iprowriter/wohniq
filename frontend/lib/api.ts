@@ -1,5 +1,6 @@
 import type {
   AddressOut,
+  CommuteOut,
   ListingDetailResponse,
   ListingOut,
   MapStop,
@@ -102,3 +103,9 @@ export const getStopsInView = (b: Box) =>
 
 export const getParksInView = (b: Box) =>
   getJson<GeoJSON.FeatureCollection>(`/api/v1/parks?${qs(b)}`, "parks");
+
+export const getListingCommute = (id: string, to: string) =>
+  getJson<{ to: string; commute: CommuteOut | null; note: string | null }>(
+    `/api/v1/listings/${id}/commute?${qs({ to })}`,
+    "the trip time",
+  );
