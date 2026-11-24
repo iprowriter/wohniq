@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+/**
+ * Home (Berlin Ink, T9.4): hero search, "Every listing, checked", three entry cards, Explore
+ * Berlin + the big map (kept, owner's decision), How WohnIQ works. With ?q= the same page shows
+ * the results: what we understood, sort / only fair rents / share, result cards and a sticky
+ * map with layers. Searches live in the URL, so they can be shared and reloaded.
+ */
+
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getMapListings, getRandomListings, search } from "@/lib/api";
-import type { SearchResponse, SearchResultItem } from "@/lib/types";
+import type { ListingOut, SearchResponse } from "@/lib/types";
 import type { Bounds, MapListing } from "@/lib/map/listingsMap";
 import {
   EXPLORE_COUNT,
@@ -13,115 +21,111 @@ import {
   type ExploreCard,
   type ExploreStatus,
 } from "@/lib/map/exploreCards";
+import {
+  readParams,
+  resultsHeading,
+  SORT_LABELS,
+  toQuery,
+  visibleResults,
+  type SearchParams,
+  type SortKey,
+} from "@/lib/results";
+import { isFairRent } from "@/lib/listing/chips";
+import { useSaved } from "@/lib/useSaved";
 import { CriteriaChips } from "@/components/CriteriaChips";
 import { SearchNotices } from "@/components/SearchNotices";
 import { ResultCard } from "@/components/ResultCard";
 import { FeaturedCard, type CardListing } from "@/components/FeaturedCard";
 import { ListingsMapSection } from "@/components/map/ListingsMapSection";
 import { ComparisonModal } from "@/components/ComparisonModal";
-import { LifestyleEntryBar } from "@/components/lifestyle/LifestyleEntryBar";
-import { LifestyleFeatureCard } from "@/components/lifestyle/LifestyleFeatureCard";
+import { SearchForm } from "@/components/home/SearchForm";
+import { CheckedCard, EntryCards, HowItWorks } from "@/components/home/HomeSections";
+import { ResultsMap } from "@/components/results/ResultsMap";
+import { Button } from "@/components/ui/primitives";
 
-const EXAMPLE =
-  "I work near Alexanderplatz, budget €1,500, quiet neighborhood, good transport, cafes nearby";
+const EXAMPLES = [
+  "Quiet 2 rooms in Mitte near a park",
+  "Family flat, good schools, under €1,800",
+  "Furnished, 20 min to TU Berlin",
+];
+const CACHE_PREFIX = "wohniq_search:";
+const MAX_COMPARE = 4;
+const EXPLORE_POOL = 12;
+const RESULTS_LIMIT = 20;
 
-const CACHE_KEY = "wohniq_last_search";
-const NAV_FLAG = "wohniq_navigating_to_listing";
-
-function popCache(): { query: string; data: SearchResponse } | null {
+function cacheGet(key: string): SearchResponse | null {
   try {
-    const navigated = sessionStorage.getItem(NAV_FLAG);
-    sessionStorage.removeItem(NAV_FLAG);
-    if (!navigated) return null;
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as { query: string; data: SearchResponse }) : null;
+    const raw = sessionStorage.getItem(CACHE_PREFIX + key);
+    return raw ? (JSON.parse(raw) as SearchResponse) : null;
   } catch {
     return null;
   }
 }
 
-function saveCache(query: string, data: SearchResponse) {
+function cacheSet(key: string, data: SearchResponse) {
   try {
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ query, data }));
+    sessionStorage.setItem(CACHE_PREFIX + key, JSON.stringify(data));
   } catch {
-    // storage full or unavailable — ignore
+    /* storage full or unavailable */
   }
 }
 
-function MarketingCard({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
+export default function Home() {
   return (
-    <div className="flex gap-4 rounded-2xl border border-gray-200 bg-white p-6">
-      <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-        {icon}
-      </div>
-      <div>
-        <h3 className="mb-1 font-semibold text-gray-900">{title}</h3>
-        <p className="text-sm leading-relaxed text-gray-500">{body}</p>
-      </div>
-    </div>
+    <Suspense fallback={<div className="min-h-[60vh] bg-ink" />}>
+      <HomeInner />
+    </Suspense>
   );
 }
 
-const MAX_COMPARE = 4;
-// Random listings fetched on load: the first EXPLORE_COUNT are shown, the rest are spare
-// fillers for when a map area has fewer than EXPLORE_COUNT listings.
-const EXPLORE_POOL = 12;
+function HomeInner() {
+  const router = useRouter();
+  const urlParams = useSearchParams();
+  const params = useMemo(() => readParams(new URLSearchParams(urlParams.toString())), [urlParams]);
 
-export default function Home() {
-  const [query, setQuery] = useState("");
-  const [data, setData] = useState<SearchResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  // Explore Berlin: always EXPLORE_COUNT cards; follows the map once the user moves it.
-  const [pool, setPool] = useState<CardListing[]>([]);
-  const [cards, setCards] = useState<ExploreCard<CardListing>[]>([]);
-  const [exploreStatus, setExploreStatus] = useState<ExploreStatus>({ kind: "random" });
   const [mapListings, setMapListings] = useState<MapListing[] | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
-  const lastView = useRef<{ bounds: Bounds; zoom: number } | null>(null);
-  const exploreRef = useRef<HTMLElement>(null);
-  // Latest values for async callbacks (debounced map moves, fetches resolving later).
-  const latest = useRef({ pool, cards, mapListings });
-  latest.current = { pool, cards, mapListings };
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [compareOpen, setCompareOpen] = useState(false);
-  const resultsRef = useRef<HTMLDivElement>(null);
-
-  function toggleSelect(id: string) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else if (next.size < MAX_COMPARE) {
-        next.add(id);
-      }
-      return next;
-    });
-  }
-
-  const selectedItems: SearchResultItem[] = data
-    ? data.results.filter((r) => selectedIds.has(r.listing.id))
-    : [];
 
   useEffect(() => {
-    const cached = popCache();
-    if (cached) {
-      setQuery(cached.query);
-      setData(cached.data);
-    }
-    loadRandomCards();
     getMapListings()
       .then(setMapListings)
       .catch((e) => setMapError(e instanceof Error ? e.message : "Failed to load the map"));
   }, []);
+
+  function go(next: SearchParams | null, replace = false) {
+    const url = next ? `/${toQuery(next)}` : "/";
+    if (replace) router.replace(url, { scroll: false });
+    else router.push(url, { scroll: false });
+  }
+
+  return params ? (
+    <Results params={params} go={go} mapListings={mapListings} />
+  ) : (
+    <HomeView go={go} mapListings={mapListings} mapError={mapError} />
+  );
+}
+
+// ── Home ────────────────────────────────────────────────────────────────────────────────
+
+function HomeView({
+  go,
+  mapListings,
+  mapError,
+}: {
+  go: (p: SearchParams) => void;
+  mapListings: MapListing[] | null;
+  mapError: string | null;
+}) {
+  const [pool, setPool] = useState<CardListing[]>([]);
+  const [cards, setCards] = useState<ExploreCard<CardListing>[]>([]);
+  const [exploreStatus, setExploreStatus] = useState<ExploreStatus>({ kind: "random" });
+  const lastView = useRef<{ bounds: Bounds; zoom: number } | null>(null);
+  const exploreRef = useRef<HTMLElement>(null);
+  const latest = useRef({ pool, cards, mapListings });
+  latest.current = { pool, cards, mapListings };
+
+  useEffect(loadRandomCards, []);
+  const run = (q: string) => go({ q, fair: false, sort: "fit" });
 
   /** Fresh random pool; shows its first cards, or re-picks for the current map area. */
   function loadRandomCards() {
@@ -129,271 +133,340 @@ export default function Home() {
       .then((fresh) => {
         setPool(fresh);
         if (lastView.current && latest.current.mapListings) {
-          // Refresh while following the map: re-roll for the same view.
           syncCardsToMap(lastView.current.bounds, lastView.current.zoom, fresh, []);
         } else {
           setCards(fresh.slice(0, EXPLORE_COUNT).map((listing) => ({ listing, tag: null })));
           setExploreStatus({ kind: "random" });
         }
       })
-      .catch(() => {/* silently ignore — featured listings are best-effort */});
+      .catch(() => {});
   }
 
-  /** Explore Berlin follows the map: the listings in view first, fillers after. */
   function syncCardsToMap(
     bounds: Bounds,
     zoom: number,
     fillers: CardListing[] = latest.current.pool,
     previous: ExploreCard<CardListing>[] = latest.current.cards,
   ) {
-    const mapListings = latest.current.mapListings;
-    if (!mapListings) return;
+    const all = latest.current.mapListings;
+    if (!all) return;
     lastView.current = { bounds, zoom };
     const { cards: next, status } = pickExploreCards<CardListing>({
-      inView: listingsForView(mapListings, bounds, zoom),
+      inView: listingsForView(all, bounds, zoom),
       pool: fillers,
-      all: mapListings,
+      all,
       previous,
     });
     setCards(next);
     setExploreStatus(status);
   }
 
+  // "Every listing, checked": a real listing with a fair rent, low risk, near the U/S-Bahn.
+  const risk = useMemo(() => new Map(mapListings?.map((m) => [m.id, m.risk_band]) ?? []), [mapListings]);
+  const showcase = useMemo(() => {
+    const full = pool as ListingOut[];
+    const good = full.filter(
+      (l) =>
+        isFairRent(l.rent) &&
+        risk.get(l.id) === "low" &&
+        (l.location?.rail_modes ?? []).some((m) => m === "ubahn" || m === "sbahn") &&
+        (l.location?.rail_walk_minutes ?? 99) <= 8,
+    );
+    return good[0] ?? full.find((l) => isFairRent(l.rent)) ?? full[0] ?? null;
+  }, [pool, risk]);
+
   const shownInView = cards.filter((c) => c.tag === "in-view").length;
 
-  /** `budget` re-runs the query with a raised budget (from a "budget too low" hint). */
-  async function runSearch(q: string, budget?: number) {
-    const trimmed = q.trim();
-    if (!trimmed) return;
+  return (
+    <>
+      <section className="bg-ink text-text-on-ink">
+        <div className="mx-auto grid max-w-page items-center gap-12 px-[18px] pb-20 pt-14 md:px-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:pt-[72px]">
+          <div className="min-w-0">
+            <p className="text-[14px] font-semibold uppercase tracking-[0.08em] text-accent-on-ink">
+              Berlin flat search you can trust
+            </p>
+            <h1 className="mt-3.5 text-[40px] font-bold leading-[1.03] tracking-[-0.04em] text-white sm:text-[56px] xl:text-[64px]">
+              Find your Berlin flat. Know it&apos;s fair before you call.
+            </h1>
+            <p className="mt-5 max-w-[600px] text-[17px] leading-relaxed text-text-on-ink-muted sm:text-[19px]">
+              Say what you need in plain words. WohnIQ ranks the flats, checks each rent against the
+              official Mietspiegel and flags likely scams, and tells you why.
+            </p>
+            <div className="mt-9">
+              <SearchForm onSearch={run} />
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-[14px] text-text-on-ink-muted">Try:</span>
+              {EXAMPLES.map((ex) => (
+                <button
+                  key={ex}
+                  type="button"
+                  onClick={() => run(ex)}
+                  className="min-h-[36px] rounded-full border border-white/20 px-3 text-[14px] text-text-on-ink-soft hover:border-white/40 hover:text-white"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
+          </div>
+          <CheckedCard listing={showcase} lowRisk={!!showcase && risk.get(showcase.id) === "low"} />
+        </div>
+      </section>
+
+      <div className="mx-auto flex max-w-page flex-col gap-14 px-[18px] py-14 md:px-8">
+        <EntryCards />
+
+        <div>
+          <section ref={exploreRef} className="scroll-mt-20 pb-8" data-testid="explore" aria-labelledby="explore-heading">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <h2 id="explore-heading" className="text-[26px] font-bold tracking-tight text-text">
+                  Explore Berlin
+                </h2>
+                <p
+                  className="mt-1 line-clamp-2 h-10 text-[15px] text-text-muted sm:line-clamp-1 sm:h-6"
+                  aria-live="polite"
+                  data-testid="explore-subtitle"
+                >
+                  {exploreSubtitle(exploreStatus, shownInView)}
+                </p>
+              </div>
+              <Button variant="outline" onClick={loadRandomCards}>
+                Show others
+              </Button>
+            </div>
+            {cards.length === 0 ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: EXPLORE_COUNT }).map((_, i) => (
+                  <div key={i} className="h-72 animate-pulse rounded-lg bg-chip" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {cards.map((c) => (
+                  <FeaturedCard key={c.listing.id} listing={c.listing} tag={c.tag} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          <ListingsMapSection
+            listings={mapListings}
+            error={mapError}
+            onUserViewChange={(bounds, zoom) => syncCardsToMap(bounds, zoom)}
+            cardsNote={mapToCardsNote(exploreStatus, shownInView)}
+            onCardsNoteClick={() => exploreRef.current?.scrollIntoView({ behavior: "smooth" })}
+          />
+        </div>
+
+        <HowItWorks />
+      </div>
+    </>
+  );
+}
+
+// ── Results ─────────────────────────────────────────────────────────────────────────────
+
+function Results({
+  params,
+  go,
+  mapListings,
+}: {
+  params: SearchParams;
+  go: (p: SearchParams | null, replace?: boolean) => void;
+  mapListings: MapListing[] | null;
+}) {
+  const [data, setData] = useState<SearchResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [compare, setCompare] = useState<Set<string>>(new Set());
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const saved = useSaved();
+  // After a search, scroll so "We understood:" sits just under the sticky header and the
+  // results follow below it (the chips are never hidden behind the header).
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const cacheKey = `${params.q}|${params.budget ?? ""}`;
+
+  useEffect(() => {
+    let cancelled = false;
+    setCompare(new Set());
+    const cached = cacheGet(cacheKey);
+    if (cached) {
+      setData(cached);
+      return;
+    }
     setLoading(true);
     setError(null);
-    setSelectedIds(new Set());
-    setCompareOpen(false);
+    search(params.q, RESULTS_LIMIT, params.budget)
+      .then((res) => {
+        if (cancelled) return;
+        setData(res);
+        cacheSet(cacheKey, res);
+        setTimeout(() => chipsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      })
+      .catch((e) => !cancelled && (setError(e instanceof Error ? e.message : "Something went wrong"), setData(null)))
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [cacheKey, params.q, params.budget]);
+
+  const areas = data?.criteria.areas ?? [];
+  const results = data?.results ?? [];
+  const shown = visibleResults(results, params.fair, params.sort);
+  const fairCount = results.filter((r) => isFairRent(r.listing.rent)).length;
+  const selectedItems = results.filter((r) => compare.has(r.listing.id));
+
+  function toggleCompare(id: string) {
+    setCompare((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else if (next.size < MAX_COMPARE) next.add(id);
+      return next;
+    });
+  }
+
+  async function share() {
+    const url = window.location.href;
     try {
-      const result = await search(trimmed, 6, budget);
-      setData(result);
-      saveCache(trimmed, result);
-      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-      setData(null);
-    } finally {
-      setLoading(false);
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      window.prompt("Copy this link", url);
     }
   }
 
   return (
     <>
-      {/* ── Hero ── */}
-      <section className="bg-gray-950 px-4 py-20 text-white">
-        <div className="mx-auto max-w-2xl text-center">
-          <h1 className="mb-3 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            Find your Berlin flat,{" "}
-            <span className="text-indigo-400">smarter.</span>
-          </h1>
-          <p className="mb-8 text-base text-gray-400 sm:text-lg">
-            Describe what you need in plain language — we rank, explain, and
-            flag every listing.
+      <section className="bg-ink text-text-on-ink">
+        <div className="mx-auto max-w-page px-[18px] pb-12 pt-12 md:px-8">
+          <p className="text-[14px] font-semibold uppercase tracking-[0.08em] text-accent-on-ink">
+            Berlin flat search you can trust
           </p>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void runSearch(query);
-            }}
-            className="flex gap-2"
-          >
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g. quiet 2-room near Mitte, budget €1,400, good cafes"
-              className="flex-1 rounded-full border border-gray-700 bg-gray-800 px-5 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-            >
-              {loading ? "Searching…" : "Search"}
-            </button>
-          </form>
-
-          <button
-            type="button"
-            onClick={() => {
-              setQuery(EXAMPLE);
-              void runSearch(EXAMPLE);
-            }}
-            className="mt-3 text-xs text-gray-500 hover:text-gray-300"
-          >
-            Try an example →
-          </button>
-
-          <div>
-            <LifestyleEntryBar />
+          <h1 className="mt-3 max-w-4xl text-[34px] font-bold leading-[1.05] tracking-[-0.035em] text-white sm:text-[48px]">
+            Describe the flat you want. We check the rent, the area and the risk.
+          </h1>
+          <p className="mt-4 max-w-[640px] text-[17px] leading-relaxed text-text-on-ink-muted">
+            Every result is ranked by fit, measured against Berlin&apos;s official rent index and
+            screened for scams, with the reasons spelled out.
+          </p>
+          <div className="mt-8 max-w-[940px]">
+            <SearchForm initial={params.q} busy={loading} onSearch={(q) => go({ q, fair: params.fair, sort: params.sort })} />
+          </div>
+          <div ref={chipsRef} className="mt-4 scroll-mt-24">
+            {data && <CriteriaChips criteria={data.criteria} />}
           </div>
         </div>
       </section>
 
-      {/* ── Main content ── */}
-      <div className="mx-auto max-w-6xl px-4">
-
-        {/* Error */}
-        {error && (
-          <p className="mt-8 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
-        )}
-
-        {/* ── Search results ── */}
-        {data ? (
-          // scroll-mt: the auto-scroll to results must stop below the sticky header (57 px),
-          // or it hides the "Understood as" chips.
-          <section ref={resultsRef} className="scroll-mt-16 py-10">
-            <div className="mb-4">
-              <CriteriaChips criteria={data.criteria} />
-              {data.commute_note && (
-                <p className="mt-2 text-xs text-gray-500">{data.commute_note}</p>
-              )}
-            </div>
-            <SearchNotices
-              notices={data.notices ?? []}
-              busy={loading}
-              onRaiseBudget={(budget) => void runSearch(query, budget)}
-            />
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                {data.results.length} result{data.results.length === 1 ? "" : "s"} · ranked by fit
-              </p>
-              <button
-                type="button"
-                onClick={() => { setData(null); setQuery(""); setSelectedIds(new Set()); }}
-                className="text-xs text-gray-400 hover:text-gray-700"
-              >
-                ✕ Clear search
-              </button>
-            </div>
-            <div className="space-y-4">
-              {data.results.map((item) => (
-                <ResultCard
-                  key={item.listing.id}
-                  item={item}
-                  selected={selectedIds.has(item.listing.id)}
-                  onToggleSelect={toggleSelect}
-                  selectionDisabled={selectedIds.size >= MAX_COMPARE}
-                />
-              ))}
-            </div>
-          </section>
-        ) : (
-          <>
-            {/* ── Marketing cards ── */}
-            <section id="how-it-works" className="grid gap-4 py-10 sm:grid-cols-2">
-              <LifestyleFeatureCard />
-              <MarketingCard
-                icon={
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                  </svg>
-                }
-                title="AI-Powered Matching"
-                body="Describe what matters to you — commute, budget, quiet street, local cafes. We parse your criteria and rank every listing by real fit, not just keywords."
-              />
-              <MarketingCard
-                icon={
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  </svg>
-                }
-                title="Built-in Scam Protection"
-                body="Every listing is risk-scored before it reaches you. Suspicious pricing, ghost addresses, and pressure tactics are automatically detected and flagged."
-              />
-            </section>
-
-            {/* ── Featured listings (follow the map below) ── */}
-            <section ref={exploreRef} className="scroll-mt-16 pb-12" data-testid="explore">
-              <div className="mb-5 flex items-start justify-between gap-4">
-                {/* min-w-0: lets the subtitle shrink instead of widening the page on phones. */}
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-lg font-semibold">Explore Berlin</h2>
-                  {/* Fixed height (two lines on phones, one from sm), so the section never
-                      changes height as the text changes. */}
-                  <p
-                    className="mt-0.5 line-clamp-2 h-10 text-sm text-gray-500 sm:line-clamp-1 sm:h-5"
-                    aria-live="polite"
-                    data-testid="explore-subtitle"
-                  >
-                    {exploreSubtitle(exploreStatus, shownInView)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={loadRandomCards}
-                  className="mt-1 flex-shrink-0 text-xs text-gray-400 hover:text-gray-700"
-                >
-                  Refresh ↻
-                </button>
-              </div>
-
-              {cards.length === 0 ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {Array.from({ length: EXPLORE_COUNT }).map((_, i) => (
-                    <div key={i} className="h-64 animate-pulse rounded-2xl bg-gray-100" />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {cards.map((c) => (
-                    <FeaturedCard key={c.listing.id} listing={c.listing} tag={c.tag} />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* ── See on the map ── */}
-            <ListingsMapSection
-              listings={mapListings}
-              error={mapError}
-              onUserViewChange={(bounds, zoom) => syncCardsToMap(bounds, zoom)}
-              cardsNote={mapToCardsNote(exploreStatus, shownInView)}
-              onCardsNoteClick={() => exploreRef.current?.scrollIntoView({ behavior: "smooth" })}
-            />
-          </>
-        )}
-      </div>
-
-      {/* ── Sticky comparison bar ── */}
-      {selectedIds.size >= 2 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-indigo-100 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-indigo-700">{selectedIds.size}</span> listings selected
-              {selectedIds.size < MAX_COMPARE && (
-                <span className="ml-1 text-gray-400">
-                  (add up to {MAX_COMPARE - selectedIds.size} more)
-                </span>
-              )}
+      <section className="mx-auto max-w-page px-[18px] py-10 md:px-8" aria-labelledby="results-heading">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h2 id="results-heading" className="text-[26px] font-bold tracking-tight text-text" data-testid="results-heading">
+              {loading && !data ? "Searching…" : resultsHeading(shown.length, areas)}
+            </h2>
+            <p className="mt-1 text-[15px] text-text-muted">
+              Sorted by {params.sort === "fit" ? "fit" : SORT_LABELS[params.sort].toLowerCase()}. Rent checked against the Berliner Mietspiegel 2026.
             </p>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setSelectedIds(new Set())}
-                className="text-xs text-gray-400 hover:text-gray-700"
+            {data?.commute_note && <p className="mt-1 text-[13px] text-text-muted">{data.commute_note}</p>}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="flex min-h-tap items-center gap-2 rounded-md border border-line-strong bg-surface px-3 text-[14px] text-text">
+              Sort:
+              <select
+                className="bg-transparent font-medium outline-none"
+                value={params.sort}
+                onChange={(e) => go({ ...params, sort: e.target.value as SortKey }, true)}
               >
-                Clear
-              </button>
-              <button
-                type="button"
-                onClick={() => setCompareOpen(true)}
-                className="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-              >
-                Compare
-              </button>
+                {Object.entries(SORT_LABELS).map(([k, label]) => (
+                  <option key={k} value={k}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button
+              variant={params.fair ? "dark" : "outline"}
+              aria-pressed={params.fair}
+              onClick={() => go({ ...params, fair: !params.fair }, true)}
+              data-testid="fair-toggle"
+            >
+              Only fair rents ({fairCount})
+            </Button>
+            <Button variant="outline" onClick={share}>
+              {copied ? "Link copied" : "Share search"}
+            </Button>
+            <button type="button" onClick={() => go(null)} className="min-h-tap px-2 text-[14px] text-text-muted underline underline-offset-2 hover:text-text">
+              Clear search
+            </button>
+          </div>
+        </div>
+
+        {error && <p role="alert" className="mb-4 rounded-md bg-warn-bg px-4 py-3 text-[14px] text-warn">{error}</p>}
+        {data && (
+          <SearchNotices
+            notices={data.notices ?? []}
+            busy={loading}
+            onRaiseBudget={(budget) => go({ ...params, budget })}
+          />
+        )}
+        {params.fair && data && fairCount === 0 && results.length > 0 && (
+          <p className="mb-4 rounded-md bg-chip px-4 py-3 text-[14px] text-text-body">
+            None of these {results.length} flats is within the rent-brake limit.{" "}
+            <button type="button" className="font-semibold text-accent underline" onClick={() => go({ ...params, fair: false }, true)}>
+              Show all
+            </button>
+          </p>
+        )}
+
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="flex min-w-0 flex-col gap-4">
+            {shown.map((item) => (
+              <ResultCard
+                key={item.listing.id}
+                item={item}
+                compared={compare.has(item.listing.id)}
+                onToggleCompare={toggleCompare}
+                compareDisabled={compare.size >= MAX_COMPARE}
+                saved={saved.has(item.listing.id)}
+                onToggleSave={saved.toggle}
+                highlighted={highlighted === item.listing.id}
+                onHover={setHighlighted}
+              />
+            ))}
+            {loading && !data && Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-64 animate-pulse rounded-lg bg-chip" />)}
+          </div>
+          <div className="lg:sticky lg:top-24">
+            {data && (
+              <ResultsMap
+                results={shown}
+                areas={areas}
+                allListings={mapListings}
+                highlighted={highlighted}
+                onHighlight={setHighlighted}
+              />
+            )}
+          </div>
+        </div>
+      </section>
+
+      {compare.size >= 2 && (
+        <div className="fixed inset-x-0 bottom-0 z-[1050] border-t border-line bg-surface/95 px-[18px] py-3 shadow-lg backdrop-blur-sm">
+          <div className="mx-auto flex max-w-page items-center justify-between gap-4">
+            <p className="text-[14px] text-text-body">
+              <span className="font-semibold text-text">{compare.size}</span> flats selected
+              {compare.size < MAX_COMPARE && <span className="text-text-muted"> (up to {MAX_COMPARE})</span>}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => setCompare(new Set())}>Clear</Button>
+              <Button onClick={() => setCompareOpen(true)}>Compare</Button>
             </div>
           </div>
         </div>
       )}
-
-      {/* ── Comparison modal ── */}
       {compareOpen && selectedItems.length >= 2 && (
         <ComparisonModal items={selectedItems} onClose={() => setCompareOpen(false)} />
       )}

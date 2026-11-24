@@ -34,9 +34,10 @@ async function goToResultsAsStudent(page: Page) {
 
 test("homepage invites users into Lifestyle Match", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Tell us how you live/ })).toBeVisible();
-  await expect(page.getByText("Berlin areas scored")).toBeVisible();
-  await page.getByRole("link", { name: /Try Lifestyle Match/ }).click();
+  // Berlin Ink homepage (T9.4): one of the three entry cards under the hero.
+  const card = page.getByTestId("entry-card").filter({ hasText: "Lifestyle match" });
+  await expect(card).toContainText("Start the match");
+  await card.click();
   await expect(page).toHaveURL(/\/lifestyle$/);
   await expect(page.getByRole("heading", { name: /Start with a profile/ })).toBeVisible();
 });

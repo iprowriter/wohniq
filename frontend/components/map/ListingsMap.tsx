@@ -336,7 +336,7 @@ export function ListingsMap({ listings, onUserViewChange }: Props) {
             onClick={() => goToTier(t)}
             aria-pressed={t === tier}
             className={`rounded-full px-3 py-1.5 font-medium transition-colors ${
-              t === tier ? "bg-violet-700 text-white" : "text-gray-600 hover:bg-violet-50 hover:text-violet-800"
+              t === tier ? "bg-ink text-white" : "text-text-body hover:bg-accent-tint hover:text-accent"
             }`}
           >
             {TIER_LABEL[t]}

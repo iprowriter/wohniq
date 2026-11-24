@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { NAV, isActive } from "@/lib/nav";
 import { StatusBadge } from "./StatusBadge";
+import { useSaved } from "@/lib/useSaved";
 
 export function Logo() {
   return (
@@ -25,6 +26,7 @@ export function SiteHeader() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]); // close the phone menu on navigation
+  const saved = useSaved().ids.length;
 
   return (
     <header className="sticky top-0 z-[1100] bg-ink text-text-on-ink">
@@ -55,6 +57,14 @@ export function SiteHeader() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <StatusBadge />
+          <Link
+            href="/saved"
+            data-testid="saved-link"
+            aria-current={pathname.startsWith("/saved") ? "page" : undefined}
+            className="hidden min-h-tap items-center rounded-md bg-white px-4 text-[15px] font-medium text-text hover:bg-text-on-ink-soft sm:inline-flex"
+          >
+            Saved ({saved})
+          </Link>
           <button
             type="button"
             className="flex min-h-tap min-w-[44px] items-center justify-center rounded-[10px] text-white md:hidden"
@@ -86,6 +96,12 @@ export function SiteHeader() {
               </Link>
             );
           })}
+          <Link
+            href="/saved"
+            className="flex min-h-tap items-center rounded-[10px] px-3 text-base text-text-on-ink-muted"
+          >
+            Saved ({saved})
+          </Link>
         </nav>
       )}
     </header>

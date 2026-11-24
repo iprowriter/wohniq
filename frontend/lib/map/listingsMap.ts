@@ -30,6 +30,11 @@ export interface MapListing {
   warmmiete_eur: number;
   photo_url?: string | null;
   risk_band?: "low" | "caution" | "high" | null;
+  // Berlin data, for the Explore Berlin cards that follow the map.
+  rent_verdict?: string | null;
+  rail_stop?: string | null;
+  rail_modes?: string[];
+  rail_walk_minutes?: number | null;
 }
 
 export type MapTier = "city" | "district" | "neighbourhood" | "listing";
@@ -98,10 +103,9 @@ export function median(values: number[]): number {
 }
 
 /** €1.068 — the German thousands separator used for prices across WohnIQ. */
-export function formatEuro(amount: number): string {
-  return `€${Math.round(amount)
-    .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+export function formatEuro(n: number): string {
+  // Same format as the rest of the app (lib/format.ts): €1,068.
+  return `€${new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 }).format(Math.round(n))}`;
 }
 
 export function formatRooms(rooms: number): string {
