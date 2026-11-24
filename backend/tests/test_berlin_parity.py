@@ -120,3 +120,12 @@ def test_tables_and_documents(both):
     assert local.crime_rates() == pg.crime_rates()
     assert local.berlin_crime_rate() == pg.berlin_crime_rate()
     assert local.area_stats() == pg.area_stats()
+
+
+def test_map_layers(both):
+    local, pg = both
+    for box in ((52.52, 13.39, 52.54, 13.42), (52.45, 13.20, 52.50, 13.30)):
+        assert local.stops_in_bbox(*box) == pg.stops_in_bbox(*box)
+        a, b = local.parks_in_bbox(*box), pg.parks_in_bbox(*box)
+        assert [p["name"] for p in a] == [p["name"] for p in b]
+        assert [p["area_m2"] for p in a] == [p["area_m2"] for p in b]

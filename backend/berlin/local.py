@@ -327,6 +327,44 @@ class LocalBerlinData:
             s["lng"],
         )
 
+    # --- map layers (results map: Transit, Green) -----------------------------------------
+
+    def stops_in_bbox(
+        self, south: float, west: float, north: float, east: float, limit: int = 400
+    ) -> list[Stop]:
+        layer = self._stops
+        idx = np.nonzero(
+            (layer.lat >= south) & (layer.lat <= north) & (layer.lng >= west) & (layer.lng <= east)
+        )[0][:limit]
+        return [
+            Stop(
+                layer.rows[i]["id"],
+                layer.rows[i]["name"],
+                tuple(layer.rows[i]["modes"]),
+                layer.rows[i]["lat"],
+                layer.rows[i]["lng"],
+                0.0,
+            )
+            for i in idx
+        ]
+
+    def parks_in_bbox(
+        self, south: float, west: float, north: float, east: float, limit: int = 300
+    ) -> list[dict]:
+        b = self._park_bbox
+        idx = np.nonzero(
+            (b[:, 0] <= east) & (b[:, 2] >= west) & (b[:, 1] <= north) & (b[:, 3] >= south)
+        )[0]
+        order = sorted(idx.tolist(), key=lambda i: -self._parks[i]["area_m2"])[:limit]
+        return [
+            {
+                "name": self._parks[i]["name"],
+                "area_m2": self._parks[i]["area_m2"],
+                "polygons": self._parks[i]["polygons"],
+            }
+            for i in sorted(order)
+        ]
+
     # --- rent index ---------------------------------------------------------------------
 
     def rent_rows(self) -> list[dict]:

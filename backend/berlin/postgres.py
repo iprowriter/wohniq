@@ -226,6 +226,47 @@ class PostgresBerlinData:
             r.code, r.name, r.station_type, r.lqi, r.measured_at, float(r.d), r.lat, r.lng
         )
 
+    # --- map layers (results map: Transit, Green) -----------------------------------------
+
+    _BOX = "ST_MakeEnvelope(:west, :south, :east, :north, 4326)"
+
+    def stops_in_bbox(
+        self, south: float, west: float, north: float, east: float, limit: int = 400
+    ) -> list[Stop]:
+        rows = self._all(
+            "SELECT id, name, modes, lat, lng FROM berlin_stop "
+            "WHERE lat BETWEEN :south AND :north AND lng BETWEEN :west AND :east "
+            'ORDER BY id COLLATE "C" LIMIT :limit',
+            south=south,
+            west=west,
+            north=north,
+            east=east,
+            limit=limit,
+        )
+        return [Stop(r.id, r.name, tuple(r.modes), r.lat, r.lng, 0.0) for r in rows]
+
+    def parks_in_bbox(
+        self, south: float, west: float, north: float, east: float, limit: int = 300
+    ) -> list[dict]:
+        import json
+
+        rows = self._all(
+            "SELECT id, name, area_m2, ST_AsGeoJSON(geog::geometry, 5) AS g FROM berlin_park "
+            f"WHERE ST_Intersects(geog, {self._BOX}::geography) "
+            "ORDER BY area_m2 DESC, id LIMIT :limit",
+            south=south,
+            west=west,
+            north=north,
+            east=east,
+            limit=limit,
+        )
+        out = []
+        for r in sorted(rows, key=lambda r: r.id):
+            g = json.loads(r.g)
+            polys = g["coordinates"] if g["type"] == "MultiPolygon" else [g["coordinates"]]
+            out.append({"name": r.name, "area_m2": r.area_m2, "polygons": polys})
+        return out
+
     # --- rent index ---------------------------------------------------------------------
 
     def rent_rows(self) -> list[dict]:

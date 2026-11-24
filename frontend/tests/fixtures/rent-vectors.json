@@ -1,0 +1,1276 @@
+{
+ "checklist": [
+  {
+   "group": 1,
+   "id": "bath-minus-01",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-02",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-03",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-04",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-05",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-06",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-07",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-08",
+   "not_applicable": [
+    "1973-1990-east"
+   ],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-09",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-minus-10",
+   "not_applicable": [
+    "1973-1990-east"
+   ],
+   "sign": "-"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-01",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-02",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-03",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-04",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-05",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-06",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-07",
+   "not_applicable": [
+    "2010-2015",
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-08",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-09",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-10",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 1,
+   "id": "bath-plus-11",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-01",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-02",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-03",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-04",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-05",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-06",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-minus-07",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-01",
+   "not_applicable": [
+    "2010-2015",
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-02",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-03",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-04",
+   "not_applicable": [
+    "2002-2009",
+    "2010-2015",
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-05",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-06",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 2,
+   "id": "kitchen-plus-07",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-01",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-02",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-03",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-04",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-05",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-06",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-07",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-minus-08",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-01",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-02",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-03",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-04",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-05",
+   "not_applicable": [
+    "1991-2001",
+    "2002-2009",
+    "2010-2015",
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-06",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-07",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-08",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-09",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-10",
+   "not_applicable": [
+    "2002-2009",
+    "2010-2015",
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 3,
+   "id": "flat-plus-11",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-01",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-02",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-03",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-04",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-05",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-06",
+   "not_applicable": [
+    "1919-1949",
+    "pre1918"
+   ],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-07",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-08",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-energy-145",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-energy-195",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-minus-energy-235",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-01",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-02",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-03",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-04",
+   "not_applicable": [
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-05",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-06",
+   "not_applicable": [
+    "2010-2015",
+    "2016-2019",
+    "2020-2024"
+   ],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-07",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-08",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-energy-120",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-energy-100",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 4,
+   "id": "building-plus-energy-80",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-minus-01",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-minus-02",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-minus-03",
+   "not_applicable": [],
+   "sign": "-"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-plus-01",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-plus-02",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-plus-03",
+   "not_applicable": [],
+   "sign": "+"
+  },
+  {
+   "group": 5,
+   "id": "surroundings-plus-04",
+   "not_applicable": [],
+   "sign": "+"
+  }
+ ],
+ "periods": {
+  "1919-1949": {
+   "from": 1919,
+   "label": "1919–1949",
+   "side": null,
+   "to": 1949
+  },
+  "1950-1964": {
+   "from": 1950,
+   "label": "1950–1964",
+   "side": null,
+   "to": 1964
+  },
+  "1965-1972": {
+   "from": 1965,
+   "label": "1965–1972",
+   "side": null,
+   "to": 1972
+  },
+  "1973-1985-west": {
+   "from": 1973,
+   "label": "1973–1985 (West)",
+   "side": "west",
+   "to": 1985
+  },
+  "1973-1990-east": {
+   "from": 1973,
+   "label": "1973–1990 (East)",
+   "side": "east",
+   "to": 1990
+  },
+  "1986-1990-west": {
+   "from": 1986,
+   "label": "1986–1990 (West)",
+   "side": "west",
+   "to": 1990
+  },
+  "1991-2001": {
+   "from": 1991,
+   "label": "1991–2001",
+   "side": null,
+   "to": 2001
+  },
+  "2002-2009": {
+   "from": 2002,
+   "label": "2002–2009",
+   "side": null,
+   "to": 2009
+  },
+  "2010-2015": {
+   "from": 2010,
+   "label": "2010–2015",
+   "side": null,
+   "to": 2015
+  },
+  "2016-2019": {
+   "from": 2016,
+   "label": "2016–2019",
+   "side": null,
+   "to": 2019
+  },
+  "2020-2024": {
+   "from": 2020,
+   "label": "2020–2024",
+   "side": null,
+   "to": 2024
+  },
+  "pre1918": {
+   "from": null,
+   "label": "before 1918",
+   "side": null,
+   "to": 1918
+  }
+ },
+ "rows": [
+  {
+   "high": 12.25,
+   "location": "simple",
+   "low": 7.01,
+   "mean": 9.27,
+   "period": "pre1918",
+   "row": 3,
+   "size_max": 45,
+   "size_min": 40
+  },
+  {
+   "high": 9.53,
+   "location": "simple",
+   "low": 6.23,
+   "mean": 7.32,
+   "period": "1965-1972",
+   "row": 24,
+   "size_max": 55,
+   "size_min": 40
+  },
+  {
+   "high": 10.51,
+   "location": "medium",
+   "low": 7.74,
+   "mean": 8.83,
+   "period": "1919-1949",
+   "row": 78,
+   "size_max": 40,
+   "size_min": 0
+  },
+  {
+   "high": 9.55,
+   "location": "medium",
+   "low": 5.9,
+   "mean": 7.3,
+   "period": "1919-1949",
+   "row": 81,
+   "size_max": null,
+   "size_min": 60
+  },
+  {
+   "high": 10.49,
+   "location": "medium",
+   "low": 6.6,
+   "mean": 7.78,
+   "period": "1973-1985-west",
+   "row": 91,
+   "size_max": 40,
+   "size_min": 35
+  },
+  {
+   "high": 9.84,
+   "location": "medium",
+   "low": 6.63,
+   "mean": 7.64,
+   "period": "1973-1990-east",
+   "row": 103,
+   "size_max": 40,
+   "size_min": 0
+  },
+  {
+   "high": 17.68,
+   "location": "medium",
+   "low": 10.24,
+   "mean": 14.42,
+   "period": "2016-2019",
+   "row": 124,
+   "size_max": 95,
+   "size_min": 70
+  },
+  {
+   "high": 13.54,
+   "location": "good",
+   "low": 7.09,
+   "mean": 9.46,
+   "period": "pre1918",
+   "row": 135,
+   "size_max": 70,
+   "size_min": 60
+  },
+  {
+   "high": 13.21,
+   "location": "good",
+   "low": 7.52,
+   "mean": 11.06,
+   "period": "1991-2001",
+   "row": 172,
+   "size_max": 75,
+   "size_min": 65
+  }
+ ],
+ "vectors": [
+  {
+   "expected": {
+    "asked": 7.75,
+    "comparable": 7.75,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     1,
+     1,
+     1,
+     -1,
+     -1
+    ],
+    "high": 9.55,
+    "ignored_features": [],
+    "limit": 8.53,
+    "low": 5.9,
+    "mean": 7.3,
+    "net_groups": 1,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1919-1949",
+    "row": 81,
+    "used_checklist": true,
+    "verdict": "within_limit"
+   },
+   "input": {
+    "cold_rent_eur": 465,
+    "east": false,
+    "features": [
+     "bath-plus-01",
+     "building-minus-01",
+     "flat-plus-01",
+     "kitchen-plus-03",
+     "surroundings-minus-01"
+    ],
+    "location_class": "medium",
+    "size_m2": 60,
+    "year_built": 1930
+   },
+   "name": "brochure example 10.4 B"
+  },
+  {
+   "expected": {
+    "asked": 9.84,
+    "comparable": 9.46,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 13.54,
+    "ignored_features": [],
+    "limit": 10.41,
+    "low": 7.09,
+    "mean": 9.46,
+    "net_groups": 0,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "pre1918",
+    "row": 135,
+    "used_checklist": false,
+    "verdict": "within_limit"
+   },
+   "input": {
+    "cold_rent_eur": 600,
+    "east": true,
+    "features": [],
+    "location_class": "good",
+    "size_m2": 61,
+    "year_built": 1908
+   },
+   "name": "index only, within"
+  },
+  {
+   "expected": {
+    "asked": 14.1,
+    "comparable": 9.46,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 13.54,
+    "ignored_features": [],
+    "limit": 10.41,
+    "low": 7.09,
+    "mean": 9.46,
+    "net_groups": 0,
+    "over_per_m2": 3.69,
+    "over_per_month": 225,
+    "period": "pre1918",
+    "row": 135,
+    "used_checklist": false,
+    "verdict": "above_limit"
+   },
+   "input": {
+    "cold_rent_eur": 860,
+    "east": true,
+    "features": [],
+    "location_class": "good",
+    "size_m2": 61,
+    "year_built": 1908
+   },
+   "name": "index only, above"
+  },
+  {
+   "expected": {
+    "asked": 5.68,
+    "comparable": 9.27,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 12.25,
+    "ignored_features": [],
+    "limit": 10.2,
+    "low": 7.01,
+    "mean": 9.27,
+    "net_groups": 0,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "pre1918",
+    "row": 3,
+    "used_checklist": false,
+    "verdict": "below_index"
+   },
+   "input": {
+    "cold_rent_eur": 250,
+    "east": false,
+    "features": [],
+    "location_class": "simple",
+    "size_m2": 44,
+    "year_built": 1900
+   },
+   "name": "below the index"
+  },
+  {
+   "expected": {
+    "asked": 11.82,
+    "comparable": 7.76,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     1,
+     1,
+     0,
+     -1,
+     0
+    ],
+    "high": 9.53,
+    "ignored_features": [],
+    "limit": 8.54,
+    "low": 6.23,
+    "mean": 7.32,
+    "net_groups": 1,
+    "over_per_m2": 3.28,
+    "over_per_month": 144,
+    "period": "1965-1972",
+    "row": 24,
+    "used_checklist": true,
+    "verdict": "above_limit"
+   },
+   "input": {
+    "cold_rent_eur": 520,
+    "east": true,
+    "energy_kwh": 160,
+    "features": [
+     "bath-plus-04",
+     "bath-plus-11",
+     "building-minus-02",
+     "flat-minus-07",
+     "flat-plus-01",
+     "kitchen-plus-03",
+     "kitchen-plus-05"
+    ],
+    "location_class": "simple",
+    "size_m2": 44,
+    "year_built": 1965
+   },
+   "name": "energy 160 + net plus"
+  },
+  {
+   "expected": {
+    "asked": null,
+    "comparable": 7.02,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     -1,
+     0
+    ],
+    "high": 9.55,
+    "ignored_features": [],
+    "limit": 7.72,
+    "low": 5.9,
+    "mean": 7.3,
+    "net_groups": -1,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1919-1949",
+    "row": 81,
+    "used_checklist": true,
+    "verdict": "unknown"
+   },
+   "input": {
+    "east": false,
+    "energy_kwh": 240,
+    "features": [
+     "building-plus-08"
+    ],
+    "location_class": "medium",
+    "size_m2": 60,
+    "year_built": 1930
+   },
+   "name": "energy replaces insulation"
+  },
+  {
+   "expected": {
+    "asked": null,
+    "comparable": 7.75,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    "high": 9.55,
+    "ignored_features": [],
+    "limit": 8.53,
+    "low": 5.9,
+    "mean": 7.3,
+    "net_groups": 1,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1919-1949",
+    "row": 81,
+    "used_checklist": true,
+    "verdict": "unknown"
+   },
+   "input": {
+    "east": false,
+    "energy_is_demand": true,
+    "energy_kwh": 110,
+    "energy_without_hot_water": true,
+    "features": [],
+    "location_class": "medium",
+    "size_m2": 60,
+    "year_built": 1930
+   },
+   "name": "demand value, no hot water"
+  },
+  {
+   "expected": {
+    "asked": null,
+    "comparable": 5.9,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     -1,
+     -1,
+     -1,
+     -1,
+     -1
+    ],
+    "high": 9.55,
+    "ignored_features": [],
+    "limit": 6.49,
+    "low": 5.9,
+    "mean": 7.3,
+    "net_groups": -5,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1919-1949",
+    "row": 81,
+    "used_checklist": true,
+    "verdict": "unknown"
+   },
+   "input": {
+    "east": false,
+    "features": [
+     "bath-minus-01",
+     "building-minus-01",
+     "flat-minus-01",
+     "kitchen-minus-01",
+     "surroundings-minus-01"
+    ],
+    "location_class": "medium",
+    "size_m2": 60,
+    "year_built": 1930
+   },
+   "name": "all groups down"
+  },
+  {
+   "expected": {
+    "asked": 15.0,
+    "comparable": 15.07,
+    "covered": true,
+    "exempt": "new_build",
+    "groups": [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 17.68,
+    "ignored_features": [
+     "bath-plus-07"
+    ],
+    "limit": null,
+    "low": 10.24,
+    "mean": 14.42,
+    "net_groups": 1,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "2016-2019",
+    "row": 124,
+    "used_checklist": true,
+    "verdict": "new_build"
+   },
+   "input": {
+    "cold_rent_eur": 1200,
+    "east": false,
+    "features": [
+     "bath-plus-01",
+     "bath-plus-07"
+    ],
+    "location_class": "medium",
+    "size_m2": 80,
+    "year_built": 2017
+   },
+   "name": "ignored for building age"
+  },
+  {
+   "expected": {
+    "asked": 20.0,
+    "comparable": 14.42,
+    "covered": true,
+    "exempt": "new_build",
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 17.68,
+    "ignored_features": [],
+    "limit": null,
+    "low": 10.24,
+    "mean": 14.42,
+    "net_groups": 0,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "2016-2019",
+    "row": 124,
+    "used_checklist": false,
+    "verdict": "new_build"
+   },
+   "input": {
+    "cold_rent_eur": 1600,
+    "east": false,
+    "features": [],
+    "location_class": "medium",
+    "size_m2": 80,
+    "year_built": 2017
+   },
+   "name": "new build"
+  },
+  {
+   "expected": {
+    "asked": 20.0,
+    "comparable": null,
+    "covered": false,
+    "exempt": "new_build",
+    "groups": [],
+    "high": null,
+    "ignored_features": [],
+    "limit": null,
+    "low": null,
+    "mean": null,
+    "net_groups": 0,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": null,
+    "row": null,
+    "used_checklist": false,
+    "verdict": "not_covered"
+   },
+   "input": {
+    "cold_rent_eur": 1600,
+    "east": false,
+    "features": [],
+    "location_class": "medium",
+    "size_m2": 80,
+    "year_built": 2025
+   },
+   "name": "after 2024"
+  },
+  {
+   "expected": {
+    "asked": 7.89,
+    "comparable": 7.64,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 9.84,
+    "ignored_features": [],
+    "limit": 8.4,
+    "low": 6.63,
+    "mean": 7.64,
+    "net_groups": 0,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1973-1990-east",
+    "row": 103,
+    "used_checklist": false,
+    "verdict": "within_limit"
+   },
+   "input": {
+    "cold_rent_eur": 300,
+    "east": true,
+    "features": [],
+    "location_class": "medium",
+    "size_m2": 38,
+    "year_built": 1980
+   },
+   "name": "east 1980"
+  },
+  {
+   "expected": {
+    "asked": 7.89,
+    "comparable": 7.78,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 10.49,
+    "ignored_features": [],
+    "limit": 8.56,
+    "low": 6.6,
+    "mean": 7.78,
+    "net_groups": 0,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1973-1985-west",
+    "row": 91,
+    "used_checklist": false,
+    "verdict": "within_limit"
+   },
+   "input": {
+    "cold_rent_eur": 300,
+    "east": false,
+    "features": [],
+    "location_class": "medium",
+    "size_m2": 38,
+    "year_built": 1980
+   },
+   "name": "west 1980"
+  },
+  {
+   "expected": {
+    "asked": 8.0,
+    "comparable": 6.97,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "high": 9.22,
+    "ignored_features": [],
+    "limit": 7.67,
+    "low": 5.57,
+    "mean": 6.97,
+    "net_groups": 0,
+    "over_per_m2": 0.33,
+    "over_per_month": 20,
+    "period": "1919-1949",
+    "row": 81,
+    "used_checklist": false,
+    "verdict": "above_limit"
+   },
+   "input": {
+    "cold_rent_eur": 480,
+    "east": false,
+    "features": [],
+    "location_class": "medium",
+    "no_central_heating_or_bath": true,
+    "size_m2": 60,
+    "year_built": 1930
+   },
+   "name": "1949 without heating"
+  },
+  {
+   "expected": {
+    "asked": 11.14,
+    "comparable": 11.49,
+    "covered": true,
+    "exempt": null,
+    "groups": [
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "high": 13.21,
+    "ignored_features": [],
+    "limit": 12.64,
+    "low": 7.52,
+    "mean": 11.06,
+    "net_groups": 1,
+    "over_per_m2": null,
+    "over_per_month": null,
+    "period": "1991-2001",
+    "row": 172,
+    "used_checklist": true,
+    "verdict": "within_limit"
+   },
+   "input": {
+    "cold_rent_eur": 780,
+    "east": false,
+    "features": [
+     "bath-minus-01",
+     "bath-plus-01",
+     "kitchen-plus-02"
+    ],
+    "location_class": "good",
+    "size_m2": 70,
+    "year_built": 1995
+   },
+   "name": "tie in a group"
+  }
+ ]
+}

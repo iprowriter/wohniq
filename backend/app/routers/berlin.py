@@ -144,3 +144,37 @@ def get_right_now(lat: float, lng: float, data: Data) -> dict:
     """Nearest stops with walking minutes, plus live departures when reachable."""
     _check_point(lat, lng)
     return right_now(data, lat, lng, live=settings.wohniq_live_departures).to_dict()
+
+
+def _check_box(south: float, west: float, north: float, east: float) -> None:
+    if not (south < north and west < east):
+        raise HTTPException(status_code=422, detail="Invalid bounding box")
+    if (north - south) > 0.25 or (east - west) > 0.4:
+        raise HTTPException(status_code=422, detail="Bounding box too large; zoom in")
+
+
+@router.get("/stops")
+def stops_in_view(data: Data, south: float, west: float, north: float, east: float) -> list[dict]:
+    """Stops inside a map view, with their transport types (results map: Transit)."""
+    _check_box(south, west, north, east)
+    return [
+        {"id": s.id, "name": s.name, "modes": list(s.modes), "lat": s.lat, "lng": s.lng}
+        for s in data.stops_in_bbox(south, west, north, east)
+    ]
+
+
+@router.get("/parks")
+def parks_in_view(data: Data, south: float, west: float, north: float, east: float) -> dict:
+    """Green spaces of 1 ha or more inside a map view, as GeoJSON (results map: Green)."""
+    _check_box(south, west, north, east)
+    return {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": p["name"], "area_m2": p["area_m2"]},
+                "geometry": {"type": "MultiPolygon", "coordinates": p["polygons"]},
+            }
+            for p in data.parks_in_bbox(south, west, north, east)
+        ],
+    }

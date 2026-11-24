@@ -153,6 +153,9 @@ class ListingLocationOut(BaseModel):
     rail_stop: str | None = None  # nearest S/U-Bahn station
     rail_modes: list[str] = Field(default_factory=list)
     rail_walk_minutes: int | None = None
+    # The matched address's point: where maps place the flat (one point per listing).
+    lat: float | None = None
+    lng: float | None = None
 
 
 class RentOut(BaseModel):
@@ -658,6 +661,11 @@ class MapListingOut(BaseModel):
     warmmiete_eur: int
     photo_url: str | None = None  # cover photo (first of the set)
     risk_band: str | None = None  # low | caution | high
+    # Berlin data (ADR-0016/0017): for the Explore Berlin cards that follow the map.
+    rent_verdict: str | None = None
+    rail_stop: str | None = None
+    rail_modes: list[str] = Field(default_factory=list)
+    rail_walk_minutes: int | None = None
 
 
 # Every listing inside Berlin; the map aggregates medians client-side from these.
@@ -688,15 +696,36 @@ def get_map_listings(repo: ListingRepository = Depends(get_repository)) -> list[
                 title=x.title,
                 kiez=x.kiez,
                 district=x.district,
-                lat=x.lat,
-                lng=x.lng,
-                rooms=float(x.rooms),
-                size_m2=x.size_m2,
-                warmmiete_eur=x.warmmiete_eur,
-                photo_url=photos[0].source_url if photos else None,
-                risk_band=risk.band if risk else None,
+                **(
+                    {"lat": x.lat, "lng": x.lng}
+                    | _map_berlin_fields(x)
+                    | {
+                        "rooms": float(x.rooms),
+                        "size_m2": x.size_m2,
+                        "warmmiete_eur": x.warmmiete_eur,
+                        "photo_url": photos[0].source_url if photos else None,
+                        "risk_band": risk.band if risk else None,
+                    }
+                ),
             )
         )
+    return out
+
+
+def _map_berlin_fields(listing: Listing) -> dict:
+    fields = _berlin_fields(listing)
+    out: dict = {}
+    if "rent" in fields:
+        out["rent_verdict"] = fields["rent"].verdict
+    if "location" in fields:
+        loc = fields["location"]
+        out |= {
+            "lat": loc.lat,  # same point as the listing page and the results map
+            "lng": loc.lng,
+            "rail_stop": loc.rail_stop,
+            "rail_modes": loc.rail_modes,
+            "rail_walk_minutes": loc.rail_walk_minutes,
+        }
     return out
 
 
