@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T9.2 — Backend: rent check, Around this flat, Right now** (branch `berlin-ink`, M9 below). T1.2 (CI + Supabase keep-alive) is still open on `main`.
+➡️ **T9.3 — Design basics + offline map** (branch `berlin-ink`, M9 below). T1.2 (CI + Supabase keep-alive) is still open on `main`.
 
 ---
 
@@ -109,7 +109,8 @@
 ## M9 — Berlin Ink (redesign + Berlin open data)
 *Rent check, Around this flat, Right now and the "Berlin Ink" design, from the open data in Berlin Visualized (data only, not its code). Branch `berlin-ink`, one stop per task for review. [ADR-0016](docs/adr/0016-berlin-open-data-in-supabase.md).*
 - [x] **T9.1 — Data build + Supabase load.** `make berlin-data` (≈ 45 s) reads 16 checksummed raw files from a Berlin Visualized checkout (`BERLIN_RAW_DIR`) → `backend/data/berlin/build/` (gitignored, 9.7 MB): Mietspiegel 2026 table (189 rows, self-validating) + checklist (83 items, column-split PDF parse), 400,505 addresses (location class, East/West, planning area), 2,970 stops typed from the VBB timetable, schools, Kitas (UTM33 → WGS84), parks ≥ 1 ha, playgrounds, air stations + LQI snapshot, 13,280 accidents, crime per district region (Neighbourhoods parser), typical values for all 542 planning areas. Migration 0003 (PostGIS in `extensions`, 12 `berlin_*` tables, `listing.year_built`); `make berlin-load` (≈ 15 s, 138 MB DB total). `BerlinData` interface with in-memory (offline) and PostGIS (live) implementations; `listing.year_built` derived from the id. Tests: `test_berlin_data.py`, `test_berlin_parity.py` (slow; live DB vs offline give the same answers).
-- [ ] **T9.2 — Backend features.** Rent check (Mietspiegel row, ±20 % per feature group, rent-brake limit, exemptions), place profile (8 measures with sources, percentile among 542 areas, neutral sentences), Right now (live BVG with offline nearest-stops fallback), address search API; scam price check against the rent index. _Depends: T9.1_
+- [x] **T9.2 — Backend features.** `berlin/rent.py` (row, net feature groups ±20 %, limit, energy boxes, exemptions; brochure example tested), `berlin/profile.py` (8 measures, sources, position among 542 areas, neutral wording), `berlin/departures.py` (6 nearest stops offline; live BVG/VBB departures, 3 s timeout, 30 s cache, `WOHNIQ_LIVE_DEPARTURES`), `berlin/listings.py` (matched address → location class, area, station, rent; one point per listing). API: `/rent/index`, `/rent/addresses[/{id}]`, `/place`, `/right-now`, `/listings/{id}/around`; listings carry `year_built`, `location`, `rent`. Rent overrides (29 fair, 4 price bait), scam price signal vs. the index, photo reuse ≥ 4 shared photos: 88 Low / 8 Caution / 4 High, no honest listing High. [ADR-0017](docs/adr/0017-rent-check-and-scam-price-signal.md), SPEC F11–F12. Tests: `test_berlin_rent.py`, `test_berlin_place.py`, scam/synthetic additions. _Depends: T9.1_
+- [ ] **T9.2b — Offline scam wording check + 40 extra listings** (owner decision from the earlier build: English/German phrases, negation-aware; tricky-but-honest listings that use the same words). _Depends: T9.2_
 - [ ] **T9.3 — Design basics + offline map.** Berlin Ink tokens, Geist, header/footer, shared components, `berlin.pmtiles` served locally for every map. _Depends: T9.1_
 - [ ] **T9.4 — Home, results and rent check page.** _Depends: T9.2, T9.3_
 - [ ] **T9.5 — Listing page (desktop + phone).** _Depends: T9.4_

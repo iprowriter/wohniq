@@ -79,3 +79,24 @@ def test_payment_scams_carry_textual_signals():
             assert "wire" in x.contact_text.lower()
         if x.scam_type == "overseas_landlord":
             assert "western union" in x.contact_text.lower()
+
+
+def test_rent_overrides_apply_by_id_and_keep_the_deposit_rule():
+    import json
+
+    from data.synthetic import OVERRIDES_PATH
+
+    overrides = json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
+    raw = {str(x.id): x for x in generate_listings(100, seed=42, apply_overrides=False)}
+    done = {str(x.id): x for x in generate_listings(100, seed=42)}
+    assert overrides and set(overrides) <= set(raw)
+    for listing_id, x in done.items():
+        if listing_id in overrides:
+            assert x.kaltmiete_eur == overrides[listing_id]["kaltmiete_eur"]
+            assert x.deposit_eur == 3 * x.kaltmiete_eur
+        else:
+            assert x.kaltmiete_eur == raw[listing_id].kaltmiete_eur
+        # Only rent fields change; ids, photos and labels never do.
+        assert (x.photo_set_id, x.is_scam, x.scam_type) == (
+            raw[listing_id].photo_set_id, raw[listing_id].is_scam, raw[listing_id].scam_type
+        )

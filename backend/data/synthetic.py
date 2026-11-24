@@ -17,10 +17,12 @@ Produces three kinds of listing:
 from __future__ import annotations
 
 import hashlib
+import json
 import random
 import uuid
 from dataclasses import dataclass
 from datetime import date, timedelta
+from pathlib import Path
 
 from data.kieze import KIEZE, Kiez
 
@@ -119,6 +121,19 @@ _BUILD_BANDS: tuple[tuple[int, int, float], ...] = (
     (2002, 2013, 0.04),
     (2014, 2024, 0.11),
 )
+
+
+# Rent overrides set against the Mietspiegel (data/berlin/fair_rents.py, ADR-0017): some
+# honest listings at fair rents, price-bait scams below the index. Applied by id, after
+# generation, so nothing else changes. Missing file = the generator's own prices.
+OVERRIDES_PATH = Path(__file__).parent / "demo" / "rent_overrides.json"
+
+
+def _rent_overrides() -> dict[str, dict]:
+    try:
+        return json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
 
 
 def year_built_for(listing_id: uuid.UUID) -> int:
@@ -239,6 +254,7 @@ def generate_listings(
     scam_ratio: float = 0.15,
     hard_negative_ratio: float = 0.08,
     reference_date: date | None = None,
+    apply_overrides: bool = True,
 ) -> list[SyntheticListing]:
     """Generate `count` listings deterministically for `seed`.
 
@@ -274,8 +290,13 @@ def generate_listings(
         if listing.scam_type == "photo_reuse" and genuine:
             listing.photo_set_id = rng.choice(genuine).photo_set_id
 
+    overrides = _rent_overrides() if apply_overrides else {}
     for listing in listings:
         listing.year_built = year_built_for(listing.id)
+        override = overrides.get(str(listing.id))
+        if override:
+            listing.kaltmiete_eur = override["kaltmiete_eur"]
+            listing.deposit_eur = 3 * listing.kaltmiete_eur  # Kaution: 3x cold rent
     return listings
 
 
