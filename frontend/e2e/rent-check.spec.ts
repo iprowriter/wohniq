@@ -55,3 +55,18 @@ test("building ages follow the address: East has one 1973–1990 band", async ({
   await expect(select.locator("option", { hasText: "1973–1990" })).toHaveCount(1);
   await expect(select.locator("option", { hasText: "1973–1985" })).toHaveCount(0);
 });
+
+test("Check this rent from a listing fills the form and runs the check", async ({ page }) => {
+  const map = await (await page.request.get("http://localhost:8000/api/v1/listings/map")).json();
+  const detail = await (await page.request.get(`http://localhost:8000/api/v1/listings/${map[0].id}`)).json();
+  await page.goto(`/listings/${map[0].id}`);
+  const link = page.getByRole("link", { name: /Check this rent|Open the full rent check/ }).first();
+  await link.click();
+  await expect(page).toHaveURL(new RegExp(`/rent-check\\?listing=${map[0].id}$`));
+  await expect(page.getByTestId("prefill-note")).toContainText(detail.listing.title);
+  await expect(page.getByLabel(/Size/).first()).toHaveValue(String(detail.listing.size_m2));
+  await expect(page.getByLabel(/cold rent/i).first()).toHaveValue(String(detail.listing.kaltmiete_eur));
+  await expect(page.locator("#rent-result")).toContainText(/rent-brake limit|rent index|new build/i);
+  // Only the sample listing's id is in the address, never the figures.
+  expect(page.url()).not.toContain(String(detail.listing.kaltmiete_eur));
+});

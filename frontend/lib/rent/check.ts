@@ -262,6 +262,17 @@ export function ageOptions(east: boolean): AgeOption[] {
   ];
 }
 
+/** The building-age option that contains a year ("1908" → "before 1918"). */
+export function ageIdForYear(year: number, east: boolean): string {
+  for (const o of ageOptions(east)) {
+    if (o.id === "pre1918" && year <= 1918) return o.id;
+    if (o.id === "2025" && year >= 2025) return o.id;
+    const m = o.id.match(/^(\d{4})-(\d{4})$/);
+    if (m && Number(m[1]) <= year && year <= Number(m[2])) return o.id;
+  }
+  return "pre1918";
+}
+
 /** Index mean for every building age at this location and size (the bar chart). Computed in
  * the browser so the flat's size never leaves it. Mirrors berlin/rent.py `rent_by_period`. */
 export function rentByPeriod(

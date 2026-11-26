@@ -36,6 +36,7 @@ class ListingLocation:
     rail_walk_minutes: int | None
     lat: float
     lng: float
+    address_id: int | None = None  # the matched address (rent check prefill, T9.7)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -87,6 +88,7 @@ def _location(
         rail_walk_minutes=walk_min(stop.distance_m) if stop else None,
         lat=address.lat,
         lng=address.lng,
+        address_id=address.id,
     )
 
 

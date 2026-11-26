@@ -7,7 +7,8 @@ export const metadata: Metadata = {
     "Check any Berlin address against the Mietspiegel 2026 and the rent brake. Works offline; your flat's details stay in your browser.",
 };
 
-export default function RentCheckPage() {
+export default function RentCheckPage({ searchParams }: { searchParams?: { listing?: string } }) {
+  const listing = searchParams?.listing && /^[0-9a-f-]{36}$/i.test(searchParams.listing) ? searchParams.listing : undefined;
   return (
     <div>
       <section className="no-print bg-ink text-text-on-ink">
@@ -25,7 +26,7 @@ export default function RentCheckPage() {
           </p>
         </div>
       </section>
-      <RentCheck />
+      <RentCheck listingId={listing} />
     </div>
   );
 }

@@ -158,6 +158,8 @@ class ListingLocationOut(BaseModel):
     # The matched address's point: where maps place the flat (one point per listing).
     lat: float | None = None
     lng: float | None = None
+    # Its id, so "Check this rent" can open the rent check at that address.
+    address_id: int | None = None
 
 
 class RentOut(BaseModel):

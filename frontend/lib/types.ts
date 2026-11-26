@@ -83,6 +83,7 @@ export interface ListingLocationOut {
   rail_walk_minutes?: number | null;
   lat?: number | null;
   lng?: number | null;
+  address_id?: number | null; // matched address: prefill for the rent check
 }
 
 export type RentVerdict =

@@ -108,6 +108,7 @@ Every listing and any Berlin address checked against the Berliner Mietspiegel 20
 - **AC1.** A listing shows the index range, the rent-brake limit (index mean + 10 %, labelled an estimate) and a verdict: within the limit, above it (with € per m² and per month), below the index, or a new build without a limit.
 - **AC2.** For any of the 400,505 residential addresses, the user enters size, building age and cold rent, optionally an energy value and the official checklist; the result follows the brochure's method (its worked example, €7.30 → €7.75, is a test).
 - **AC3.** The flat's rent and features are computed in the browser and never sent to the server or put in a URL.
+- **AC3b.** "Check this rent" on a listing opens `/rent-check?listing=<id>`: the form is filled from that sample listing (its matched address, size, building age, cold rent) and the check runs; only the listing id is in the URL, never the figures.
 - **AC4.** The rent-brake exemptions and "not legal advice" are shown with every verdict; every figure cites the Mietspiegel row.
 - **AC5.** Works offline (demo mode) and live (Supabase) with the same answers.
 

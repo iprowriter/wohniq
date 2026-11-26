@@ -153,3 +153,13 @@ def test_similar_unknown_and_bad_ids(client):
         client.get("/api/v1/listings/00000000-0000-0000-0000-000000000000/similar").status_code
         == 404
     )
+
+
+def test_listing_location_carries_the_matched_address_id(client):
+    """ "Check this rent" opens the rent check at the listing's matched address (T9.7)."""
+    repo = get_demo_repository()
+    lid = str(next(iter(repo._listings)))
+    loc = client.get(f"/api/v1/listings/{lid}").json()["location"]
+    assert isinstance(loc["address_id"], int)
+    addr = client.get(f"/api/v1/rent/addresses/{loc['address_id']}").json()
+    assert addr["street"] == loc["street"] and addr["postcode"] == loc["postcode"]

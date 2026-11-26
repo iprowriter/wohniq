@@ -4,7 +4,7 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { ageOptions, checkRent, periodFor, type RentInput } from "../lib/rent/check.ts";
+import { ageIdForYear, ageOptions, checkRent, periodFor, type RentInput } from "../lib/rent/check.ts";
 
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/rent-vectors.json", import.meta.url), "utf8"));
 
@@ -38,5 +38,18 @@ describe("building-age choices", () => {
         else assert.ok(p, o.label);
       }
     }
+  });
+});
+
+describe("prefill from a listing", () => {
+  test("a building year picks the age option that contains it", () => {
+    assert.equal(ageIdForYear(1908, false), "pre1918");
+    assert.equal(ageIdForYear(1918, false), "pre1918");
+    assert.equal(ageIdForYear(1919, false), "1919-1949");
+    assert.equal(ageIdForYear(1980, false), "1973-1985");
+    assert.equal(ageIdForYear(1988, false), "1986-1990");
+    assert.equal(ageIdForYear(1988, true), "1973-1990"); // East Berlin has one 1973–1990 band
+    assert.equal(ageIdForYear(2014, false), "2014-2015");
+    assert.equal(ageIdForYear(2031, false), "2025");
   });
 });

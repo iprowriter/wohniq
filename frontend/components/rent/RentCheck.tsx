@@ -8,10 +8,11 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { getPlaceProfile, getRentIndex } from "@/lib/api";
+import Link from "next/link";
+import { getAddress, getListingDetail, getPlaceProfile, getRentIndex } from "@/lib/api";
 import type { AddressOut, PlaceProfile } from "@/lib/types";
 import type { RentIndex } from "@/lib/rent/index";
-import { ageOptions, checkRent, rentByPeriod, type RentResult } from "@/lib/rent/check";
+import { ageIdForYear, ageOptions, checkRent, rentByPeriod, type RentResult } from "@/lib/rent/check";
 import { explainResult, VERDICT_TITLE, verdictTone } from "@/lib/rent/explain";
 import { euro, euro2 } from "@/lib/format";
 import { AddressSearch } from "./AddressSearch";
@@ -53,7 +54,8 @@ function saveCompare(entries: Entry[]) {
 const inputClass =
   "min-h-tap w-full rounded-md border border-input bg-surface px-3.5 text-base text-text outline-none placeholder:text-text-faint focus:border-accent focus:ring-2 focus:ring-accent/20";
 
-export function RentCheck() {
+/** `listingId`: opened from a listing's "Check this rent"; its figures fill the form. */
+export function RentCheck({ listingId }: { listingId?: string }) {
   const [index, setIndex] = useState<RentIndex | null>(null);
   const [indexError, setIndexError] = useState<string | null>(null);
   const [address, setAddress] = useState<AddressOut | null>(null);
@@ -70,11 +72,41 @@ export function RentCheck() {
   const [error, setError] = useState<string | null>(null);
   const [profile, setProfile] = useState<PlaceProfile | null>(null);
   const [compare, setCompare] = useState<Entry[]>([]);
+  const [fromListing, setFromListing] = useState<{ id: string; title: string } | null>(null);
+  const [addressKey, setAddressKey] = useState(0); // remounts the address box after a prefill
+  const [runWhenReady, setRunWhenReady] = useState(false);
 
   useEffect(() => {
     getRentIndex().then(setIndex).catch((e) => setIndexError(String(e.message ?? e)));
     setCompare(loadCompare());
   }, []);
+
+  // Prefill from a listing: its matched address, size, building age and cold rent (the
+  // listing is a sample, so its id in the URL says nothing about the user).
+  useEffect(() => {
+    if (!listingId) return;
+    let live = true;
+    getListingDetail(listingId)
+      .then(async (d) => {
+        const l = d.listing;
+        const id = d.location?.address_id;
+        const a = id != null ? await getAddress(id).catch(() => null) : null;
+        if (!live) return;
+        if (a) {
+          setAddress(a);
+          setAddressKey((k) => k + 1);
+        }
+        setSize(String(l.size_m2));
+        setCold(String(l.kaltmiete_eur));
+        if (l.year_built) setAgeId(ageIdForYear(l.year_built, a?.east ?? d.location?.east ?? false));
+        setFromListing({ id: l.id, title: l.title });
+        if (a) setRunWhenReady(true);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [listingId]);
 
   const ages = ageOptions(address?.east ?? false);
   const age = ages.find((a) => a.id === ageId) ?? ages[0];
@@ -97,6 +129,14 @@ export function RentCheck() {
       getPlaceProfile(address.lat, address.lng, address.location_class).then(setProfile).catch(() => {});
     }
   }, [address]);
+
+  useEffect(() => {
+    if (runWhenReady && index && address) {
+      setRunWhenReady(false);
+      submit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runWhenReady, index, address, ageId]);
 
   function toggle(id: string) {
     setFeatures((prev) => {
@@ -171,7 +211,17 @@ export function RentCheck() {
           }}
           aria-label="Your flat"
         >
-          <AddressSearch value={address} onPick={setAddress} />
+          {fromListing && (
+            <p className="rounded-md bg-accent-tint px-3 py-2 text-[13.5px] leading-snug text-text-body" data-testid="prefill-note">
+              Filled in from{" "}
+              <Link href={`/listings/${fromListing.id}`} className="font-semibold text-accent underline underline-offset-2">
+                {fromListing.title}
+              </Link>
+              . The address is the nearest real one to this sample listing. Change anything and check again; add the
+              features from the checklist for a closer result.
+            </p>
+          )}
+          <AddressSearch key={addressKey} value={address} onPick={setAddress} />
           <div className="grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1.5 text-[15px] font-semibold text-text">
               Size (m²)

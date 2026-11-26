@@ -176,7 +176,7 @@ export default function ListingPage() {
               <section className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5 sm:p-6" aria-labelledby="rent-heading" data-testid="rent-panel">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h2 id="rent-heading" className="text-[20px] font-semibold text-text">Rent check</h2>
-                  <Link href="/rent-check" className="text-[14px] text-accent underline underline-offset-2">Open the full rent check</Link>
+                  <Link href={`/rent-check?listing=${listing.id}`} className="text-[14px] text-accent underline underline-offset-2">Open the full rent check</Link>
                 </div>
                 <p className="text-[15px] leading-relaxed text-text-body">{rent.explanation}</p>
                 {rent.covered && rent.low != null && rent.mean != null && rent.high != null && (
@@ -280,7 +280,7 @@ export default function ListingPage() {
                 <Button variant="outline" aria-pressed={isSaved} onClick={() => saved.toggle(listing.id)}>{isSaved ? "Saved" : "Save"}</Button>
                 <Button variant="outline" onClick={() => setComparing(true)} data-testid="compare-with">Compare</Button>
               </div>
-              <Link href="/rent-check" className={buttonClass("ghost")}>Check this rent</Link>
+              <Link href={`/rent-check?listing=${listing.id}`} className={buttonClass("ghost")}>Check this rent</Link>
             </section>
             <div className="hidden lg:block">
               <RightNowCard lat={mapLat} lng={mapLng} />
