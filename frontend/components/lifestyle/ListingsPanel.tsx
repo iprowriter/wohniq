@@ -53,14 +53,14 @@ export function ListingsPanel({ region, budget, onClose }: Props) {
     <div className="fixed inset-0 z-[1000]" role="dialog" aria-modal="true" aria-labelledby="flats-title">
       <button type="button" className="absolute inset-0 bg-gray-950/40 backdrop-blur-[2px]" onClick={onClose} aria-label="Close" tabIndex={-1} />
       <aside className="animate-[slide-in_0.35s_ease-out_both] absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white shadow-2xl">
-        <header className="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4">
+        <header className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div>
-            <p className="text-xs text-gray-400">WohnIQ listings in</p>
-            <h2 id="flats-title" className="text-lg font-semibold text-gray-900">
+            <p className="text-xs text-text-muted">WohnIQ listings in</p>
+            <h2 id="flats-title" className="text-lg font-semibold text-text">
               {region.name}
             </h2>
             {data && (
-              <p className="mt-0.5 text-xs text-gray-500">
+              <p className="mt-0.5 text-xs text-text-muted">
                 {data.count} flat{data.count === 1 ? "" : "s"} located in this area · budget {euro(budget)}
               </p>
             )}
@@ -69,21 +69,20 @@ export function ListingsPanel({ region, budget, onClose }: Props) {
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="rounded-full p-2 text-text-muted hover:bg-chip hover:text-text"
             aria-label="Close listings"
           >
-            ✕
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
           </button>
         </header>
 
         <div className="flex-1 space-y-3 overflow-y-auto p-5">
           {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-          {!data && !error && [0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-gray-100" />)}
+          {!data && !error && [0, 1, 2].map((i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-chip" />)}
           {data && data.count === 0 && (
             <div className="px-2 py-12 text-center">
-              <p className="text-4xl" aria-hidden="true">🏘️</p>
-              <p className="mt-3 font-semibold text-gray-900">No WohnIQ listings here yet</p>
-              <p className="mt-1 text-sm leading-relaxed text-gray-500">
+              <p className="mt-3 font-semibold text-text">No WohnIQ listings here yet</p>
+              <p className="mt-1 text-sm leading-relaxed text-text-muted">
                 {region.name} still matches your lifestyle — our listing inventory is small. Try the next areas on
                 your list, or check back later.
               </p>
@@ -95,22 +94,22 @@ export function ListingsPanel({ region, budget, onClose }: Props) {
               <Link
                 key={listing.id}
                 href={`/listings/${listing.id}`}
-                className={`block overflow-hidden rounded-xl border transition hover:shadow-md ${high ? "border-red-200" : "border-gray-200"}`}
+                className={`block overflow-hidden rounded-xl border transition hover:shadow-md ${high ? "border-red-200" : "border-line"}`}
               >
                 {high && (
                   <p className="bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
-                    ⚠ High scam risk — read the warning signs before contacting anyone.
+                    High scam risk: read the warning signs before contacting anyone.
                   </p>
                 )}
                 <div className="flex gap-3 p-3">
                   {listing.photos[0] ? (
                     <ListingPhoto url={listing.photos[0].url} alt={listing.title} className="h-20 w-24 flex-shrink-0 rounded-lg object-cover" />
                   ) : (
-                    <div className="h-20 w-24 flex-shrink-0 rounded-lg bg-gray-100" />
+                    <div className="h-20 w-24 flex-shrink-0 rounded-lg bg-chip" />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm font-medium text-gray-900">{listing.title}</p>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="line-clamp-2 text-sm font-medium text-text">{listing.title}</p>
+                    <p className="mt-0.5 text-xs text-text-muted">
                       {listing.size_m2} m² · {listing.rooms} room{listing.rooms === 1 ? "" : "s"}
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -118,7 +117,7 @@ export function ListingsPanel({ region, budget, onClose }: Props) {
                       {fits_budget !== null && (
                         <span
                           className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                            fits_budget ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
+                            fits_budget ? "bg-emerald-50 text-emerald-700" : "bg-warn-bg text-warn"
                           }`}
                         >
                           {fits_budget ? "Within budget" : "Over budget"}
@@ -132,12 +131,12 @@ export function ListingsPanel({ region, budget, onClose }: Props) {
             );
           })}
           {data && data.count > data.listings.length && (
-            <p className="text-center text-xs text-gray-400">
+            <p className="text-center text-xs text-text-muted">
               Showing {data.listings.length} of {data.count}.
             </p>
           )}
         </div>
-        <footer className="border-t border-gray-100 px-5 py-3 text-[11px] leading-relaxed text-gray-400">
+        <footer className="border-t border-line px-5 py-3 text-[11px] leading-relaxed text-text-muted">
           Matched by each flat&apos;s location inside the area. Every listing is risk-scored — a very low price is a
           common scam pattern.
         </footer>

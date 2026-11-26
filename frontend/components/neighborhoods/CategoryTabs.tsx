@@ -2,6 +2,7 @@
 
 import type { NeighborhoodCatalog } from "@/lib/neighborhoods/types";
 import { OVERALL } from "@/lib/neighborhoods/logic";
+import { CategoryIcon } from "@/components/lifestyle/explorer/icons";
 
 /** Category switcher: re-ranks the list and recolours the map. */
 export function CategoryTabs({
@@ -13,7 +14,7 @@ export function CategoryTabs({
   active: string;
   onChange: (id: string) => void;
 }) {
-  const items = [{ id: OVERALL, label: catalog.overall.label, emoji: "⭐" }, ...catalog.categories];
+  const items = [{ id: OVERALL, label: catalog.overall.label }, ...catalog.categories];
   return (
     <div className="relative">
       <div
@@ -30,13 +31,13 @@ export function CategoryTabs({
                 type="button"
                 aria-pressed={on}
                 onClick={() => onChange(c.id)}
-                className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   on
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/25"
-                    : "border border-gray-200 bg-white text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+                    ? "bg-accent text-white shadow-md shadow-accent/20"
+                    : "border border-line bg-white text-text-body hover:border-accent/50 hover:text-accent"
                 }`}
               >
-                <span aria-hidden="true">{c.emoji}</span>
+                <CategoryIcon id={c.id === OVERALL ? "overall" : c.id} size={16} />
                 {c.label}
               </button>
             );
@@ -45,7 +46,7 @@ export function CategoryTabs({
       </div>
       {/* fade: there are more categories to scroll to */}
       <div
-        className="pointer-events-none absolute -right-4 top-0 h-full w-12 bg-gradient-to-l from-[#f7f7f5] to-transparent"
+        className="pointer-events-none absolute -right-4 top-0 h-full w-12 bg-gradient-to-l from-ground to-transparent"
         aria-hidden="true"
       />
     </div>

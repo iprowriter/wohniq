@@ -196,7 +196,8 @@ describe("colours, tiers and comparisons", () => {
     assert.equal(bandIndex(143, 143), 4);
     assert.equal(rankColor(1, 143), BANDS[0].color);
     assert.equal(rankColor(143, 143), BANDS[4].color);
-    assert.equal(rankTextColor(72, 143), "#312e81"); // light middle band → dark text
+    assert.equal(rankTextColor(72, 143), "#0D1321"); // lighter bands → ink text
+    assert.equal(rankTextColor(143, 143), "#0D1321"); // bottom 20% is the palest blue, not an alarm colour
     assert.equal(rankTextColor(1, 143), "#ffffff");
   });
 

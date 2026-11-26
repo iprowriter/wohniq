@@ -10,9 +10,9 @@ export function StepProgress({ steps, current, onJump, visited }: Props) {
   const pct = steps.length > 1 ? (index / (steps.length - 1)) * 100 : 100;
   return (
     <div>
-      <div className="relative h-1.5 overflow-hidden rounded-full bg-gray-100">
+      <div className="relative h-1.5 overflow-hidden rounded-full bg-chip">
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 transition-[width] duration-500 ease-out"
+          className="absolute inset-y-0 left-0 rounded-full bg-accent transition-[width] duration-500 ease-out"
           style={{ width: `${pct}%` }}
           role="progressbar"
           aria-valuemin={0}
@@ -24,7 +24,7 @@ export function StepProgress({ steps, current, onJump, visited }: Props) {
       <ol className="mt-3 hidden justify-between text-xs sm:flex">
         {steps.map((s, i) => {
           const clickable = onJump && visited.has(s.id) && s.id !== current;
-          const state = i < index ? "text-indigo-600" : i === index ? "font-semibold text-gray-900" : "text-gray-400";
+          const state = i < index ? "text-accent" : i === index ? "font-semibold text-text" : "text-text-muted";
           return (
             <li key={s.id}>
               {clickable ? (

@@ -27,6 +27,7 @@ import {
   setWeight,
   sourceMap,
 } from "@/lib/neighborhoods/logic";
+import { CategoryIcon } from "@/components/lifestyle/explorer/icons";
 import { CategoryTabs } from "@/components/neighborhoods/CategoryTabs";
 import { AreaRow } from "@/components/neighborhoods/AreaRow";
 import { AreaDetailPanel } from "@/components/neighborhoods/AreaDetailPanel";
@@ -36,7 +37,7 @@ const NeighborhoodsMap = dynamic(
   () => import("@/components/neighborhoods/NeighborhoodsMap").then((m) => m.NeighborhoodsMap),
   {
     ssr: false,
-    loading: () => <div className="h-full min-h-[320px] animate-pulse rounded-2xl bg-gray-100" />,
+    loading: () => <div className="h-full min-h-[320px] animate-pulse rounded-2xl bg-chip" />,
   },
 );
 
@@ -193,21 +194,13 @@ function NeighborhoodsPage() {
   return (
     <>
       {/* ── Header ── */}
-      <section className="relative overflow-hidden bg-gray-950 px-4 py-10 text-white">
-        <div
-          className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-indigo-600/30 blur-3xl"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute -bottom-24 left-10 h-56 w-56 rounded-full bg-fuchsia-600/20 blur-3xl"
-          aria-hidden="true"
-        />
+      <section className="relative overflow-hidden bg-ink px-4 py-10 text-white">
         <div className="relative mx-auto max-w-7xl">
-          <p className="text-xs uppercase tracking-[0.2em] text-indigo-300">Berlin Neighborhoods</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-text-on-ink-muted">Berlin Neighborhoods</p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             Compare all of Berlin&apos;s neighborhoods
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-300">
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-on-ink-soft">
             Every area ranked on official and open data: crime, road safety, schools, healthcare, parks, transport and
             more. Pick a category to re-rank the list and the map; every number shows its source.
           </p>
@@ -231,12 +224,12 @@ function NeighborhoodsPage() {
       </section>
 
       {/* ── Category switcher (sticky) ── */}
-      <div className="sticky top-[57px] z-40 border-b border-gray-100 bg-[#f7f7f5]/95 px-4 py-3 backdrop-blur-sm">
+      <div className="sticky top-[57px] z-40 border-b border-line bg-ground/95 px-4 py-3 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl">
           {catalog ? (
             <CategoryTabs catalog={catalog} active={category} onChange={setCategory} />
           ) : (
-            <div className="h-10 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-10 animate-pulse rounded-full bg-chip" />
           )}
         </div>
       </div>
@@ -246,11 +239,11 @@ function NeighborhoodsPage() {
           <p className="text-4xl" aria-hidden="true">
             🛰️
           </p>
-          <p className="mt-3 text-gray-700">{error}</p>
+          <p className="mt-3 text-text-body">{error}</p>
           <button
             type="button"
             onClick={loadCatalog}
-            className="mt-4 rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+            className="mt-4 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white hover:bg-accent-hover"
           >
             Try again
           </button>
@@ -261,7 +254,7 @@ function NeighborhoodsPage() {
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[minmax(0,460px)_minmax(0,1fr)]">
           {/* ── Map (first on mobile, sticky on the right on desktop) ── */}
           <aside className="min-w-0 lg:order-2">
-            <div className="isolate h-72 overflow-hidden rounded-2xl border border-gray-200 bg-white sm:h-96 lg:sticky lg:top-[8.5rem] lg:h-[calc(100vh-10rem)]">
+            <div className="isolate h-72 overflow-hidden rounded-2xl border border-line bg-white sm:h-96 lg:sticky lg:top-[8.5rem] lg:h-[calc(100vh-10rem)]">
               {shapes && ranking ? (
                 <NeighborhoodsMap
                   shapes={shapes}
@@ -275,7 +268,7 @@ function NeighborhoodsPage() {
                   onSelect={selectFromMap}
                 />
               ) : (
-                <div className="h-full animate-pulse bg-gray-100" />
+                <div className="h-full animate-pulse bg-chip" />
               )}
             </div>
           </aside>
@@ -283,16 +276,16 @@ function NeighborhoodsPage() {
           {/* ── Ranked list ── */}
           <div className="min-w-0 lg:order-1" aria-busy={loading}>
             <div className="mb-3">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-text">
                 {info ? (
                   <>
-                    <span aria-hidden="true">{info.emoji}</span> {info.question}
+                    <CategoryIcon id={info.id} size={16} /> {info.question}
                   </>
                 ) : (
                   <>⭐ {customWeights ? "Your weighted ranking" : "Overall ranking"}</>
                 )}
               </h2>
-              <p className="mt-1 text-xs leading-relaxed text-gray-500">
+              <p className="mt-1 text-xs leading-relaxed text-text-muted">
                 {info ? info.caveat : catalog.overall.description}
               </p>
             </div>
@@ -303,11 +296,11 @@ function NeighborhoodsPage() {
                   type="button"
                   aria-expanded={showWeights}
                   onClick={() => setShowWeights((v) => !v)}
-                  className="rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+                  className="rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-medium text-text-body hover:border-accent/50 hover:text-accent"
                 >
                   ⚖️ {showWeights ? "Hide weights" : "Adjust what matters"}
                   {customWeights && (
-                    <span className="ml-1.5 rounded-full bg-indigo-100 px-1.5 text-[10px] text-indigo-700">custom</span>
+                    <span className="ml-1.5 rounded-full bg-accent-tint px-1.5 text-[10px] text-accent">custom</span>
                   )}
                 </button>
                 {showWeights && (
@@ -336,7 +329,7 @@ function NeighborhoodsPage() {
                   value={filter.query}
                   onChange={(e) => setFilter((f) => ({ ...f, query: e.target.value }))}
                   placeholder="Find an area…"
-                  className="w-full rounded-full border border-gray-200 bg-white px-4 py-2 text-sm placeholder:text-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className="w-full rounded-full border border-line bg-white px-4 py-2 text-sm placeholder:text-text-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                 />
               </label>
               <label>
@@ -344,7 +337,7 @@ function NeighborhoodsPage() {
                 <select
                   value={filter.district}
                   onChange={(e) => setFilter((f) => ({ ...f, district: e.target.value }))}
-                  className="rounded-full border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-indigo-400 focus:outline-none"
+                  className="rounded-full border border-line bg-white px-3 py-2 text-sm text-text-body focus:border-accent focus:outline-none"
                 >
                   <option value="">All districts</option>
                   {catalog.districts.map((d) => (
@@ -356,24 +349,24 @@ function NeighborhoodsPage() {
               </label>
             </div>
             <div className="mb-3 flex items-center justify-between gap-2">
-              <p className="text-xs text-gray-500" aria-live="polite">
+              <p className="text-xs text-text-muted" aria-live="polite">
                 {ranking ? (
                   <>
                     Showing {list.length} of {total} · ranks are Berlin-wide
-                    {loading && <span className="ml-2 text-indigo-600">Updating…</span>}
+                    {loading && <span className="ml-2 text-accent">Updating…</span>}
                   </>
                 ) : (
                   "Ranking Berlin's areas…"
                 )}
               </p>
-              <div className="flex rounded-full bg-gray-100 p-0.5 text-xs font-medium" role="group" aria-label="Order">
+              <div className="flex rounded-full bg-chip p-0.5 text-xs font-medium" role="group" aria-label="Order">
                 {(["best", "worst"] as Order[]).map((o) => (
                   <button
                     key={o}
                     type="button"
                     aria-pressed={order === o}
                     onClick={() => setOrder(o)}
-                    className={`rounded-full px-3 py-1 transition ${order === o ? "bg-white text-gray-900 shadow" : "text-gray-500 hover:text-gray-800"}`}
+                    className={`rounded-full px-3 py-1 transition ${order === o ? "bg-white text-text shadow" : "text-text-muted hover:text-text"}`}
                   >
                     {orderLabel(o, info ? bestLabel : null, info ? worstLabel : null)}
                   </button>
@@ -393,18 +386,18 @@ function NeighborhoodsPage() {
             {!ranking && !error && (
               <div className="space-y-2" aria-busy="true">
                 {Array.from({ length: 6 }, (_, i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-2xl bg-gray-100" />
+                  <div key={i} className="h-20 animate-pulse rounded-2xl bg-chip" />
                 ))}
               </div>
             )}
 
             {ranking && list.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">
+              <div className="rounded-2xl border border-dashed border-line-strong p-8 text-center text-sm text-text-muted">
                 No area matches “{filter.query}”{filter.district ? ` in ${filter.district}` : ""}.{" "}
                 <button
                   type="button"
                   onClick={() => setFilter({ query: "", district: "" })}
-                  className="font-semibold text-indigo-600 hover:underline"
+                  className="font-semibold text-accent hover:underline"
                 >
                   Clear filters
                 </button>
@@ -437,20 +430,20 @@ function NeighborhoodsPage() {
                   ) : detailError ? (
                     <p className="mt-3 text-xs text-red-600">{detailError}</p>
                   ) : (
-                    <div className="mt-3 h-24 animate-pulse rounded-xl bg-gray-50" />
+                    <div className="mt-3 h-24 animate-pulse rounded-xl bg-ground" />
                   )}
                 </AreaRow>
               ))}
             </ol>
 
-            <p className="mt-6 text-xs leading-relaxed text-gray-400">
+            <p className="mt-6 text-xs leading-relaxed text-text-muted">
               Areas are Berlin&apos;s 143 official LOR <em>Bezirksregionen</em>. Scores are percentiles against all of
               Berlin (100 = best); the badges mark the top and bottom 20%. Looking for a flat?{" "}
-              <Link href="/lifestyle" className="text-indigo-600 hover:underline">
+              <Link href="/lifestyle" className="text-accent hover:underline">
                 Try Lifestyle Match
               </Link>{" "}
               or{" "}
-              <Link href="/" className="text-indigo-600 hover:underline">
+              <Link href="/" className="text-accent hover:underline">
                 search listings
               </Link>
               .

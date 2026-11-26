@@ -18,18 +18,31 @@ function recordApiCalls(page: Page): Request[] {
 }
 
 async function startStudentPreset(page: Page) {
-  await page.goto("/lifestyle");
+  await page.goto("/lifestyle/questions");
   await page.getByRole("button", { name: /Student/ }).click();
   await expect(page.getByRole("heading", { name: "Your move" })).toBeVisible();
 }
 
-async function goToResultsAsStudent(page: Page) {
-  await startStudentPreset(page);
-  await page.getByRole("button", { name: "skip to your profile" }).click();
-  await expect(page.getByText("The Campus Explorer")).toBeVisible();
-  await page.getByRole("button", { name: /show my areas/ }).click();
-  await expect(page).toHaveURL(/\/lifestyle\/results$/);
-  await expect(page.locator("article").first()).toBeVisible();
+/** The explorer settings: the left column on desktop, the "Adjust" drawer on a phone. */
+async function openSettings(page: Page) {
+  const adjust = page.getByRole("button", { name: "Adjust" });
+  if (await adjust.isVisible()) {
+    await adjust.click();
+    return page.getByRole("dialog", { name: "Adjust your match" });
+  }
+  return page.getByTestId("lifestyle-settings");
+}
+
+async function closeSettings(page: Page) {
+  const done = page.getByRole("button", { name: "Show results" });
+  if (await done.isVisible()) await done.click();
+}
+
+/** Explorer (T9.6): pick the Student profile card on the first visit. */
+async function exploreAsStudent(page: Page) {
+  await page.goto("/lifestyle");
+  await page.getByTestId("profile-cards").getByRole("button", { name: /Student/ }).click();
+  await expect(page.getByTestId("area-row").first()).toBeVisible();
 }
 
 test("homepage invites users into Lifestyle Match", async ({ page }) => {
@@ -66,20 +79,23 @@ test("Definition of Done: student preset → area near TU Berlin within budget, 
   await expect(page.getByText("Did we capture your lifestyle?")).toBeVisible();
   await page.getByRole("button", { name: /show my areas/ }).click();
 
-  // Results: among the top 3, an area ≤ 20 min from TU Berlin that fits the €700 budget.
-  const cards = page.locator("article");
-  await expect(cards.first()).toBeVisible();
+  // The questions end in the explorer: among the top 3, an area ≤ 20 min from TU Berlin
+  // that fits the €700 budget.
+  await expect(page).toHaveURL(/\/lifestyle$/);
+  const rows = page.getByTestId("area-row");
+  await expect(rows.first()).toBeVisible();
   let nearAndAffordable = 0;
   for (let i = 0; i < 3; i++) {
-    const card = cards.nth(i);
-    const text = await card.innerText();
-    const minutes = Number(text.match(/≈ (\d+) min[^\n]*to TU Berlin/)?.[1] ?? "999");
-    if (minutes <= 20 && text.includes("Fits budget")) nearAndAffordable += 1;
-    // Every suggestion explains itself with data and a source.
-    await expect(card.locator("li").first()).toContainText(/\d/);
-    await expect(card.getByText(/· 20\d\d/).first()).toBeVisible();
+    const text = await rows.nth(i).innerText();
+    const minutes = Number(text.match(/(\d+) min\s+to TU Berlin/)?.[1] ?? "999");
+    if (minutes <= 20 && text.includes("fits budget")) nearAndAffordable += 1;
   }
   expect(nearAndAffordable).toBeGreaterThan(0);
+  // Every suggestion explains itself with data and a source.
+  await rows.first().getByRole("button").first().click();
+  const detail = page.getByTestId("area-detail");
+  await expect(detail.locator("li").first()).toContainText(/\d/);
+  await expect(detail.getByText(/· 20\d\d/).first()).toBeVisible();
 
   // Privacy: answers never in the URL, cookies or localStorage; only POST bodies.
   expect(page.url()).not.toMatch(/700|tu_berlin|student/);
@@ -93,59 +109,95 @@ test("Definition of Done: student preset → area near TU Berlin within budget, 
   expect(matchResponse?.headers()["cache-control"]).toBe("no-store");
 });
 
-test("the user stays in control: tune weights, update, remove and restore areas, see flats", async ({ page }) => {
-  await goToResultsAsStudent(page);
-  const cards = page.locator("article");
-  const firstName = (await cards.first().locator("h3").innerText()).trim();
+test("the explorer re-ranks live: weights, budget, remove and restore, compare, see flats", async ({ page }) => {
+  await exploreAsStudent(page);
+  const rows = page.getByTestId("area-row");
+  await expect(page.getByTestId("live-summary")).toContainText("143 areas ranked");
+  await expect(page.getByTestId("persona")).toContainText("The Campus Explorer");
 
-  // Tune: raise Safety with the keyboard; nothing changes until "Update results".
-  const update = page.getByRole("button", { name: /Update results|up to date/ });
-  await expect(update).toHaveText("Results are up to date");
-  const safety = page.getByLabel("Safety", { exact: true });
-  await safety.focus();
-  for (let i = 0; i < 5; i++) await safety.press("ArrowRight");
-  await expect(update).toHaveText("Update results (1 change)");
-  await expect(page.getByText("Set by you")).toBeVisible();
-  const matchCall = page.waitForResponse((r) => r.url().endsWith("/lifestyle/match"));
-  await update.click();
-  const body = (await matchCall).request().postDataJSON();
-  expect(body.weights).toEqual({ safety: 5 }); // only the changed weight is sent
-  await expect(update).toHaveText("Results are up to date");
+  // A weight change re-ranks without a button; only the changed weight is sent.
+  let settings = await openSettings(page);
+  await settings.getByRole("button", { name: /more things to weigh/ }).click();
+  const matchCall = page.waitForResponse((r) => r.url().endsWith("/lifestyle/match") && r.request().postDataJSON().weights?.safety === 5);
+  await settings.getByRole("radio", { name: "Safety: 5 of 5" }).click();
+  expect((await matchCall).request().postDataJSON().weights).toEqual({ safety: 5 });
+  await expect(settings.getByRole("radio", { name: "Safety: 5 of 5" })).toHaveAttribute("aria-checked", "true");
+  await closeSettings(page);
 
-  // Remove the top area: it disappears, then comes back on undo.
-  const top = (await cards.first().locator("h3").innerText()).trim();
-  await cards.first().getByRole("button", { name: /Remove .* from my results/ }).click();
-  await expect(page.locator("article h3", { hasText: top })).toHaveCount(0);
-  await page.getByRole("button", { name: `${top} ↺` }).click();
-  await expect(page.locator("article h3", { hasText: top })).toHaveCount(1);
+  // Not for me: the area leaves the list, then comes back from "Removed areas".
+  const top = (await rows.first().getAttribute("data-key"))!;
+  const topName = (await rows.first().locator("h3 span.block").first().innerText()).trim();
+  await rows.first().getByRole("button").first().click();
+  await page.getByRole("button", { name: `Remove ${topName} from my results` }).click();
+  await expect(page.locator(`[data-testid=area-row][data-key="${top}"]`)).toHaveCount(0);
+  settings = await openSettings(page);
+  await settings.getByRole("button", { name: `Bring back ${topName}` }).click();
+  await closeSettings(page);
+  await expect(page.locator(`[data-testid=area-row][data-key="${top}"]`)).toHaveCount(1);
 
-  // Why this score / data behind it.
-  await cards.first().getByRole("button", { name: "Why this score" }).click();
-  await expect(cards.first().getByText(/adds to score/i)).toBeVisible();
-  await cards.first().getByRole("button", { name: "The data behind this" }).click();
-  await expect(cards.first().getByText(/^Sources$/i)).toBeVisible();
+  // Compare two areas side by side.
+  await rows.nth(0).getByRole("button").first().click();
+  await page.getByTestId("area-detail").getByRole("button", { name: "Compare" }).click();
+  await rows.nth(1).getByRole("button").first().click();
+  await page.getByTestId("area-detail").getByRole("button", { name: "Compare" }).click();
+  const compare = page.getByTestId("compare-areas");
+  await expect(compare).toBeVisible();
+  await expect(compare.getByRole("rowheader", { name: "Trip to TU Berlin" })).toBeVisible();
 
-  // See flats here: a side panel that closes with Escape.
-  await cards.first().getByRole("button", { name: "See flats here →" }).click();
+  // The data behind it, then See flats here: a side panel that closes with Escape.
+  const detail = page.getByTestId("area-detail");
+  await detail.getByRole("button", { name: "The data behind this" }).click();
+  await expect(detail.getByText(/^Sources$/)).toBeVisible();
+  await detail.getByRole("button", { name: "See flats here" }).click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
   await expect(dialog.getByText(/WohnIQ listings in/)).toBeVisible();
-  await expect(dialog.getByText(/flats? located in this area/)).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
-  expect(firstName.length).toBeGreaterThan(0);
+
+  // The budget re-ranks too, and nothing is put in the URL.
+  settings = await openSettings(page);
+  await settings.getByLabel("Budget in euros").fill("1400");
+  await closeSettings(page);
+  await expect(page.getByTestId("live-summary")).not.toContainText("updating");
+  expect(page.url()).not.toMatch(/1400|budget/);
 });
 
-test("the map shades every area and numbers the top matches", async ({ page }) => {
-  await goToResultsAsStudent(page);
+test("the map shades every area, numbers the top 10 and marks the destination", async ({ page }) => {
+  await exploreAsStudent(page);
   await expect(page.locator(".leaflet-overlay-pane path")).toHaveCount(143);
-  await expect(page.locator(".leaflet-marker-pane > div")).toHaveCount(10);
+  await expect(page.locator(".leaflet-marker-pane .lm-rank")).toHaveCount(10);
+  await expect(page.locator(".leaflet-marker-pane .lm-dest")).toHaveCount(1);
+  await page.locator(".lm-rank", { hasText: /^3$/ }).click();
+  await expect(page.getByTestId("map-card")).toContainText("match");
+  await page.getByRole("button", { name: "Details below" }).click();
+  await expect(page.getByTestId("area-detail")).toBeVisible();
   await page.getByRole("button", { name: "All of Berlin" }).click();
-  await expect(page.getByRole("button", { name: "Zoom to my matches" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "All of Berlin" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the old results address redirects to the explorer; no emoji on Lifestyle", async ({ page }) => {
+  await page.goto("/lifestyle/results");
+  await expect(page).toHaveURL(/\/lifestyle$/);
+  await expect(page.getByRole("heading", { name: "Start with a profile" })).toBeVisible();
+  const text = await page.locator("body").innerText();
+  // Emoji-style characters (not ©, which the map credits use).
+  expect(text).not.toMatch(/\p{Emoji_Presentation}|\uFE0F/u);
+});
+
+test("on a phone the map comes first and the settings sit behind Adjust", async ({ browser }) => {
+  const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  await exploreAsStudent(page);
+  await expect(page.getByTestId("lifestyle-settings")).toBeHidden();
+  await page.getByRole("button", { name: "Adjust" }).click();
+  const drawer = page.getByRole("dialog", { name: "Adjust your match" });
+  await expect(drawer.getByLabel("Budget in euros")).toBeVisible();
+  await drawer.getByRole("button", { name: "Show results" }).click();
+  await expect(drawer).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
 test("starting from scratch needs at least one preference; answers can be cleared", async ({ page }) => {
-  await page.goto("/lifestyle");
+  await page.goto("/lifestyle/questions");
   await page.getByRole("button", { name: /Start from scratch/ }).click();
   for (let i = 0; i < 4; i++) await page.getByRole("button", { name: /Next →|See my lifestyle →/ }).click();
   await expect(page.getByText("Tell us at least one thing you care about")).toBeVisible();

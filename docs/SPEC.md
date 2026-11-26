@@ -128,14 +128,15 @@ Every listing and any Berlin address checked against the Berliner Mietspiegel 20
 6. User opens a listing for detail, or selects several to compare (F8).
 
 **Lifestyle Match flow (F9)**
-1. Homepage entry bar / card → `/lifestyle`: pick a preset or start from scratch.
-2. Four question pages → summary with persona → "Yes, that's me".
-3. `/lifestyle/results`: ranked areas with reasons and sources, shaded map, tune weights → Update results, remove areas.
-4. "See flats here" → WohnIQ listings located in the area (with risk badges) → listing detail.
+1. Homepage entry card → `/lifestyle` (the explorer, T9.6): on a first visit, profile cards under the map; pick one.
+2. Two columns: settings on the left (profile, budget, size, budget firmness, destination, longest trip, what matters 0–5, removed areas); on the right the map (all 143 areas shaded on one blue scale, top 10 numbered, destination marked, Top 10 / All of Berlin) above "Best areas for you". Every change re-ranks live (debounced); the ranking stays the deterministic engine.
+3. Open an area: score bars for what you weigh, reasons with sources, the data behind it; See flats here, Compare (up to 3, side by side, best value marked), Not for me (restorable). Clicking an area on the map shows a small card with "Details below".
+4. "Answer questions instead" → `/lifestyle/questions` (the four question pages + persona summary), which end in the explorer. `/lifestyle/results` redirects to `/lifestyle`.
+5. Phone: map first, list below, settings behind "Adjust". No emoji anywhere (line icons). Answers stay in this tab only (ADR-0012).
 
 **Berlin Neighborhoods flow (F10)**
 1. Header menu "Berlin Neighborhoods" → `/neighborhoods`: overall ranking, list + map.
-2. Pick a category (e.g. Safety) → re-ranked list and recoloured map; toggle best-first / worst-first.
+2. Pick a category (e.g. Safety, line icons on the tabs) → re-ranked list and recoloured map on one calm blue scale (deep blue = top 20%, palest = bottom 20%; no alarm colour); toggle best-first / worst-first. The Affluence category stays.
 3. Click an area on the map (or a row) → its detail: strengths, watch-outs, metrics vs. Berlin with sources, rank in every category.
 4. Optional: adjust weights → Update ranking; share the URL.
 

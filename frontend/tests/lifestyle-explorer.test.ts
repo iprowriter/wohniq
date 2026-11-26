@@ -34,12 +34,13 @@ describe("lifestyle explorer", () => {
   });
 
   test("compare marks the best value per row, and nothing when all are equal", () => {
-    const rows = compareRows([region("A", 82, 650, 19, 70), region("B", 75, 720, 15, 70)], [w("green", 3)], "TU Berlin");
+    const rows = compareRows([region("A", 82, 650, 19, 0.7), region("B", 75, 720, 15, 0.7)], [w("green", 3)], "TU Berlin");
     const byLabel = Object.fromEntries(rows.map((r) => [r.label, r]));
     assert.deepEqual(byLabel["Match"].best, [0]);
     assert.deepEqual(byLabel["Typical warm rent"].best, [0]);
     assert.deepEqual(byLabel["Trip to TU Berlin"].best, [1]);
     assert.deepEqual(byLabel["green"].best, []); // a tie: no "best"
+    assert.deepEqual(byLabel["green"].values, ["70/100", "70/100"]);
   });
 
   test("trip detail", () => {

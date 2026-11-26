@@ -39,7 +39,7 @@ function styleFor(key: string, s: StyleInput): L.PathOptions {
   const active = key === s.selected;
   const hover = key === s.hovered;
   return {
-    color: active ? "#111827" : hover ? "#4f46e5" : "#ffffff",
+    color: active ? "#0D1321" : hover ? "#2747E6" : "#ffffff",
     weight: active ? 3 : hover ? 2.5 : 0.8,
     fillColor: a && shown ? rankColor(a.rank, s.total) : MUTED_COLOR,
     fillOpacity: shown ? (active || hover ? 0.9 : 0.72) : 0.25,
@@ -88,7 +88,7 @@ function FitView({ shapes, selected, showAll }: { shapes: AreaCollection; select
 
 function rankIcon(rank: number, total: number, active: boolean) {
   const size = active ? 32 : 24;
-  const bg = active ? "#111827" : rankColor(rank, total);
+  const bg = active ? "#0D1321" : rankColor(rank, total);
   const fg = active ? "#ffffff" : rankTextColor(rank, total);
   return L.divIcon({
     className: "",
@@ -185,7 +185,7 @@ export function NeighborhoodsMap({
               () => {
                 const a = inputRef.current.byKey[key];
                 const rank = a ? `#${a.rank} of ${inputRef.current.total}` : "";
-                return `<strong>${feature.properties?.name}</strong><br/><span style="color:#6b7280">${feature.properties?.district}</span>${
+                return `<strong>${feature.properties?.name}</strong><br/><span style="color:#5B6478">${feature.properties?.district}</span>${
                   rank ? `<br/>${rank} · score ${Math.round(a.score)}` : ""
                 }`;
               },
@@ -212,13 +212,13 @@ export function NeighborhoodsMap({
       <button
         type="button"
         onClick={() => setShowAll(true)}
-        className="absolute right-3 top-3 z-[400] rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-gray-700 shadow hover:text-indigo-700"
+        className="absolute right-3 top-3 z-[400] rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-text-body shadow hover:text-accent"
       >
         All of Berlin
       </button>
-      <div className="pointer-events-none absolute bottom-2 left-2 z-[400] max-w-[calc(100%-1rem)] rounded-lg bg-white/95 px-2 py-1.5 text-[10px] text-gray-600 shadow sm:bottom-3 sm:left-3 sm:px-2.5 sm:py-2">
+      <div className="pointer-events-none absolute bottom-2 left-2 z-[400] max-w-[calc(100%-1rem)] rounded-lg bg-white/95 px-2 py-1.5 text-[10px] text-text-body shadow sm:bottom-3 sm:left-3 sm:px-2.5 sm:py-2">
         <div className="flex items-center gap-1.5 whitespace-nowrap">
-          <span className="font-semibold text-indigo-800">{bestLabel ?? "Best"}</span>
+          <span className="font-semibold text-accent">{bestLabel ?? "Best"}</span>
           {BANDS.map((b) => (
             <span
               key={b.label}
@@ -227,9 +227,9 @@ export function NeighborhoodsMap({
               title={b.label}
             />
           ))}
-          <span className="font-semibold text-orange-700">{worstLabel ?? "Worst"}</span>
+          <span className="font-semibold text-text-body">{worstLabel ?? "Worst"}</span>
         </div>
-        <p className="mt-0.5 hidden text-gray-400 sm:block">
+        <p className="mt-0.5 hidden text-text-muted sm:block">
           Colour = rank among Berlin&apos;s {areas.length} areas (fifths)
         </p>
       </div>

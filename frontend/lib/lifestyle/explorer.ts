@@ -78,7 +78,7 @@ export function compareRows(regions: RegionResult[], weights: WeightOut[], desti
     const scores = regions.map((r) => r.factors.find((f) => f.attribute === w.attribute)?.score ?? null);
     rows.push({
       label: w.label,
-      values: scores.map((s) => (s == null ? "–" : `${Math.round(s)}/100`)),
+      values: scores.map((s) => (s == null ? "–" : `${Math.round(s * 100)}/100`)), // factor scores are 0–1
       best: bestOf(scores, true),
     });
   }

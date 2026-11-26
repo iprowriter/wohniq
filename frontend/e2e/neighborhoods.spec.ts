@@ -100,7 +100,7 @@ test("list → map: selecting a row outlines the area on the map", async ({ page
   await expect(rows(page)).toHaveCount(143);
   await row(page, MUGGELHEIM).locator("button").first().click();
   await expect(row(page, MUGGELHEIM).getByTestId("area-detail")).toBeVisible();
-  await expect(page.locator(`path.nbh-area-${MUGGELHEIM}`)).toHaveAttribute("stroke", "#111827");
+  await expect(page.locator(`path.nbh-area-${MUGGELHEIM}`)).toHaveAttribute("stroke", "#0D1321");
   // Tapping the row again collapses it.
   await row(page, MUGGELHEIM).locator("button").first().click();
   await expect(row(page, MUGGELHEIM).getByTestId("area-detail")).toHaveCount(0);
