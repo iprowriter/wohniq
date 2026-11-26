@@ -2,15 +2,13 @@
 
 > Tell us how you live — we match you to Berlin neighbourhoods, explain every suggestion with the data behind it, and never store your answers.
 
-Lifestyle Match is a questionnaire-driven way into WohnIQ. Instead of typing a query, people answer a few playful questions (or start from a preset). We predict their "lifestyle persona", let them confirm it, and rank all **143 Berlin areas** for them with a transparent, deterministic score. Every suggestion shows *why* it fits and *which publication* each number comes from. Users can re-weight, remove areas, update results and jump to WohnIQ listings located in an area.
+Lifestyle Match is a way into WohnIQ for people who don't yet know where to search. Since the Berlin Ink redesign (T9.6) it is an **explorer** at `/lifestyle`: settings on the left, and on the right a map of all **143 Berlin areas** above "Best areas for you", re-ranked live with a transparent, deterministic score. Every suggestion shows *why* it fits and *which publication* each number comes from. The questionnaire, which predicts a "lifestyle persona", now lives at `/lifestyle/questions` and ends in the explorer.
 
-| Entry points (homepage) | Questionnaire summary |
-|---|---|
-| ![Homepage entry bar and marketing card](../assets/lifestyle-homepage.png) | ![Persona and "did we get this right?"](../assets/lifestyle-questionnaire.png) |
+| Explorer: settings, map, best areas |
+|---|
+| ![Lifestyle explorer](../assets/lifestyle-results.png) |
 
-| Results: ranked areas, shaded map, "Tune your match" | Listings located in an area (offline demo: photo placeholders) |
-|---|---|
-| ![Results page](../assets/lifestyle-results.png) | ![Listings side panel](../assets/lifestyle-listings-panel.png) |
+Older screenshots of the first version (questionnaire summary, listings panel) are kept in `assets/` for the history.
 
 Decisions: [ADR-0010](adr/0010-lifestyle-match-data-model.md) (data model & provenance) · [ADR-0011](adr/0011-lifestyle-match-scoring.md) (answers → weights → ranking) · [ADR-0012](adr/0012-privacy-by-design.md) (privacy by design).
 
@@ -18,19 +16,14 @@ Decisions: [ADR-0010](adr/0010-lifestyle-match-data-model.md) (data model & prov
 
 ## 1. User flow
 
-1. **Homepage:** a "Try Lifestyle Match" bar under the search box, a marketing card above the feature cards, and a header link → `/lifestyle`.
-2. **Welcome:** five presets (🎓 Student, 💼 Young professional, 👨‍👩‍👧 Family, 🎨 Remote/creative, 🌳 Calm & green) or "Start from scratch". A preset pre-fills answers; every answer stays editable.
-3. **Four pages** (back/forward, progress bar, jump to visited steps):
-   - *Your move:* budget (with cited reference figures), flat size, rooms, household, how firm the budget is.
-   - *Your days:* a destination from a fixed list of 13 campuses/hubs, how often, maximum commute, work style, getting around.
-   - *Evenings & weekends.*
-   - *Your neighbourhood:* who's around, safety (opt-in, with a caveat), extras.
-4. **Summary:** the persona ("The Campus Explorer"), the derived weights with the answer behind each, "You told us" with a *Change* link per answer, and **"Yes, that's me — show my areas"**.
-5. **Results** (`/lifestyle/results`):
-   - ranked area cards: score, budget/commute badges, reasons with source chips, trade-offs, *Why this score*, *The data behind this*;
-   - a shaded map of all 143 areas with the top matches numbered;
-   - **Tune your match** sliders with an explicit **Update results** button;
-   - **✕ Not for me** with undo, and **See flats here** (side panel).
+1. **Homepage:** the "Lifestyle match" entry card under the hero, and "Lifestyle match" in the header → `/lifestyle`.
+2. **First visit:** five profile cards under the map (Student, Young professional, Family, Remote / creative, Calm & green; line icons, no emoji). A profile pre-fills answers; everything stays editable.
+3. **Explorer** (`/lifestyle`, two columns; on phones the map comes first and the settings sit behind "Adjust"):
+   - *Settings (left):* profile, budget and size, how firm the budget is, where you go most (13 campuses/hubs) and the longest trip you accept, "What matters" from 0 to 5 per factor, removed areas, "Answer questions instead", clear my answers.
+   - *Map (right, top):* all 143 areas on one blue scale by match, the top 10 numbered, the destination marked; Top 10 / All of Berlin; a click shows a small card with "Details below".
+   - *Best areas for you (under the map):* compact rows (rank, area, typical warm rent and whether it fits, trip time, match). An opened row shows score bars for what you weigh, reasons with source chips, trade-offs, *The data behind this*, **See flats here** (side panel), **Compare** (up to three areas side by side, best value marked) and **Not for me** (restorable).
+   - Every change re-ranks immediately (debounced), through the same deterministic engine.
+4. **Questions** (`/lifestyle/questions`): four pages (*Your move*, *Your days*, *Evenings & weekends*, *Your neighbourhood*), then the persona summary ("The Campus Explorer") with the derived weights and "Yes, that's me — show my areas", which opens the explorer. `/lifestyle/results` redirects to `/lifestyle`.
 
 ## 2. What we score (16 factors)
 

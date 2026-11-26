@@ -124,7 +124,7 @@ export function PhotoGallery({
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" /></svg>
         </button>
         {photos.length > 1 && (
-          <span className="absolute bottom-3 right-4 rounded-full bg-ink/80 px-2.5 py-0.5 text-[13px] text-white">
+          <span className="absolute bottom-3 right-4 rounded-full bg-ink px-2.5 py-0.5 text-[13px] text-white">
             {slide + 1} / {photos.length}
           </span>
         )}

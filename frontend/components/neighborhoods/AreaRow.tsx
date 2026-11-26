@@ -22,6 +22,7 @@ export function AreaRow({ area: a, total, bestLabel, worstLabel, selected, onSel
     <li
       id={`area-${a.key}`}
       data-key={a.key}
+      data-label={`#${a.rank} ${a.name}, ${a.district}`}
       onMouseEnter={() => onHover(a.key)}
       onMouseLeave={() => onHover(null)}
       className={`scroll-mt-40 rounded-2xl border bg-white transition-shadow ${
@@ -34,7 +35,6 @@ export function AreaRow({ area: a, total, bestLabel, worstLabel, selected, onSel
         type="button"
         onClick={() => onSelect(a.key)}
         aria-expanded={selected}
-        aria-label={`#${a.rank} ${a.name}, ${a.district}`}
         className="flex w-full items-start gap-3 rounded-2xl p-3.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <span

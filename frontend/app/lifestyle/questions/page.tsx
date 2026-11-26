@@ -162,7 +162,7 @@ export default function LifestylePage() {
               fits your life.
             </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-base text-text-muted sm:text-lg">
+          <p className="mx-auto mt-4 max-w-xl text-base text-text-on-ink-muted sm:text-lg">
             Tell us how you live. We match you to {catalog?.region_count ?? 143} Berlin areas using official
             data — and show you exactly why.
           </p>

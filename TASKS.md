@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T9.8 — Offline check, accessibility pass, docs** (branch `berlin-ink`, M9 below). T1.2 (CI + Supabase keep-alive) is still open on `main`.
+➡️ **M9 complete on `berlin-ink`: open one PR to `main`.** T1.2 (CI + Supabase keep-alive) is still open on `main`.
 
 ---
 
@@ -116,7 +116,7 @@
 - [x] **T9.5 — Listing page (desktop + phone).** Top bar (Back to N results from the last search, Share, Print), photo grid + viewer (phone: swipe strip with counter, back/share), title from the matched address, facts (floor, built, Anmeldung), three verdict cards (fit from the last search, rent, risk), price card, rent check with scale and exemptions, Right now, commute (`/listings/{id}/commute`, offline estimate) with the stops map, Around this flat (phone: 6 + "All 8 measures"), why the risk is low / what to ask (from signals only), About; phone bar with rent, Save, Request viewing (safety checklist dialog). Old OSM amenity map removed. Tests: `listing.test.ts`, e2e `listing.spec.ts`, commute endpoint test. _Depends: T9.4_
 - [x] **T9.6 — Lifestyle explorer (design B, two columns) + Neighbourhoods restyle.** _Depends: T9.3_ — `/lifestyle` explorer (settings left; map above "Best areas for you"; live re-rank; compare up to 3; Not for me; phone "Adjust"), questions moved to `/lifestyle/questions`, `/lifestyle/results` redirects; one blue scale on both maps, line icons instead of emoji.
 - [x] **T9.7 — Saved searches, similar apartments, compare page.** _Depends: T9.5_ — saved searches with New badges and download/import (ADR-0020); `/listings/{id}/similar` (deterministic, high-risk included with chip); shared compare list of 4 + bar; `/compare?ids=` replaces the pop-up.
-- [ ] **T9.8 — Offline check, accessibility pass, docs.** _Depends: T9.7_
+- [x] **T9.8 — Offline check, accessibility pass, docs.** _Depends: T9.7_ — `e2e/offline.spec.ts` (every page, all outside requests blocked: none attempted), `e2e/a11y.spec.ts` (axe WCAG 2.1 A/AA on 9 pages, desktop + phone: 0 violations), ESLint configured (`next/core-web-vitals`, clean), README / LIFESTYLE_MATCH / screenshots updated.
 
 ---
 

@@ -144,7 +144,7 @@ function CompareInner() {
                       <RentChip rent={d.rent} short />
                       <RiskChip risk={d.risk} short />
                     </div>
-                    <button type="button" onClick={() => go(ids.filter((x) => x !== id))} className="mt-2 text-[13px] text-accent underline" aria-label={`Remove ${l.title}`}>
+                    <button type="button" onClick={() => go(ids.filter((x) => x !== id))} className="mt-1 inline-flex min-h-tap items-center text-[13px] text-accent underline" aria-label={`Remove ${l.title}`}>
                       Remove
                     </button>
                   </th>

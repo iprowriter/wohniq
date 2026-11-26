@@ -439,11 +439,11 @@ function NeighborhoodsPage() {
             <p className="mt-6 text-xs leading-relaxed text-text-muted">
               Areas are Berlin&apos;s 143 official LOR <em>Bezirksregionen</em>. Scores are percentiles against all of
               Berlin (100 = best); the badges mark the top and bottom 20%. Looking for a flat?{" "}
-              <Link href="/lifestyle" className="text-accent hover:underline">
+              <Link href="/lifestyle" className="text-accent underline underline-offset-2">
                 Try Lifestyle Match
               </Link>{" "}
               or{" "}
-              <Link href="/" className="text-accent hover:underline">
+              <Link href="/" className="text-accent underline underline-offset-2">
                 search listings
               </Link>
               .

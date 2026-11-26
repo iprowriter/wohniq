@@ -362,7 +362,7 @@ export function ListingsMap({ listings, onUserViewChange }: Props) {
       </div>
       {offline && (
         <p className="mt-1.5 text-xs text-gray-500">
-          The offline map file isn't available on this server. Outlines show Berlin&apos;s areas.
+          The offline map file isn&apos;t available on this server. Outlines show Berlin&apos;s areas.
         </p>
       )}
     </div>

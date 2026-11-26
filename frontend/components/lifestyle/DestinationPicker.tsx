@@ -71,7 +71,7 @@ export function DestinationPicker({ answers, destinations, frequency, labels, on
           <div>
             <div className="flex items-end justify-between">
               <label htmlFor="commute" className="text-base font-semibold text-text">
-                Longest commute you'd accept
+                Longest commute you&apos;d accept
               </label>
               <span className="text-2xl font-bold tabular-nums text-text">
                 {answers.max_commute_min}

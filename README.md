@@ -20,15 +20,29 @@ Berlin's rental market is scarce, fast-moving, and scam-prone. Traditional porta
 5. Real-time enrichment fetches public-transport commute times (BVG/VBB API) and POI counts (OSM Overpass).
 6. A hybrid scam engine runs on every listing: price z-score, pHash duplicate detection, and an LLM text pass produce a fused 0–100 risk score with evidence.
 7. Results render as cards with a natural-language explanation grounded in the score breakdown, a risk badge, and a neighborhood map.
-8. Users can select 2–4 listings for a side-by-side comparison.
+8. Every listing is checked against the official **Berliner Mietspiegel 2026** (index range, rent-brake limit, verdict) and gets an **Around this flat** profile and **Right now** departures from Berlin's open data.
+9. Users can save searches, see similar flats and compare up to four flats side by side on a shareable `/compare` page.
+
+### Berlin Ink: the redesign with Berlin's open data
+
+The current look ("Berlin Ink", [`docs/design/berlin-ink/`](docs/design/berlin-ink/)) adds Berlin's official open data to every screen. The data is built once from checksummed source files into Supabase/PostGIS, and into local build files for offline use ([ADR-0016](docs/adr/0016-berlin-open-data-in-supabase.md)):
+
+- **Rent check** (`/rent-check` and on every listing): any of Berlin's 400,505 residential addresses against the Mietspiegel 2026 and the rent brake, following the brochure's method (its worked example is a test). The flat's rent is computed in the browser and never sent anywhere ([ADR-0017](docs/adr/0017-rent-check-and-scam-price-signal.md)).
+- **Around this flat**: nearest S/U-Bahn, schools, Kitas, parks and playgrounds, air quality, road accidents, recorded crime for the district region and the location class, each with its source and its position among Berlin's 542 planning areas. Wording describes, never judges.
+- **Right now**: the six nearest stops with BVG-style transport icons, offline; live departures when online.
+- **Scam checks** now compare rents with the rent index and read the landlord's wording offline in English and German ([ADR-0018](docs/adr/0018-offline-scam-wording-check.md)).
+- **Similar apartments** on every listing (ranked by code on named factors, each card saying why), a **compare list** of up to four flats with a `/compare?ids=…` page, and **saved searches** with "new since last time" and download/import, all without an account ([ADR-0020](docs/adr/0020-saved-searches-in-the-browser.md)).
+- **Offline first**: one local vector map of Berlin (PMTiles) draws every map without a tile server ([ADR-0019](docs/adr/0019-offline-basemap-and-berlin-ink-foundations.md)); in demo mode nothing leaves the machine (an end-to-end test blocks all outside requests).
+
+![Rent check](./assets/rent-check.png)
 
 ### See on the map — every listing, and what an area costs
 
-Under "Explore Berlin" on the homepage, every listing sits on the OpenStreetMap map as a purple price pill (warm rent). Click one for a card with photo, rent, location, rooms and size; the pill stays marked. Zoom out and listings cluster into the **median rent of each neighbourhood** (z12), then **each district** (z11), and once other cities are on screen (z ≤ 10) into a single **Berlin median**. A switcher jumps straight to any level. Tiers, thresholds and why: [ADR-0015](docs/adr/0015-homepage-listings-map.md).
+Under "Explore Berlin" on the homepage, every listing sits on the offline Berlin map as a blue price pill (warm rent). Click one for a card with photo, rent, location, rooms and size; the pill stays marked. Zoom out and listings cluster into the **median rent of each neighbourhood** (z12), then **each district** (z11), and once other cities are on screen (z ≤ 10) into a single **Berlin median**. A switcher jumps straight to any level. Tiers, thresholds and why: [ADR-0015](docs/adr/0015-homepage-listings-map.md).
 
 ### Lifestyle Match — find your Kiez, not just a flat
 
-Not everyone knows which neighbourhood to search in. **Lifestyle Match** (`/lifestyle`) asks a few playful questions (or starts from a preset like 🎓 Student or 🌳 Calm & green). It predicts your lifestyle persona, lets you confirm it, and ranks **all 143 Berlin areas** with a transparent, deterministic score built from official and open data: police crime statistics, the population register, the environmental atlas, IBB rents, the VBB timetable and OpenStreetMap. Every suggestion explains *why*, with the source of each number. You can re-weight factors, remove areas, update the ranking and open WohnIQ listings located in an area. **Your answers are never stored or logged.**
+Not everyone knows which neighbourhood to search in. **Lifestyle Match** (`/lifestyle`) is an explorer in two columns: your settings on the left (a profile such as Student or Calm & green, budget, where you go most, what matters from 0 to 5), and on the right a map of **all 143 Berlin areas** above "Best areas for you". Every change re-ranks live; you can open an area, compare up to three side by side, or remove it. Prefer questions? `/lifestyle/questions` asks them and predicts a persona. The ranking is a transparent, deterministic score built from official and open data: police crime statistics, the population register, the environmental atlas, IBB rents, the VBB timetable and OpenStreetMap. Every suggestion explains *why*, with the source of each number. You can open WohnIQ listings located in any area. **Your answers are never stored or logged.**
 
 ![Lifestyle Match results](./assets/lifestyle-results.png)
 
@@ -36,7 +50,7 @@ Not everyone knows which neighbourhood to search in. **Lifestyle Match** (`/life
 
 ### Berlin Neighborhoods — every area, ranked your way
 
-**Berlin Neighborhoods** (`/neighborhoods`, in the header menu) shows **all 143 Berlin areas** as a ranked list next to an OpenStreetMap map. Switch the category and both re-rank and recolour: crime, road safety, affluence, education, healthcare, amenities, parks & nature, public transport, quiet & clean air, parking, affordability, or a weighted overall score you can tune. Click an area on the map and the sidebar jumps to it with every figure, its Berlin comparison and its source.
+**Berlin Neighborhoods** (`/neighborhoods`, in the header menu) shows **all 143 Berlin areas** as a ranked list next to the map, on one calm blue scale. Switch the category and both re-rank and recolour: crime, road safety, affluence, education, healthcare, amenities, parks & nature, public transport, quiet & clean air, parking, affordability, or a weighted overall score you can tune. Click an area on the map and the sidebar jumps to it with every figure, its Berlin comparison and its source.
 
 The data comes from the police crime atlas, the Unfallatlas, the Senate's social-monitoring index, official land values (Bodenrichtwerte 2026), the schools report and OpenStreetMap. Scores are percentiles against a fixed Berlin-wide distribution, with no LLM involved. Labels describe the measure, never the residents.
 
@@ -108,19 +122,23 @@ Lifestyle answers are bounded choices (no free text, no addresses). The matching
 ### ADR-0013 — Berlin Neighborhoods: ranked area profiles from official data
 
 Same 143 areas and outlines as Lifestyle Match, with a separate, reproducible bundle: 40 metrics, each with `{source, year, method}`. Metric scores are percentiles against a fixed distribution, so they are robust to outliers and comparable across categories. Categories are weighted means and the overall weights are user-adjustable. Socio-economic data is used as a clearly named proxy with caveats. Land values are compared only within the same density class, as the Gutachterausschuss requires. Missing data (income per district) is shown as *pending* next to the Berlin-wide figure, never scored as zero. [→ ADR-0013](docs/adr/0013-berlin-neighborhoods.md)
+
+### ADR-0016 to ADR-0020 — Berlin open data, rent check, offline
+
+Berlin's open data lives in its own Supabase tables (PostGIS) and in local build files read by the same interface, with a parity test between the two ([0016](docs/adr/0016-berlin-open-data-in-supabase.md)). Raw files are never committed: only the build script and SHA-256 checksums. The rent check follows the Mietspiegel brochure, and the scam price signal compares with the rent index instead of the neighbourhood median, which flags no honest listing ([0017](docs/adr/0017-rent-check-and-scam-price-signal.md)). An offline wording check reads landlord text in English and German, with negation ([0018](docs/adr/0018-offline-scam-wording-check.md)). Maps draw one local PMTiles file ([0019](docs/adr/0019-offline-basemap-and-berlin-ink-foundations.md)). Saved searches stay in the browser ([0020](docs/adr/0020-saved-searches-in-the-browser.md)).
 ---
 
 ## Stack
 
 | Layer | Tech |
 |---|---|
-| **Frontend** | Next.js + TypeScript, Tailwind CSS, shadcn/ui, Leaflet + OSM tiles |
+| **Frontend** | Next.js + TypeScript, Tailwind CSS (Berlin Ink tokens), Geist, Leaflet + `protomaps-leaflet` drawing a local PMTiles map |
 | **Backend** | FastAPI, Pydantic, Uvicorn, Docker |
 | **AI** | Gemini Flash (`gemini-2.0-flash`) — parsing, scam text, explanations; Gemini `embedding-001` — semantic search |
-| **Database** | Supabase Postgres + pgvector |
+| **Database** | Supabase Postgres + pgvector + PostGIS (Berlin open data) |
 | **ORM / migrations** | SQLAlchemy 2.0, Alembic |
 | **Scam signals** | imagehash (pHash), Pillow |
-| **Enrichment** | BVG/VBB `transport.rest` (commute), OSM Overpass (POIs), Nominatim (geocoding) |
+| **Enrichment** | BVG/VBB `transport.rest` (commute, live departures), OSM Overpass (POIs), Nominatim (geocoding), Berlin open data (Mietspiegel 2026, Geoportal, Polizei, Unfallatlas, VBB GTFS) |
 | **Images** | Pexels API (hotlinked, attributed in-app) |
 | **Deploy** | Backend → Railway (Docker); Frontend → Vercel |
 | **Cost** | €0 incremental — Gemini free tier, Supabase free, Railway existing, Vercel free |
@@ -216,7 +234,13 @@ Plus parser self-checks against each publication, a byte-for-byte rebuild test, 
 | `backend/lifestyle/` | Lifestyle Match engine: questionnaire, weights, scoring, explanations, persona (pure) |
 | `backend/data/lifestyle/` | Region profile build from official data (`make lifestyle-data`) + shipped `regions.json` |
 | `backend/app/routers/lifestyle.py` | `/api/v1/lifestyle/*` — catalog, profile, match, listings, region outlines |
-| `frontend/app/lifestyle/` | Questionnaire (`/lifestyle`) and results (`/lifestyle/results`) |
+| `frontend/app/lifestyle/` | Explorer (`/lifestyle`) and questions (`/lifestyle/questions`); `/lifestyle/results` redirects |
+| `backend/data/berlin/` | Berlin open-data build (`make berlin-data`, checksummed sources, Mietspiegel parser) and Supabase load (`make berlin-load`) |
+| `backend/berlin/` | Runtime Berlin data: local (offline) and Postgres implementations, rent check, area profile, departures |
+| `backend/search/similar.py` | Similar apartments: deterministic, named factors, a reason per card |
+| `frontend/lib/rent/`, `frontend/components/rent/` | Browser-side rent check (mirrors the Python, tested with shared vectors) and the `/rent-check` page |
+| `frontend/lib/compare/`, `frontend/app/compare/` | Compare list (up to four flats) and the `/compare` page |
+| `frontend/lib/savedSearches.ts`, `frontend/app/saved/` | Saved searches and flats, download / import |
 | `frontend/tests/`, `frontend/e2e/` | Frontend logic tests (`npm test`) and Playwright journeys (`npm run test:e2e`) |
 | [`docs/NEIGHBORHOODS.md`](docs/NEIGHBORHOODS.md) | Berlin Neighborhoods — categories, sources, scoring, data status, evaluation, DoD checklist |
 | `backend/neighborhoods/` | Berlin Neighborhoods engine: catalogue, bundle model, percentile scoring, explanations (pure) |
@@ -240,6 +264,8 @@ uv run python -m data.seed_listings
 uv run python -m data.seed_images
 uv run python -m data.embed_listings
 uv run python -m scam.score   # pre-compute risk assessments
+make berlin-data              # from the repo root: Berlin open-data build (needs BERLIN_RAW_DIR, ~45 s)
+make berlin-load              # load it into Supabase (after alembic upgrade head)
 uv run uvicorn app.main:app --reload
 
 # Frontend
@@ -303,11 +329,23 @@ plus the deterministic seed-42 generator, so it matches the live database. In of
   estimates when the transit API fails, instead of showing nothing. `make eval-commute` (online)
   measures both estimates against live journeys.
 - Featured listings are drawn from the 38 that have cached neighborhood data, so every card
-  opens onto photos, amenities, and a risk rating. Search covers all 100 listings, as live does.
+  opens onto photos, amenities, and a risk rating. Search covers all 140 listings, as live does.
 - Without `make demo-photos`, photos load from Pexels if there's internet, otherwise a
-  placeholder is shown. Map tiles (OpenStreetMap) always need internet. Without them, the
-  listing map switches to a clean background with the 500 m amenity search area, a scale bar and
-  a short note; when the connection returns, the tiles reload.
+  placeholder is shown.
+- Berlin data (rent check, Around this flat, stops) comes from the local build of
+  `make berlin-data`; every map draws the local `berlin.pmtiles` from that build, served at
+  `/tiles/berlin.pmtiles`. Only live departures need the internet; without it, "Right now"
+  lists the nearest stops with walking minutes. `e2e/offline.spec.ts` blocks every outside
+  request and visits every page.
+
+### Docker and deployment notes
+
+The backend image (`backend/Dockerfile`) leaves out the Berlin build (`.dockerignore`):
+live mode reads the Berlin tables from Supabase. The map file is then not served by the API,
+so point `NEXT_PUBLIC_MAP_TILES_URL` at a copy (for example a public Supabase Storage object);
+without it, maps show area outlines on a plain background. For a self-contained offline
+container, remove `data/berlin/build/` from `.dockerignore` (adds about 110 MB) and run with
+`WOHNIQ_DEMO=1`.
 
 ---
 
@@ -316,3 +354,5 @@ plus the deterministic seed-42 generator, so it matches the live database. In of
 Apartment photos sourced via the Pexels API; attribution shown in-app per their terms.
 
 Lifestyle Match uses derived figures from: Polizei Berlin (Kriminalitätsatlas); Amt für Statistik Berlin-Brandenburg (Einwohnerregisterstatistik, CC BY 3.0 DE; LOR 2021 with SenStadt); Senatsverwaltung für Mobilität, Verkehr, Klimaschutz und Umwelt (Umweltgerechtigkeitsatlas 2023/24); Investitionsbank Berlin (Wohnungsmarktbericht 2025 and Tabellenband); Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen (Betriebskostenübersicht 2026); Moses Mendelssohn Institut; VBB (GTFS open data); and © OpenStreetMap contributors (ODbL 1.0, via Geofabrik). Each figure's source is shown next to it in the app and listed in `backend/data/lifestyle/sources.py`.
+
+The rent check, Around this flat and Right now use: Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen (Berliner Mietspiegel 2026, Wohnlagenkarte); Geoportal Berlin (addresses, LOR planning areas, schools, Kitas, parks, playgrounds); Polizei Berlin (Kriminalitätsatlas); Statistische Ämter (Unfallatlas); VBB (GTFS stops); air-quality stations; and © OpenStreetMap contributors via the Protomaps basemap. Sources and checksums: `backend/data/berlin/sources.py`. The data was gathered for Berlin Visualized; WohnIQ uses only the data, not its code.

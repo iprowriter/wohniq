@@ -12,7 +12,7 @@ const MUGGELHEIM = "094016";
 const rows = (page: Page) => page.locator("li[data-key]");
 const row = (page: Page, key: string) => page.locator(`li[data-key="${key}"]`);
 const firstRowName = async (page: Page) =>
-  (await rows(page).first().locator("button").first().getAttribute("aria-label")) ?? "";
+  (await rows(page).first().getAttribute("data-label")) ?? "";
 
 async function clickArea(page: Page, key: string) {
   // Leaflet draws each area as an SVG path tagged with its key (NeighborhoodsMap). Click
@@ -109,11 +109,11 @@ test("list → map: selecting a row outlines the area on the map", async ({ page
 test("search and district filter keep Berlin-wide ranks", async ({ page }) => {
   await page.goto("/neighborhoods?category=safety");
   await expect(rows(page)).toHaveCount(143);
-  const rankBefore = await row(page, MUGGELHEIM).locator("button").first().getAttribute("aria-label");
+  const rankBefore = await row(page, MUGGELHEIM).getAttribute("data-label");
 
   await page.getByPlaceholder("Find an area…").fill("muggel");
   await expect(rows(page)).toHaveCount(1);
-  await expect(row(page, MUGGELHEIM).locator("button").first()).toHaveAttribute("aria-label", rankBefore!);
+  await expect(row(page, MUGGELHEIM)).toHaveAttribute("data-label", rankBefore!);
 
   await page.getByPlaceholder("Find an area…").fill("");
   await page.getByLabel("District").selectOption("Mitte");
