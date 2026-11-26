@@ -58,6 +58,8 @@ from search.ranking import (
     score_listing,
 )
 from search.retrieval import RetrievalResult
+from search.similar import Flat as SimilarFlat
+from search.similar import rank_similar
 
 logger = get_logger(__name__)
 router = APIRouter(tags=["search"])
@@ -841,6 +843,88 @@ def get_listing_commute(
     return ListingCommuteOut(
         to=place, commute=_to_commute_out(result), note=_commute_note(place, [result])
     )
+
+
+class SimilarItemOut(BaseModel):
+    listing: ListingOut
+    risk: RiskOut | None = None
+    score: float  # 0..1, from named factors (search/similar.py)
+    distance_km: float
+    reasons: list[str]
+
+
+class SimilarResponse(BaseModel):
+    # True when this flat is above the rent-brake limit and flats within it come first.
+    within_limit_first: bool
+    items: list[SimilarItemOut]
+
+
+SIMILAR_LIMIT = 12
+
+
+def _similar_flat(listing: Listing, fields: dict) -> SimilarFlat:
+    loc = fields.get("location")
+    rent = fields.get("rent")
+    return SimilarFlat(
+        id=str(listing.id),
+        lat=loc.lat if loc and loc.lat is not None else listing.lat,
+        lng=loc.lng if loc and loc.lng is not None else listing.lng,
+        rooms=float(listing.rooms),
+        size_m2=listing.size_m2,
+        warm_eur=listing.warmmiete_eur,
+        furnished=listing.furnished,
+        planning_area=loc.planning_area if loc else None,
+        district=listing.district,
+        period=rent.period if rent else None,
+        rent_verdict=rent.verdict if rent else None,
+        photo_set_id=str(listing.photo_set_id) if listing.photo_set_id else None,
+    )
+
+
+@router.get("/listings/{listing_id}/similar", response_model=SimilarResponse)
+def get_similar_listings(
+    listing_id: str, repo: Annotated[ListingRepository, Depends(get_repository)]
+) -> SimilarResponse:
+    """Similar flats, ranked deterministically with a reason per card (T9.7). High-risk
+    listings are included and carry their risk; copies reusing the photos are left out."""
+    try:
+        uid = uuid.UUID(listing_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid listing id") from None
+    target = repo.get_listing(uid)
+    if target is None:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    pool = repo.listings_in_bbox(
+        BERLIN_BBOX["lat_min"],
+        BERLIN_BBOX["lng_min"],
+        BERLIN_BBOX["lat_max"],
+        BERLIN_BBOX["lng_max"],
+        limit=MAP_LISTINGS_LIMIT,
+    )
+    fields = {str(x.id): _berlin_fields(x) for x in pool}
+    target_fields = fields.get(str(target.id)) or _berlin_fields(target)
+    ranked, fair_first = rank_similar(
+        _similar_flat(target, target_fields),
+        [_similar_flat(x, fields[str(x.id)]) for x in pool],
+        limit=SIMILAR_LIMIT,
+    )
+    by_id = {str(x.id): x for x in pool}
+    chosen = [by_id[s.id] for s in ranked]
+    photos_by_set = repo.photos_by_set([x.photo_set_id for x in chosen])
+    risk_by_id = repo.risk_by_listing([x.id for x in chosen])
+    items = []
+    for s, x in zip(ranked, chosen, strict=True):
+        out = _to_listing_out(x, photos_by_set.get(x.photo_set_id, []))
+        items.append(
+            SimilarItemOut(
+                listing=out,
+                risk=_to_risk_out(risk_by_id.get(s.id)),
+                score=s.score,
+                distance_km=s.distance_km,
+                reasons=s.reasons,
+            )
+        )
+    return SimilarResponse(within_limit_first=fair_first, items=items)
 
 
 @router.get("/listings/{listing_id}/around")

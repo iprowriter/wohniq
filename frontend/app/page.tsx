@@ -33,6 +33,7 @@ import {
 } from "@/lib/results";
 import { isFairRent } from "@/lib/listing/chips";
 import { useSaved } from "@/lib/useSaved";
+import { useCompare } from "@/lib/compare/useCompare";
 import { useSavedSearches } from "@/lib/useSavedSearches";
 import { addSearch, findSearch, readSearches, recordRun, removeSearch, writeSearches, searchHref } from "@/lib/savedSearches";
 import { saveLastSearch } from "@/lib/listing/lastSearch";
@@ -41,7 +42,6 @@ import { SearchNotices } from "@/components/SearchNotices";
 import { ResultCard } from "@/components/ResultCard";
 import { FeaturedCard, type CardListing } from "@/components/FeaturedCard";
 import { ListingsMapSection } from "@/components/map/ListingsMapSection";
-import { ComparisonModal } from "@/components/ComparisonModal";
 import { SearchForm } from "@/components/home/SearchForm";
 import { CheckedCard, EntryCards, HowItWorks } from "@/components/home/HomeSections";
 import { ResultsMap } from "@/components/results/ResultsMap";
@@ -53,7 +53,6 @@ const EXAMPLES = [
   "Furnished, 20 min to TU Berlin",
 ];
 const CACHE_PREFIX = "wohniq_search:";
-const MAX_COMPARE = 4;
 const EXPLORE_POOL = 12;
 const RESULTS_LIMIT = 20;
 
@@ -307,8 +306,7 @@ function Results({
   const [data, setData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [compare, setCompare] = useState<Set<string>>(new Set());
-  const [compareOpen, setCompareOpen] = useState(false);
+  const compare = useCompare(); // shared list (T9.7): bar + /compare page
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const saved = useSaved();
@@ -322,7 +320,6 @@ function Results({
 
   useEffect(() => {
     let cancelled = false;
-    setCompare(new Set());
     const cached = cacheGet(cacheKey);
     if (cached) {
       setData(cached);
@@ -348,7 +345,6 @@ function Results({
   const results = data?.results ?? [];
   const shown = visibleResults(results, params.fair, params.sort);
   const fairCount = results.filter((r) => isFairRent(r.listing.rent)).length;
-  const selectedItems = results.filter((r) => compare.has(r.listing.id));
 
   // Remember this view for the listing pages opened from it (fit score, "Back to …").
   useEffect(() => {
@@ -359,6 +355,7 @@ function Results({
       count: shown.length,
       areas,
       fit: Object.fromEntries(results.map((r) => [r.listing.id, { score: r.score, summary: r.explanation.summary }])),
+      items: shown.slice(0, 20).map((r) => ({ id: r.listing.id, title: r.listing.title, warm: r.listing.warmmiete_eur, kiez: r.listing.kiez })),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, params.fair, params.sort]);
@@ -384,14 +381,6 @@ function Results({
     if (thisSaved) setNews(null);
   }
 
-  function toggleCompare(id: string) {
-    setCompare((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < MAX_COMPARE) next.add(id);
-      return next;
-    });
-  }
 
   async function share() {
     const url = window.location.href;
@@ -511,8 +500,8 @@ function Results({
                 key={item.listing.id}
                 item={item}
                 compared={compare.has(item.listing.id)}
-                onToggleCompare={toggleCompare}
-                compareDisabled={compare.size >= MAX_COMPARE}
+                onToggleCompare={compare.toggle}
+                compareDisabled={compare.full}
                 saved={saved.has(item.listing.id)}
                 onToggleSave={saved.toggle}
                 highlighted={highlighted === item.listing.id}
@@ -536,23 +525,6 @@ function Results({
         </div>
       </section>
 
-      {compare.size >= 2 && (
-        <div className="fixed inset-x-0 bottom-0 z-[1050] border-t border-line bg-surface/95 px-[18px] py-3 shadow-lg backdrop-blur-sm">
-          <div className="mx-auto flex max-w-page items-center justify-between gap-4">
-            <p className="text-[14px] text-text-body">
-              <span className="font-semibold text-text">{compare.size}</span> flats selected
-              {compare.size < MAX_COMPARE && <span className="text-text-muted"> (up to {MAX_COMPARE})</span>}
-            </p>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => setCompare(new Set())}>Clear</Button>
-              <Button onClick={() => setCompareOpen(true)}>Compare</Button>
-            </div>
-          </div>
-        </div>
-      )}
-      {compareOpen && selectedItems.length >= 2 && (
-        <ComparisonModal items={selectedItems} onClose={() => setCompareOpen(false)} />
-      )}
     </>
   );
 }

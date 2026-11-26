@@ -6,6 +6,7 @@ import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { CompareBar } from "@/components/compare/CompareBar";
 
 export const metadata: Metadata = {
   title: "WohnIQ — Find your Berlin flat. Know it's fair before you call.",
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
         <SiteFooter />
+        <CompareBar />
       </body>
     </html>
   );

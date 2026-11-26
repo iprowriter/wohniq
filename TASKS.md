@@ -20,7 +20,7 @@
 
 ## Current next step
 
-➡️ **T9.7 — Saved searches, similar apartments, compare page** (branch `berlin-ink`, M9 below). T1.2 (CI + Supabase keep-alive) is still open on `main`.
+➡️ **T9.8 — Offline check, accessibility pass, docs** (branch `berlin-ink`, M9 below). T1.2 (CI + Supabase keep-alive) is still open on `main`.
 
 ---
 
@@ -115,7 +115,7 @@
 - [x] **T9.4 — Home, results and rent check page.** Home: hero search with Try examples, "Every listing, checked" (a real fair-rent, low-risk listing near the U/S-Bahn), three entry cards, Explore Berlin + big map (kept), How WohnIQ works. Results (`/?q=&fair=&sort=`, shareable): "We understood:" chips, result cards (fit, rent and risk chips, station or commute, why it ranks, worth asking, View dossier / Compare / Save), sort, Only fair rents, Share, sticky map with Listings / Median rent / Transit / Green (`/stops`, `/parks` in view). Rent check `/rent-check`: address combobox (400,505), size, building age (East/West aware), cold rent, energy value, 83-item checklist, verdict + tiles + scale + chart by building age (computed in the browser, `lib/rent/check.ts` tested against Python vectors), Around this address, Right now, stops map with BVG icons, compare up to 4 (this tab only), Print. Saved flats (localStorage) + `Saved (n)` + `/saved`. Map points at the matched address everywhere; one € format (€1,284). Tests: `rent-check.test.ts`, `rent-explain.test.ts`, `results.test.ts`, `test_rent_vectors.py`, e2e `rent-check.spec.ts` + results toolbar. _Depends: T9.2, T9.3_
 - [x] **T9.5 — Listing page (desktop + phone).** Top bar (Back to N results from the last search, Share, Print), photo grid + viewer (phone: swipe strip with counter, back/share), title from the matched address, facts (floor, built, Anmeldung), three verdict cards (fit from the last search, rent, risk), price card, rent check with scale and exemptions, Right now, commute (`/listings/{id}/commute`, offline estimate) with the stops map, Around this flat (phone: 6 + "All 8 measures"), why the risk is low / what to ask (from signals only), About; phone bar with rent, Save, Request viewing (safety checklist dialog). Old OSM amenity map removed. Tests: `listing.test.ts`, e2e `listing.spec.ts`, commute endpoint test. _Depends: T9.4_
 - [x] **T9.6 — Lifestyle explorer (design B, two columns) + Neighbourhoods restyle.** _Depends: T9.3_ — `/lifestyle` explorer (settings left; map above "Best areas for you"; live re-rank; compare up to 3; Not for me; phone "Adjust"), questions moved to `/lifestyle/questions`, `/lifestyle/results` redirects; one blue scale on both maps, line icons instead of emoji.
-- [ ] **T9.7 — Saved searches, similar apartments, compare page.** _Depends: T9.5_
+- [x] **T9.7 — Saved searches, similar apartments, compare page.** _Depends: T9.5_ — saved searches with New badges and download/import (ADR-0020); `/listings/{id}/similar` (deterministic, high-risk included with chip); shared compare list of 4 + bar; `/compare?ids=` replaces the pop-up.
 - [ ] **T9.8 — Offline check, accessibility pass, docs.** _Depends: T9.7_
 
 ---

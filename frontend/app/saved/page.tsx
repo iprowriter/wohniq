@@ -11,6 +11,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getListingDetail } from "@/lib/api";
 import type { ListingOut } from "@/lib/types";
 import { useSaved } from "@/lib/useSaved";
+import { useCompare } from "@/lib/compare/useCompare";
 import { readSaved, writeSaved, MAX_SAVED } from "@/lib/saved";
 import { useSavedSearches } from "@/lib/useSavedSearches";
 import { buildExport, mergeImport, readSearches, removeSearch, renameSearch, searchHref, writeSearches, type SavedSearch } from "@/lib/savedSearches";
@@ -118,6 +119,7 @@ function SavedInner() {
 }
 
 function Flats({ ids, onRemove }: { ids: string[]; onRemove: (id: string) => void }) {
+  const compare = useCompare();
   const [listings, setListings] = useState<Record<string, ListingOut | null>>({});
   useEffect(() => {
     const missing = ids.filter((id) => !(id in listings));
@@ -151,7 +153,17 @@ function Flats({ ids, onRemove }: { ids: string[]; onRemove: (id: string) => voi
             ) : (
               <div className="h-64 animate-pulse rounded-lg bg-chip" />
             )}
-            <Button variant="outline" onClick={() => onRemove(id)}>Remove</Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                aria-pressed={compare.has(id)}
+                disabled={!compare.has(id) && compare.full}
+                onClick={() => compare.toggle(id)}
+              >
+                {compare.has(id) ? "Comparing" : "Compare"}
+              </Button>
+              <Button variant="outline" onClick={() => onRemove(id)}>Remove</Button>
+            </div>
           </li>
         );
       })}

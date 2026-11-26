@@ -121,6 +121,9 @@ Every listing and any Berlin address checked against the Berliner Mietspiegel 20
 - **AC1.** "Save search" keeps the query, filter, sort and budget in this browser only (ADR-0020); saved searches appear under the home search box and on `/saved` (Flats / Searches tabs: run, rename, delete, delete all); the header count covers flats and searches.
 - **AC2.** Running a saved search again marks flats not seen on the previous run as "New" and says how many since when.
 - **AC3.** "Download my saved items" gives one small file; "Import" adds only what is missing, never overwrites, and refuses files that didn't come from WohnIQ.
+- **AC4.** The listing page shows "Similar apartments to this" from `GET /listings/{id}/similar`: a deterministic score from named factors (distance, rooms, size ±20 %, warm rent ±20 %, furnished, building period; `search/similar.py`, no LLM), each card saying why ("Same area · 0.8 km away", "2 rooms, 48 m² (this: 46)", "€70 less warm") with rent and risk chips. High-risk flats are included with their chip; the flat itself and copies reusing its photos are left out. If the flat is above the rent-brake limit, flats within it come first ("Similar flats within the rent limit"). Six cards on desktop, three on phones plus "Show more".
+- **AC5.** One compare list of up to four flats, kept in this browser, fed from result cards, the listing page ("Compare with…": similar flats, saved flats, the last search, a pasted listing link), similar cards and `/saved`; a "Compare (n) · Open" bar follows across pages.
+- **AC6.** `/compare?ids=…` replaces the old pop-up: reloadable and shareable; rows for price, rent check, scam risk, the flat, location (+ a trip to a place the user types), around; the best value per row is marked, never for accidents or crime; remove a column or add a flat; on phones the first column stays and flats scroll sideways.
 
 ## 6. User flows
 

@@ -277,3 +277,18 @@ export interface MapStop {
   lat: number;
   lng: number;
 }
+
+// --- Similar apartments (T9.7) ---
+
+export interface SimilarItem {
+  listing: ListingOut;
+  risk?: RiskOut | null;
+  score: number;
+  distance_km: number;
+  reasons: string[];
+}
+
+export interface SimilarResponse {
+  within_limit_first: boolean;
+  items: SimilarItem[];
+}

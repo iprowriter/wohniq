@@ -11,6 +11,8 @@ export interface LastSearch {
   count: number;
   areas: string[];
   fit: Record<string, { score: number; summary: string }>;
+  // For "Compare with…" on the listing page (T9.7): the results in order, title and rent.
+  items?: { id: string; title: string; warm: number; kiez: string }[];
 }
 
 export function saveLastSearch(s: LastSearch, storage: Storage | undefined = globalThis.sessionStorage): void {

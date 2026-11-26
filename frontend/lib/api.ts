@@ -7,6 +7,7 @@ import type {
   PlaceProfile,
   RightNowOut,
   SearchResponse,
+  SimilarResponse,
 } from "./types";
 import type { RentIndex } from "./rent/index.ts";
 import type { MapListing } from "./map/listingsMap";
@@ -109,3 +110,6 @@ export const getListingCommute = (id: string, to: string) =>
     `/api/v1/listings/${id}/commute?${qs({ to })}`,
     "the trip time",
   );
+
+export const getSimilarListings = (id: string) =>
+  getJson<SimilarResponse>(`/api/v1/listings/${id}/similar`, "similar flats");

@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getListingAround, getListingDetail } from "@/lib/api";
-import type { ListingDetailResponse, PlaceProfile } from "@/lib/types";
+import type { ListingDetailResponse, PlaceProfile, SimilarItem } from "@/lib/types";
 import { euro, euro2, rooms } from "@/lib/format";
 import { backLabel, fitLabel, readLastSearch, type LastSearch } from "@/lib/listing/lastSearch";
 import { riskChecks } from "@/lib/listing/riskChecks";
@@ -23,6 +23,8 @@ import { RightNowCard } from "@/components/place/RightNowCard";
 import { PhotoGallery } from "@/components/listing/PhotoGallery";
 import { ViewingDialog } from "@/components/listing/ViewingDialog";
 import { CommuteCard } from "@/components/listing/CommuteCard";
+import { SimilarFlats } from "@/components/listing/SimilarFlats";
+import { CompareWith } from "@/components/listing/CompareWith";
 
 const RISK_WORD = { low: "Low", caution: "Worth asking", high: "High" } as const;
 
@@ -51,6 +53,8 @@ export default function ListingPage() {
   const [viewing, setViewing] = useState(false);
   const [allMeasures, setAllMeasures] = useState(false);
   const [shared, setShared] = useState(false);
+  const [similar, setSimilar] = useState<SimilarItem[]>([]);
+  const [comparing, setComparing] = useState(false);
   const saved = useSaved();
 
   useEffect(() => {
@@ -274,14 +278,21 @@ export default function ListingPage() {
               <Button onClick={() => setViewing(true)}>Request a viewing</Button>
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" aria-pressed={isSaved} onClick={() => saved.toggle(listing.id)}>{isSaved ? "Saved" : "Save"}</Button>
-                <Link href="/rent-check" className={buttonClass("outline")}>Check this rent</Link>
+                <Button variant="outline" onClick={() => setComparing(true)} data-testid="compare-with">Compare</Button>
               </div>
+              <Link href="/rent-check" className={buttonClass("ghost")}>Check this rent</Link>
             </section>
             <div className="hidden lg:block">
               <RightNowCard lat={mapLat} lng={mapLng} />
             </div>
             <CommuteCard listingId={listing.id} lat={mapLat} lng={mapLng} />
           </aside>
+        </div>
+        <div className="mt-10 flex flex-col gap-3">
+          <Button variant="outline" className="self-start md:hidden" onClick={() => setComparing(true)}>
+            Compare with another flat
+          </Button>
+          <SimilarFlats listingId={listing.id} onLoaded={(d) => setSimilar(d.items)} />
         </div>
       </div>
 
@@ -300,6 +311,7 @@ export default function ListingPage() {
       </div>
 
       {viewing && <ViewingDialog onClose={() => setViewing(false)} />}
+      {comparing && <CompareWith listingId={listing.id} similar={similar} onClose={() => setComparing(false)} />}
     </div>
   );
 }
