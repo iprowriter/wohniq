@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 
 export const SEARCH_PLACEHOLDER = "e.g. 2 rooms near Alexanderplatz, quiet, under €1,400 warm";
 
-/** The white hero search box from the design (input + accent button). */
+/**
+ * The white hero search box from the design (input + accent button). Focus shows as a soft
+ * light halo around the whole box (on the dark hero), not the global blue outline.
+ */
 export function SearchForm({
   initial = "",
   busy = false,
@@ -23,7 +26,7 @@ export function SearchForm({
         e.preventDefault();
         if (q.trim()) onSearch(q.trim());
       }}
-      className="flex flex-wrap gap-2.5 rounded-[18px] bg-surface p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
+      className="flex flex-wrap gap-2.5 rounded-[18px] bg-surface p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.35)] transition-shadow duration-200 focus-within:shadow-[0_20px_60px_rgba(0,0,0,0.35),0_0_0_5px_rgba(255,255,255,0.16)]"
     >
       <label htmlFor="hero-search" className="sr-only">
         Describe your flat
@@ -33,7 +36,7 @@ export function SearchForm({
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder={SEARCH_PLACEHOLDER}
-        className="min-h-[52px] min-w-0 flex-[1_1_300px] bg-transparent px-4 text-[17px] text-text outline-none placeholder:text-text-faint"
+        className="min-h-[52px] min-w-0 flex-[1_1_300px] bg-transparent px-4 text-[17px] text-text outline-none placeholder:text-text-faint focus-visible:outline-none"
       />
       <button
         type="submit"
