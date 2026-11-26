@@ -12,7 +12,7 @@ import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 import type L from "leaflet";
 import {
-  BASEMAP_ATTRIBUTION,
+  basemapAttribution,
   BERLIN_INK_FLAVOR,
   basemapInfo,
   basemapUrl,
@@ -48,8 +48,8 @@ export function OfflineBasemap({ onStatus, attributionSuffix }: Props) {
         backgroundColor: BERLIN_INK_FLAVOR.background,
         maxDataZoom: info.maxZoom, // from the file itself (a hosted copy may stop at 14)
         attribution: attributionSuffix
-          ? `${BASEMAP_ATTRIBUTION} · ${attributionSuffix}`
-          : BASEMAP_ATTRIBUTION,
+          ? `${basemapAttribution(info.online)} · ${attributionSuffix}`
+          : basemapAttribution(info.online),
       }) as unknown as L.Layer;
       layer.addTo(map);
       // Keep overlays (outlines, markers) above the base map.

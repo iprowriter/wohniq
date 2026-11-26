@@ -7,9 +7,11 @@ import { join } from "node:path";
 import {
   BERLIN_INK_FLAVOR,
   ONLINE_TILE_PATTERNS,
+  basemapAttribution,
   basemapAvailable,
   basemapInfo,
   basemapUrl,
+  isTileTemplate,
 } from "../lib/map/basemap.ts";
 
 function sourceFiles(dir: string): string[] {
@@ -80,9 +82,9 @@ describe("offline base map", () => {
       b[101] = maxZoom;
       return (async () => new Response(b, { status: 206 })) as typeof fetch;
     };
-    assert.deepEqual(await basemapInfo("x", header(15)), { maxZoom: 15 });
-    assert.deepEqual(await basemapInfo("x", header(14)), { maxZoom: 14 });
-    assert.deepEqual(await basemapInfo("x", header(0)), { maxZoom: 15 }); // nonsense → default
+    assert.deepEqual(await basemapInfo("x", header(15)), { maxZoom: 15, online: false });
+    assert.deepEqual(await basemapInfo("x", header(14)), { maxZoom: 14, online: false });
+    assert.deepEqual(await basemapInfo("x", header(0)), { maxZoom: 15, online: false }); // nonsense → default
   });
 
   test("the local build file really says zoom 15 at byte 101", async () => {
@@ -92,6 +94,30 @@ describe("offline base map", () => {
     const buf = Buffer.alloc(127);
     readSync(openSync(file, "r"), buf, 0, 127, 0);
     const fetchFn = (async () => new Response(buf, { status: 206 })) as typeof fetch;
-    assert.deepEqual(await basemapInfo("x", fetchFn), { maxZoom: 15 });
+    assert.deepEqual(await basemapInfo("x", fetchFn), { maxZoom: 15, online: false });
+  });
+
+  test("a {z}/{x}/{y} tile address (e.g. the Protomaps API) is probed with the world tile", async () => {
+    const tpl = "https://tiles.example/v4/{z}/{x}/{y}.mvt?key=abc";
+    assert.equal(isTileTemplate(tpl), true);
+    assert.equal(isTileTemplate("https://x.supabase.co/storage/v1/object/public/map/berlin.pmtiles"), false);
+    const seen: string[] = [];
+    const reply = (status: number) =>
+      (async (u: string | URL | Request) => {
+        seen.push(String(u));
+        return new Response("tile", { status });
+      }) as typeof fetch;
+    assert.deepEqual(await basemapInfo(tpl, reply(200)), { maxZoom: 15, online: true });
+    assert.equal(seen[0], "https://tiles.example/v4/0/0/0.mvt?key=abc");
+    assert.equal(await basemapInfo(tpl, reply(401)), null); // bad key → outlines
+    const offline = (async () => {
+      throw new TypeError("offline");
+    }) as typeof fetch;
+    assert.equal(await basemapInfo(tpl, offline), null);
+  });
+
+  test("credits say 'offline map' only for a map file", () => {
+    assert.match(basemapAttribution(false), /OpenStreetMap.*Protomaps<\/a> · offline map$/);
+    assert.match(basemapAttribution(true), /OpenStreetMap.*Protomaps<\/a>$/);
   });
 });

@@ -1,7 +1,10 @@
 /**
- * The offline base map (ADR-0019): one local PMTiles file (Protomaps basemap v4 from
- * OpenStreetMap, Berlin, zoom 0–15), served by the API at /tiles/berlin.pmtiles and drawn
- * in the browser in Berlin Ink colours. No tile server is ever contacted.
+ * The base map (ADR-0019, ADR-0021): by default one local PMTiles file (Protomaps basemap v4
+ * from OpenStreetMap, Berlin, zoom 0–15), served by the API at /tiles/berlin.pmtiles and
+ * drawn in the browser in Berlin Ink colours, so it works offline. A deployment may instead
+ * set NEXT_PUBLIC_MAP_TILES_URL to another PMTiles file or to a tile address in the same
+ * Protomaps v4 format, e.g. the Protomaps API (`…/tiles/v4/{z}/{x}/{y}.mvt?key=…`), which
+ * covers all of Germany and beyond with the same look. Nothing online is used unless set.
  *
  * Pure module: URL resolution, the colour "flavor" protomaps-leaflet styles with, and the
  * patterns a test uses to make sure no online tile server sneaks back in.
@@ -10,15 +13,27 @@
 // Explicit .ts: this runtime import must also resolve under `node --test` (type stripping).
 import { API_BASE } from "../api.ts";
 
-/** Where the map file is. Override for a deployment without the Berlin build (e.g. a
- * public Supabase Storage URL) with NEXT_PUBLIC_MAP_TILES_URL. */
+/** Where the map comes from: NEXT_PUBLIC_MAP_TILES_URL (a PMTiles file or a {z}/{x}/{y}
+ * tile address), else the API's local file. */
 export function basemapUrl(): string {
-  return process.env.NEXT_PUBLIC_MAP_TILES_URL ?? `${API_BASE}/tiles/berlin.pmtiles`;
+  return process.env.NEXT_PUBLIC_MAP_TILES_URL || `${API_BASE}/tiles/berlin.pmtiles`;
 }
 
-export const BASEMAP_ATTRIBUTION =
+/** A tile address like https://…/{z}/{x}/{y}.mvt?key=… (rather than one PMTiles file). */
+export function isTileTemplate(url: string): boolean {
+  return /\{z\}.*\{x\}.*\{y\}/.test(url);
+}
+
+const CREDITS =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · ' +
-  '<a href="https://protomaps.com">Protomaps</a> · offline map';
+  '<a href="https://protomaps.com">Protomaps</a>';
+
+/** Map credits; "offline map" only when drawing from a PMTiles file. */
+export function basemapAttribution(online: boolean): string {
+  return online ? CREDITS : `${CREDITS} · offline map`;
+}
+
+export const BASEMAP_ATTRIBUTION = basemapAttribution(false);
 
 /** Zoom levels the file holds; Leaflet over-zooms the last one. */
 export const BASEMAP_MAX_DATA_ZOOM = 15;
@@ -131,7 +146,8 @@ export const BERLIN_INK_FLAVOR = {
   },
 } as const;
 
-/** Online tile servers the app must never use again (checked by tests/basemap.test.ts). */
+/** Raster tile servers the app must never hard-code (checked by tests/basemap.test.ts). An
+ * online source is only ever configured through NEXT_PUBLIC_MAP_TILES_URL. */
 export const ONLINE_TILE_PATTERNS: RegExp[] = [
   /tile\.openstreetmap\.org/,
   /\{s\}\.tile\./,
@@ -150,21 +166,27 @@ const HEADER_BYTES = 127;
 const MAX_ZOOM_BYTE = 101;
 
 /**
- * Is the map file reachable, and up to which zoom does it hold data? One small range request
- * for the header (no full download). A smaller hosted copy (e.g. cut to zoom 14 to fit a
- * 50 MB upload limit) is then drawn correctly: deeper zooms reuse its last level.
+ * Is the map reachable, and up to which zoom does it hold data?
+ *  - PMTiles file: one small range request for the header (byte 101 = max zoom), so a smaller
+ *    hosted copy (e.g. cut to zoom 14 to fit a 50 MB upload limit) is drawn correctly.
+ *  - Tile address: one request for the single world tile (0/0/0); Protomaps v4 goes to 15.
+ * Unreachable (offline, bad key) → null, and the maps fall back to area outlines.
  */
 export async function basemapInfo(
   url = basemapUrl(),
   fetchFn: typeof fetch = fetch,
-): Promise<{ maxZoom: number } | null> {
+): Promise<{ maxZoom: number; online: boolean } | null> {
   try {
+    if (isTileTemplate(url)) {
+      const res = await fetchFn(url.replace("{z}", "0").replace("{x}", "0").replace("{y}", "0"));
+      return res.ok ? { maxZoom: BASEMAP_MAX_DATA_ZOOM, online: true } : null;
+    }
     const res = await fetchFn(url, { headers: { Range: `bytes=0-${HEADER_BYTES - 1}` } });
     if (!res.ok) return null;
     const head = new Uint8Array(await res.arrayBuffer());
     if (new TextDecoder().decode(head.slice(0, PMTILES_MAGIC.length)) !== PMTILES_MAGIC) return null;
     const z = head.length > MAX_ZOOM_BYTE ? head[MAX_ZOOM_BYTE] : BASEMAP_MAX_DATA_ZOOM;
-    return { maxZoom: z >= 1 && z <= BASEMAP_MAX_DATA_ZOOM ? z : BASEMAP_MAX_DATA_ZOOM };
+    return { maxZoom: z >= 1 && z <= BASEMAP_MAX_DATA_ZOOM ? z : BASEMAP_MAX_DATA_ZOOM, online: false };
   } catch {
     return null;
   }
