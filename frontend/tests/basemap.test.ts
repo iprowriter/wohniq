@@ -8,6 +8,7 @@ import {
   BERLIN_INK_FLAVOR,
   ONLINE_TILE_PATTERNS,
   basemapAvailable,
+  basemapInfo,
   basemapUrl,
 } from "../lib/map/basemap.ts";
 
@@ -62,12 +63,35 @@ describe("offline base map", () => {
         return new Response(body, { status });
       }) as typeof fetch;
     assert.equal(await basemapAvailable("x", ok("PMTiles")), true);
-    assert.deepEqual(calls[0].headers, { Range: "bytes=0-6" });
+    assert.deepEqual(calls[0].headers, { Range: "bytes=0-126" });
     assert.equal(await basemapAvailable("x", ok("<html>")), false);
     assert.equal(await basemapAvailable("x", ok("", 404)), false);
     const failing = (async () => {
       throw new TypeError("network down");
     }) as typeof fetch;
     assert.equal(await basemapAvailable("x", failing), false);
+  });
+
+  test("the max zoom comes from the file's own header (a smaller hosted copy works)", async () => {
+    const header = (maxZoom: number) => {
+      const b = new Uint8Array(127);
+      b.set(new TextEncoder().encode("PMTiles"), 0);
+      b[7] = 3; // version
+      b[101] = maxZoom;
+      return (async () => new Response(b, { status: 206 })) as typeof fetch;
+    };
+    assert.deepEqual(await basemapInfo("x", header(15)), { maxZoom: 15 });
+    assert.deepEqual(await basemapInfo("x", header(14)), { maxZoom: 14 });
+    assert.deepEqual(await basemapInfo("x", header(0)), { maxZoom: 15 }); // nonsense → default
+  });
+
+  test("the local build file really says zoom 15 at byte 101", async () => {
+    const { existsSync, openSync, readSync } = await import("node:fs");
+    const file = "../backend/data/berlin/build/map/berlin.pmtiles";
+    if (!existsSync(file)) return; // no build on this machine
+    const buf = Buffer.alloc(127);
+    readSync(openSync(file, "r"), buf, 0, 127, 0);
+    const fetchFn = (async () => new Response(buf, { status: 206 })) as typeof fetch;
+    assert.deepEqual(await basemapInfo("x", fetchFn), { maxZoom: 15 });
   });
 });

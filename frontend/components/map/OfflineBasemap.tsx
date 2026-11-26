@@ -13,9 +13,8 @@ import { useMap } from "react-leaflet";
 import type L from "leaflet";
 import {
   BASEMAP_ATTRIBUTION,
-  BASEMAP_MAX_DATA_ZOOM,
   BERLIN_INK_FLAVOR,
-  basemapAvailable,
+  basemapInfo,
   basemapUrl,
 } from "@/lib/map/basemap";
 
@@ -34,10 +33,10 @@ export function OfflineBasemap({ onStatus, attributionSuffix }: Props) {
     const url = basemapUrl();
 
     (async () => {
-      const available = await basemapAvailable(url);
+      const info = await basemapInfo(url);
       if (cancelled) return;
-      onStatus?.(available);
-      if (!available) return;
+      onStatus?.(info !== null);
+      if (!info) return;
       // protomaps-leaflet touches `window` on import: load it only in the browser.
       const { leafletLayer, paintRules, labelRules } = await import("protomaps-leaflet");
       if (cancelled) return;
@@ -47,7 +46,7 @@ export function OfflineBasemap({ onStatus, attributionSuffix }: Props) {
         paintRules: paintRules(flavor),
         labelRules: labelRules(flavor, "de"),
         backgroundColor: BERLIN_INK_FLAVOR.background,
-        maxDataZoom: BASEMAP_MAX_DATA_ZOOM,
+        maxDataZoom: info.maxZoom, // from the file itself (a hosted copy may stop at 14)
         attribution: attributionSuffix
           ? `${BASEMAP_ATTRIBUTION} · ${attributionSuffix}`
           : BASEMAP_ATTRIBUTION,

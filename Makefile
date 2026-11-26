@@ -3,7 +3,7 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture berlin-data berlin-load demo-all demo-extend eval-neighborhoods test test-all lint frontend-test format frontend-dev
+.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture berlin-data berlin-load demo-all demo-extend map-web eval-neighborhoods test test-all lint frontend-test format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
@@ -31,6 +31,7 @@ help:
 	@echo "neighborhoods-data Rebuild the Berlin Neighbourhoods bundle from data/neighborhoods/raw/"
 	@echo "berlin-data    Build rent index, addresses, stops, schools… from Berlin Visualized raw files (BERLIN_RAW_DIR)"
 	@echo "berlin-load    Load the berlin-data build into Supabase (needs make migrate)"
+	@echo "map-web        Zoom-14 copy of the map (~38 MB) for hosting, e.g. Supabase Storage (needs: brew install pmtiles)"
 	@echo "neighborhoods-fixture Refresh the frontend's neighbourhoods contract fixture from the API"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "test-all       Run pytest including slow tests (e.g. Lifestyle data rebuild)"
@@ -120,6 +121,13 @@ neighborhoods-data:
 
 berlin-data:
 	cd backend && uv run python -m data.berlin.build $(ARGS)
+
+# A copy of the offline map small enough for a 50 MB upload limit (Supabase Storage free
+# plan). Deeper zooms reuse zoom 14; the app reads the max zoom from the file's header.
+map-web:
+	@command -v pmtiles >/dev/null || { echo "pmtiles CLI missing: brew install pmtiles"; exit 1; }
+	pmtiles extract backend/data/berlin/build/map/berlin.pmtiles backend/data/berlin/build/map/berlin-web.pmtiles --maxzoom=14
+	@ls -lh backend/data/berlin/build/map/berlin-web.pmtiles
 
 berlin-load:
 	cd backend && uv run python -m data.berlin.load $(ARGS)

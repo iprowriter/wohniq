@@ -145,17 +145,32 @@ export const ONLINE_TILE_PATTERNS: RegExp[] = [
 /** First bytes of every PMTiles v3 file. */
 export const PMTILES_MAGIC = "PMTiles";
 
-/** Is the map file reachable? One 7-byte range request (no full download). */
-export async function basemapAvailable(
+/** PMTiles v3 header: 127 bytes; the archive's max zoom is byte 101. */
+const HEADER_BYTES = 127;
+const MAX_ZOOM_BYTE = 101;
+
+/**
+ * Is the map file reachable, and up to which zoom does it hold data? One small range request
+ * for the header (no full download). A smaller hosted copy (e.g. cut to zoom 14 to fit a
+ * 50 MB upload limit) is then drawn correctly: deeper zooms reuse its last level.
+ */
+export async function basemapInfo(
   url = basemapUrl(),
   fetchFn: typeof fetch = fetch,
-): Promise<boolean> {
+): Promise<{ maxZoom: number } | null> {
   try {
-    const res = await fetchFn(url, { headers: { Range: "bytes=0-6" } });
-    if (!res.ok) return false;
-    const head = new TextDecoder().decode(await res.arrayBuffer());
-    return head.startsWith(PMTILES_MAGIC);
+    const res = await fetchFn(url, { headers: { Range: `bytes=0-${HEADER_BYTES - 1}` } });
+    if (!res.ok) return null;
+    const head = new Uint8Array(await res.arrayBuffer());
+    if (new TextDecoder().decode(head.slice(0, PMTILES_MAGIC.length)) !== PMTILES_MAGIC) return null;
+    const z = head.length > MAX_ZOOM_BYTE ? head[MAX_ZOOM_BYTE] : BASEMAP_MAX_DATA_ZOOM;
+    return { maxZoom: z >= 1 && z <= BASEMAP_MAX_DATA_ZOOM ? z : BASEMAP_MAX_DATA_ZOOM };
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** Is the map file reachable? */
+export async function basemapAvailable(url = basemapUrl(), fetchFn: typeof fetch = fetch): Promise<boolean> {
+  return (await basemapInfo(url, fetchFn)) !== null;
 }

@@ -344,8 +344,13 @@ plus the deterministic seed-42 generator, so it matches the live database. In of
 
 The backend image (`backend/Dockerfile`) leaves out the Berlin build (`.dockerignore`):
 live mode reads the Berlin tables from Supabase. The map file is then not served by the API,
-so point `NEXT_PUBLIC_MAP_TILES_URL` at a copy (for example a public Supabase Storage object);
-without it, maps show area outlines on a plain background. For a self-contained offline
+so point `NEXT_PUBLIC_MAP_TILES_URL` (Vercel, build time) at a hosted copy; without it, maps
+show area outlines on a plain background. The full file (98 MB) is over the Supabase free
+plan's 50 MB upload limit, so `make map-web` cuts a zoom-14 copy (about 38 MB; deeper zooms
+reuse zoom 14, and the app reads the max zoom from the file's header). Upload it to a
+public Supabase Storage bucket and use its public URL,
+`https://<project>.supabase.co/storage/v1/object/public/<bucket>/berlin.pmtiles`.
+Railway's CORS variable is `FRONTEND_ORIGINS` (comma-separated). For a self-contained offline
 container, remove `data/berlin/build/` from `.dockerignore` (adds about 110 MB) and run with
 `WOHNIQ_DEMO=1`.
 
