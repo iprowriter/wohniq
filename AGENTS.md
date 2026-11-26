@@ -64,6 +64,7 @@ Backend is managed with **uv**: `uv sync` builds `.venv` from `pyproject.toml` +
 # Backend (or use the Makefile targets from repo root)
 cd backend && uv sync                             # install deps (incl. dev group)
 uv run uvicorn app.main:app --reload              # run API
+make demo-all                                     # from repo root: offline API + UI together (Ctrl+C stops both)
 uv run pytest                                     # run tests + evals
 uv run ruff check . && uv run black --check .     # lint/format
 

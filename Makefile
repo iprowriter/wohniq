@@ -3,7 +3,7 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture berlin-data berlin-load eval-neighborhoods test test-all lint frontend-test format frontend-dev
+.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture berlin-data berlin-load demo-all eval-neighborhoods test test-all lint frontend-test format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
@@ -23,6 +23,7 @@ help:
 	@echo "neighboorhood  Populate neighboorhood_cache table"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "demo           Run the backend in offline demo mode (no DB/APIs; WOHNIQ_DEMO=1)"
+	@echo "demo-all       Offline backend (:8000) + frontend (:3000) together; Ctrl+C stops both"
 	@echo "demo-photos    Download local copies of demo photos (run once while online)"
 	@echo "demo-stops     Download VBB stops + peak network for offline commute estimates (once, online)"
 	@echo "lifestyle-data Rebuild Lifestyle Match region profiles from the official files in data/lifestyle/raw/"
@@ -89,6 +90,14 @@ dev:
 
 demo:
 	cd backend && WOHNIQ_DEMO=1 uv run uvicorn app.main:app --reload
+
+# Both servers in one terminal, no extra package: Ctrl+C (or either server exiting)
+# stops the other one too.
+demo-all:
+	@trap 'kill 0' INT TERM EXIT; \
+	(cd backend && WOHNIQ_DEMO=1 uv run uvicorn app.main:app --reload --port 8000) & \
+	(cd frontend && npm run dev -- --port 3000) & \
+	wait -n 2>/dev/null || wait
 
 demo-photos:
 	cd backend && uv run python -m data.fetch_demo_photos

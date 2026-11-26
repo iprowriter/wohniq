@@ -310,8 +310,8 @@ always use `DATABASE_URL`.
 ```bash
 make demo-photos   # once, while online: local copies of listing photos (~141 files)
 make demo-stops    # once, while online: VBB stops + weekday-peak network (takes a few minutes)
-make demo          # backend on :8000 (WOHNIQ_DEMO=1)
-make frontend-dev  # frontend on :3000
+make demo-all      # backend on :8000 (WOHNIQ_DEMO=1) + frontend on :3000; Ctrl+C stops both
+# or separately: make demo (backend) and make frontend-dev (frontend), in two terminals
 ```
 
 Data comes from `backend/data/demo/` (exported with `python -m data.export_demo_data`)
