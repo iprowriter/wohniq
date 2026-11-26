@@ -12,15 +12,40 @@ Embeddings for semantic search need Gemini: `make embed` when a key is set.
 
 from __future__ import annotations
 
+import json
 import sys
+import uuid
 
 from sqlalchemy import select
 
 from core.db import get_sessionmaker
+from data.demo_repository import DEMO_DIR
 from data.models import Listing, Photo
 from data.photo_assign import assign_from_existing
 from data.seed_listings import _to_orm
 from data.synthetic import generate_catalogue
+
+
+def _demo_photo_rows(set_ids: set[str]) -> dict[str, list[dict]]:
+    try:
+        demo = json.loads((DEMO_DIR / "photos.json").read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+    out: dict[str, list[dict]] = {}
+    for r in demo:
+        if r["photo_set_id"] in set_ids:
+            out.setdefault(r["photo_set_id"], []).append(
+                {
+                    "id": uuid.UUID(r["id"]),
+                    "photo_set_id": uuid.UUID(r["photo_set_id"]),
+                    "source_url": r["source_url"],
+                    "room_type": r["room_type"],
+                    "position": r["position"],
+                    "phash": r["phash"],
+                    "attribution": r["attribution"],
+                }
+            )
+    return out
 
 
 def main() -> int:
@@ -46,7 +71,12 @@ def main() -> int:
         need_photos = sorted(
             {x.photo_set_id for x in new if str(x.photo_set_id) not in known_sets}, key=str
         )
-        rows = assign_from_existing(need_photos, existing_rows)
+        # Same photos as the offline demo files when they have the set (make demo-extend),
+        # so demo and live show the same flat; otherwise draw from existing photos.
+        demo = _demo_photo_rows({str(s) for s in need_photos})
+        rest = [s for s in need_photos if str(s) not in demo]
+        rows = [r for s in need_photos if str(s) in demo for r in demo[str(s)]]
+        rows += assign_from_existing(rest, existing_rows)
         session.add_all(_to_orm(x) for x in new)
         session.add_all(Photo(**r) for r in rows)
         session.commit()

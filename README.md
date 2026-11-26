@@ -158,31 +158,33 @@ Evaluated against 20 canonical queries covering budget-only, location-only, vagu
 
 ### Scam detector (F7)
 
-Evaluated against the labeled synthetic set. Precision was the tuning target — avoid crying wolf on cheap-but-legit listings.
+Evaluated against the labeled synthetic set: all 164 listings (the original 100, the 40 wording listings of [ADR-0018](docs/adr/0018-offline-scam-wording-check.md) and 24 in Marzahn-Hellersdorf and Reinickendorf), without the LLM text pass (`make eval-scam ARGS='--no-llm'`). Precision is the tuning target: never cry wolf on a cheap-but-legit listing.
 
 | | Predicted scam | Predicted legit |
 |---|---|---|
-| **Actual scam** | 12 TP | 3 FN |
-| **Actual legit** | 2 FP | 83 TN |
+| **Actual scam** | 25 TP | 8 FN |
+| **Actual legit** | 0 FP | 131 TN |
 
 | Metric | Result |
 |---|---|
-| Precision | 86% |
-| Recall | 80% |
-| F1 | 0.83 |
+| Precision | 100% |
+| Recall | 76% |
+| F1 | 0.86 |
 | Accuracy | 95% |
-| Hard negatives cleared | 6 / 8 |
+| Tricky-but-honest listings cleared | 20 / 20 |
 
 **Recall by scam type:**
 
 | Type | Caught | Recall |
 |---|---|---|
-| advance_fee | 4 / 4 | 100% |
-| overseas_landlord | 4 / 4 | 100% |
-| price_bait | 4 / 4 | 100% |
-| photo_reuse | 0 / 3 | 0% |
+| advance_fee | 9 / 9 | 100% |
+| overseas_landlord | 8 / 8 | 100% |
+| price_bait | 6 / 6 | 100% |
+| fake_platform | 2 / 2 | 100% |
+| photo_reuse | 0 / 6 | 0% |
+| subtle | 0 / 2 | 0% |
 
-Photo-reuse recall is 0% because pHash matching against hotlinked Pexels URLs requires fetching image bytes, which the test environment does not do. The signal works in production (the seeder fetches bytes at seed time); the eval isolates this as a known gap.
+Price checks compare with the official rent index ([ADR-0017](docs/adr/0017-rent-check-and-scam-price-signal.md)); the wording check reads English and German offline. Photo-reuse recall is 0% in this eval because pHash matching needs the image bytes, which the eval does not fetch; the signal works when photos are hashed at seed time. The two "subtle" scams have no telltale phrase by design: they mark what rules alone can't catch.
 
 ### Lifestyle Match (F9)
 
