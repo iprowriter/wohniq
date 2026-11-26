@@ -43,3 +43,6 @@ class FakeRepository:
 
     def commute(self, lat, lng, work_location):
         return None
+
+    def enrich(self, points, work_location, *, timeout_s):
+        return [(self.neighborhood(a, b), self.commute(a, b, work_location)) for a, b in points]

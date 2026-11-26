@@ -43,3 +43,14 @@ def offline_berlin_data(monkeypatch):
     import app.main as main
 
     monkeypatch.setattr(main, "_warm_listing_locations", lambda data: None)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_memos():
+    """Process-level memories (ADR-0022) must not leak fake answers between tests."""
+    from enrich.commute import _resolve_cached
+    from search.explanation import _cache
+
+    _resolve_cached.cache_clear()
+    _cache.clear()
+    yield

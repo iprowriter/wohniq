@@ -15,6 +15,9 @@ as if it were a real journey.
 
 from __future__ import annotations
 
+import threading
+from functools import lru_cache
+
 import httpx
 from sqlalchemy.orm import Session
 
@@ -39,12 +42,34 @@ def resolve_location(query: str) -> dict | None:
     """Resolve a free-text place name to a transit stop."""
     resp = httpx.get(
         f"{BASE_URL}/locations",
-        params={"query": query, "results": 1, "fuzzy": "true", "addresses": "false", "poi": "false"},
+        params={
+            "query": query,
+            "results": 1,
+            "fuzzy": "true",
+            "addresses": "false",
+            "poi": "false",
+        },
         timeout=15,
     )
     resp.raise_for_status()
     items = resp.json()
     return items[0] if items else None
+
+
+_resolve_lock = threading.Lock()
+
+
+@lru_cache(maxsize=256)
+def _resolve_cached(query: str) -> dict | None:
+    return resolve_location(query)
+
+
+def _resolve_memo(query: str) -> dict | None:
+    """`resolve_location` once per place name per process: a page of results shares the
+    destination (ADR-0022), and parallel lookups wait for the first instead of all
+    asking. Failures raise and are not remembered."""
+    with _resolve_lock:
+        return _resolve_cached(query)
 
 
 def fetch_first_journey(
@@ -121,6 +146,40 @@ def estimate_with_network(
     )
 
 
+def fetch_live_commute(
+    lat: float, lng: float, work_location: str
+) -> tuple[CommuteResult | None, dict | None]:
+    """A real BVG/VBB journey (network only, no database), and the stop it resolved."""
+    stop: dict | None = None
+    try:
+        stop = _resolve_memo(work_location.strip())
+        if stop and "id" in stop:
+            journey = fetch_first_journey(lat, lng, stop["id"])
+            return (parse_journey(journey) if journey else None), stop
+    except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully
+        # The destination is user input (typed in /search): not logged (ADR-0012).
+        logger.warning(
+            "commute lookup failed (origin %s): %s", _origin_key(lat, lng), type(exc).__name__
+        )
+    return None, stop
+
+
+def store_commute(
+    session: Session, lat: float, lng: float, work_location: str, result: CommuteResult
+) -> None:
+    """Remember a live journey (estimates are never stored)."""
+    session.add(
+        CommuteCache(
+            origin_key=_origin_key(lat, lng),
+            dest_key=work_location.strip().lower(),
+            minutes=result.minutes,
+            changes=result.changes,
+            walk_minutes=result.walk_minutes,
+        )
+    )
+    session.commit()
+
+
 def get_commute(
     session: Session,
     lat: float,
@@ -131,36 +190,13 @@ def get_commute(
     if not work_location:
         return None
 
-    origin_key = _origin_key(lat, lng)
-    dest_key = work_location.strip().lower()
-
-    cached = session.get(CommuteCache, (origin_key, dest_key))
+    cached = session.get(CommuteCache, (_origin_key(lat, lng), work_location.strip().lower()))
     if cached is not None:
         return CommuteResult(cached.minutes, cached.changes, cached.walk_minutes)
 
-    stop: dict | None = None
-    result: CommuteResult | None = None
-    try:
-        stop = resolve_location(work_location)
-        if stop and "id" in stop:
-            journey = fetch_first_journey(lat, lng, stop["id"])
-            result = parse_journey(journey) if journey else None
-    except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully
-        # The destination is user input (typed in /search): not logged (ADR-0012).
-        logger.warning("commute lookup failed (origin %s): %s", origin_key, type(exc).__name__)
-
+    result, stop = fetch_live_commute(lat, lng, work_location)
     if result is None:
         # Show an estimate rather than nothing; deliberately not cached.
         return estimate_commute_to(lat, lng, work_location, destination=_stop_coords(stop))
-
-    session.add(
-        CommuteCache(
-            origin_key=origin_key,
-            dest_key=dest_key,
-            minutes=result.minutes,
-            changes=result.changes,
-            walk_minutes=result.walk_minutes,
-        )
-    )
-    session.commit()
+    store_commute(session, lat, lng, work_location, result)
     return result

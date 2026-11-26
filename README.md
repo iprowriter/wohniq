@@ -123,9 +123,9 @@ Lifestyle answers are bounded choices (no free text, no addresses). The matching
 
 Same 143 areas and outlines as Lifestyle Match, with a separate, reproducible bundle: 40 metrics, each with `{source, year, method}`. Metric scores are percentiles against a fixed distribution, so they are robust to outliers and comparable across categories. Categories are weighted means and the overall weights are user-adjustable. Socio-economic data is used as a clearly named proxy with caveats. Land values are compared only within the same density class, as the Gutachterausschuss requires. Missing data (income per district) is shown as *pending* next to the Berlin-wide figure, never scored as zero. [→ ADR-0013](docs/adr/0013-berlin-neighborhoods.md)
 
-### ADR-0016 to ADR-0021 — Berlin open data, rent check, offline
+### ADR-0016 to ADR-0022 — Berlin open data, rent check, offline, fast search
 
-Berlin's open data lives in its own Supabase tables (PostGIS) and in local build files read by the same interface, with a parity test between the two ([0016](docs/adr/0016-berlin-open-data-in-supabase.md)). Raw files are never committed: only the build script and SHA-256 checksums. The rent check follows the Mietspiegel brochure, and the scam price signal compares with the rent index instead of the neighbourhood median, which flags no honest listing ([0017](docs/adr/0017-rent-check-and-scam-price-signal.md)). An offline wording check reads landlord text in English and German, with negation ([0018](docs/adr/0018-offline-scam-wording-check.md)). Maps draw one local PMTiles file ([0019](docs/adr/0019-offline-basemap-and-berlin-ink-foundations.md)). Saved searches stay in the browser ([0020](docs/adr/0020-saved-searches-in-the-browser.md)). The deployed site can draw the same map style from the Protomaps API instead ([0021](docs/adr/0021-online-tiles-for-deployment.md)).
+Berlin's open data lives in its own Supabase tables (PostGIS) and in local build files read by the same interface, with a parity test between the two ([0016](docs/adr/0016-berlin-open-data-in-supabase.md)). Raw files are never committed: only the build script and SHA-256 checksums. The rent check follows the Mietspiegel brochure, and the scam price signal compares with the rent index instead of the neighbourhood median, which flags no honest listing ([0017](docs/adr/0017-rent-check-and-scam-price-signal.md)). An offline wording check reads landlord text in English and German, with negation ([0018](docs/adr/0018-offline-scam-wording-check.md)). Maps draw one local PMTiles file ([0019](docs/adr/0019-offline-basemap-and-berlin-ink-foundations.md)). Saved searches stay in the browser ([0020](docs/adr/0020-saved-searches-in-the-browser.md)). The deployed site can draw the same map style from the Protomaps API instead ([0021](docs/adr/0021-online-tiles-for-deployment.md)). A live search shows results in seconds with rule-based explanations and swaps in the model's wording after, from one batched call per ten flats; slow outside services get time limits with offline answers ([0022](docs/adr/0022-fast-hybrid-search.md)).
 ---
 
 ## Stack
@@ -353,7 +353,11 @@ domain in the Protomaps dashboard). Alternatively host a PMTiles copy: the full 
 is over the Supabase free plan's 50 MB upload limit, so `make map-web` cuts a zoom-14 copy
 (about 38 MB; the app reads the max zoom from the file's header) for a public Supabase
 Storage bucket. Without the variable, maps show area outlines on a plain background.
-Railway's CORS variable is `FRONTEND_ORIGINS` (comma-separated). For a self-contained offline
+Railway's CORS variable is `FRONTEND_ORIGINS` (comma-separated). Use Supabase's
+**transaction pooler** for `DATABASE_URL` (same host, port 6543): the session pooler (5432)
+allows 15 clients in total and a parallel search runs out of them
+([ADR-0022](docs/adr/0022-fast-hybrid-search.md)). `GEMINI_CHAT_MODEL` changes the Gemini
+model without a code change. For a self-contained offline
 container, remove `data/berlin/build/` from `.dockerignore` (adds about 110 MB) and run with
 `WOHNIQ_DEMO=1`.
 

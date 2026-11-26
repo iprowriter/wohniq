@@ -28,6 +28,7 @@ from enrich.commute import get_commute
 from enrich.commute_parse import CommuteResult
 from enrich.neighborhood import get_neighborhood
 from enrich.neighborhood_parse import NeighborhoodResult
+from enrich.page import Enriched, enrich_page
 from search.criteria import SearchCriteria
 from search.retrieval import RetrievalResult, retrieve
 
@@ -58,6 +59,12 @@ class ListingRepository(Protocol):
     def commute(
         self, lat: float, lng: float, work_location: str | None
     ) -> CommuteResult | None: ...
+
+    def enrich(
+        self, points: list[tuple[float, float]], work_location: str | None, *, timeout_s: float
+    ) -> list[Enriched]:
+        """(neighbourhood, commute) per point, answering within about `timeout_s`."""
+        ...
 
 
 class SqlRepository:
@@ -130,6 +137,26 @@ class SqlRepository:
 
     def commute(self, lat: float, lng: float, work_location: str | None) -> CommuteResult | None:
         return get_commute(self.session, lat, lng, work_location)
+
+    def enrich(
+        self, points: list[tuple[float, float]], work_location: str | None, *, timeout_s: float
+    ) -> list[Enriched]:
+        """Parallel live lookups with an offline answer after `timeout_s` (ADR-0022)."""
+        return enrich_page(
+            self.session,
+            get_sessionmaker(),
+            points,
+            work_location,
+            timeout_s=timeout_s,
+            offline_neighborhood=_bundled_neighborhood,
+        )
+
+
+def _bundled_neighborhood(lat: float, lng: float) -> NeighborhoodResult | None:
+    """The neighbourhood counts shipped with the offline demo, for the same listings."""
+    from data.demo_repository import get_demo_repository
+
+    return get_demo_repository().neighborhood(lat, lng)
 
 
 def get_repository() -> Iterator[ListingRepository]:

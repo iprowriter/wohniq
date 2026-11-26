@@ -24,6 +24,19 @@ class Settings(BaseSettings):
     # Gemini (LLM + embeddings). Empty by default so the app boots without a key;
     # the LLM client checks for presence before making calls.
     gemini_api_key: str = ""
+    # Chat model id (GEMINI_CHAT_MODEL). Google retires ids and new keys may not get old
+    # ones, so it is a setting, changeable on Railway without a deploy of new code.
+    gemini_chat_model: str = "gemini-2.5-flash"
+    # Thinking tokens per call (GEMINI_THINKING_BUDGET). 0 = off: parsing and explaining
+    # are short structured tasks and thinking roughly doubles their latency. -1 = the
+    # model's default. Models that can't turn thinking off ignore it (core/llm.py).
+    gemini_thinking_budget: int = 0
+
+    # Fast search (ADR-0022): time limits, in seconds, after which the deterministic
+    # path answers instead of waiting.
+    search_parse_timeout_s: float = 4.0  # Gemini query parsing; keyword parser otherwise
+    search_explain_timeout_s: float = 25.0  # one batch of AI explanations
+    search_enrich_timeout_s: float = 2.5  # live trip times + neighbourhood lookups
 
     # Supabase / Postgres
     database_url: str = ""
@@ -97,6 +110,13 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.frontend_origins.split(",") if o.strip()]
+
+    @property
+    def db_connect_args(self) -> dict:
+        """psycopg options for every engine. No server-side prepared statements, so the
+        Supabase transaction pooler (port 6543) works: it shares few database connections
+        among many clients, where the session pooler (5432) refuses a 16th (ADR-0022)."""
+        return {"prepare_threshold": None}
 
     @property
     def sqlalchemy_url(self) -> str:

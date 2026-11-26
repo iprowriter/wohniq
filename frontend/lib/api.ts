@@ -1,6 +1,7 @@
 import type {
   AddressOut,
   CommuteOut,
+  ExplainResponse,
   ListingDetailResponse,
   ListingOut,
   MapStop,
@@ -36,6 +37,19 @@ export async function search(
   if (!res.ok) {
     throw new Error(`Search failed (${res.status})`);
   }
+  return res.json();
+}
+
+/** The model's explanations for a page of results (ADR-0022). Body: criteria + score
+ * breakdowns, never in the URL; nothing here is logged by the API. */
+export async function getExplanations(body: object, signal?: AbortSignal): Promise<ExplainResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/search/explanations`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok) throw new Error(`Explanations failed (${res.status})`);
   return res.json();
 }
 

@@ -64,11 +64,13 @@ Score and order listings with a transparent, inspectable function (commute fit, 
 For each ranked result, produce a short natural-language rationale grounded in its scores.
 - **AC1.** Every claim in the explanation maps to a real data point (commute minutes, € delta, amenity count) — no invented facts.
 - **AC2.** Explanations are generated from the structured score breakdown, not free-form over raw listings.
+- **AC3 (ADR-0022).** Results never wait for the model: they show the rule-based explanation from the same breakdown, and the model's wording replaces it when it arrives (one call per ten results). If the model fails, is slow or writes an invalid item, that result keeps the rule-based text.
 
 ### F5 — Commute analysis
 Compute public-transport travel time from each listing to the user's work location.
 - **AC1.** Uses the free BVG/VBB transit API; results cached per (origin, destination).
 - **AC2.** Returns door-to-door minutes + number of changes; degrades gracefully if the API is unavailable.
+- **AC3 (ADR-0022).** A page's lookups run in parallel; any not answered within 2.5 s show the offline estimate, labelled as one, and still fill the cache for the next search.
 
 ### F6 — Neighborhood insights
 Summarize each listing's Kiez: cafes, parks, supermarkets, nightlife, transport.
@@ -133,7 +135,7 @@ Every listing and any Berlin address checked against the Berliner Mietspiegel 20
 2. Parser → `SearchCriteria` (F1).
 3. Retrieval (F2) → candidate set.
 4. Ranking (F3) enriched with commute (F5), neighborhood (F6), risk (F7).
-5. Results render as cards with explanation (F4) and a risk badge (F7).
+5. Results render as cards with explanation (F4) and a risk badge (F7); the model's wording of the explanations follows a few seconds later (ADR-0022).
 6. User opens a listing for detail, or selects several to compare (F8).
 
 **Lifestyle Match flow (F9)**

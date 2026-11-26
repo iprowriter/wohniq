@@ -24,7 +24,12 @@ def get_engine() -> Engine:
         )
     # pool_pre_ping survives Supabase free-tier connection drops after idle pauses.
     # sqlalchemy_url pins the psycopg (v3) driver.
-    return create_engine(settings.sqlalchemy_url, pool_pre_ping=True, future=True)
+    return create_engine(
+        settings.sqlalchemy_url,
+        pool_pre_ping=True,
+        future=True,
+        connect_args=settings.db_connect_args,
+    )
 
 
 @lru_cache(maxsize=1)
