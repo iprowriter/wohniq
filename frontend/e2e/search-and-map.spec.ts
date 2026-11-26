@@ -39,6 +39,42 @@ test("Definition of Done: districts in the query are respected and every match i
   }
 });
 
+test("results show at once with rule-based text; the model's wording is swapped in after (ADR-0022)", async ({ page }) => {
+  // Hold the explanations back to prove the results don't wait for them, then answer
+  // with model wording for the first flat only.
+  let release: () => void = () => {};
+  const held = new Promise<void>((r) => (release = r));
+  await page.route("**/api/v1/search/explanations", async (route) => {
+    const body = route.request().postDataJSON() as { criteria: object; items: { listing_id: string; factors: unknown[] }[] };
+    expect(body.items.length).toBeGreaterThan(0);
+    expect(body.criteria).toBeTruthy();
+    await held;
+    const items = body.items.map((it, i) => ({
+      listing_id: it.listing_id,
+      source: i === 0 ? "ai" : "rules",
+      explanation: { summary: i === 0 ? "Model wording: in Mitte as you asked." : "ignored", reasons: [], caveats: [] },
+    }));
+    await route.fulfill({ json: { items } });
+  });
+  await searchFor(page, REPORTED);
+  const why = page.getByTestId("result-why");
+  await expect(why.first()).toHaveAttribute("data-source", "pending");
+  const rulesText = await why.nth(1).innerText();
+  release();
+  await expect(why.first()).toHaveText("Model wording: in Mitte as you asked.");
+  await expect(why.first()).toHaveAttribute("data-source", "ai");
+  await expect(why.nth(1)).toHaveAttribute("data-source", "rules");
+  await expect(why.nth(1)).toHaveText(rulesText);
+});
+
+test("a failed explanations request leaves the rule-based text in place", async ({ page }) => {
+  await page.route("**/api/v1/search/explanations", (route) => route.fulfill({ status: 500, body: "" }));
+  await searchFor(page, REPORTED);
+  const summaries = await page.getByTestId("result-why").allInnerTexts();
+  expect(summaries.length).toBeGreaterThan(0);
+  for (const s of summaries) expect(s.trim().length).toBeGreaterThan(10);
+});
+
 test("Definition of Done: a too-low budget is explained, with a one-click minimum budget", async ({ page }) => {
   await searchFor(page, "quiet flat in Mitte budget €300");
   const notice = page.locator("[data-kind=budget_too_low]");

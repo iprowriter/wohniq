@@ -163,6 +163,37 @@ Rules:
 
 ---
 
+## `explain.batch.v1` — Match explanations for a page, in one call
+
+**Purpose:** the same job as `explain.v2` for up to 10 listings at once, so a page of 20
+results costs 2 calls instead of 20 (ADR-0022). Called by `POST /search/explanations` after
+the page already shows the rule-based explanations.
+
+**Input:** each listing's `explain.v2` input, headed `Listing #n` (n = 1…10).
+
+**Output schema:**
+```python
+class BatchItem(BaseModel):
+    ref: int                # the n of "Listing #n"
+    summary: str
+    reasons: list[str]
+    caveats: list[str]
+
+class ExplanationBatch(BaseModel):
+    items: list[BatchItem]
+```
+
+**System prompt:** the `explain.v2` prompt with three changes (`search/explanation.py` derives it from that prompt and a test checks the derivation):
+- "why a specific listing fits" becomes "why each of several listings fits"; the breakdowns are "headed \"Listing #n\"".
+- Output: "ONLY the JSON object {\"items\": [...]}: one item per listing, with \"ref\" set to its number n and its summary, reasons and caveats."
+- Added: "Each item uses ONLY its own listing's breakdown; never carry a value from one listing to another."
+
+**Validation:** malformed JSON is re-prompted once. Then every item is validated as an `Explanation` on its own (the generic-summary check included); items with an unknown or repeated `ref` are ignored.
+
+**Fallback:** per item. Any listing without a valid item, or every listing when the call fails or exceeds its time limit, keeps the deterministic template.
+
+---
+
 ## Cross-cutting prompt conventions
 
 - **Temperature:** low (≈0.2) for parser and scam_text (determinism matters); slightly higher (≈0.5) acceptable for explanations.
@@ -175,4 +206,5 @@ Rules:
 - **v1 (2026-06-15):** Initial parser, scam_text, and explain prompts.
 - **parser.v2:** adds `areas` / `excluded_areas` (Berlin districts, neighbourhoods, nicknames). Previously districts were discarded, so "a quiet flat in Mitte, Spandau, Lichtenberg, Treptow" became just `quiet_priority` and results came from anywhere. `work_location` is now explicitly the workplace only.
 - **parser.v2, code-side rule (no prompt change, so no version bump):** after the call, the model's `work_location` is dropped if it is a Berlin area the text doesn't describe as a workplace, and a workplace area the text names but the model missed is added — the same rule the keyword parser applies, so live and offline mode agree.
+- **explain.batch.v1 (ADR-0022):** `explain.v2` for up to 10 listings per call, validated and falling back per item.
 - **explain.v2:** summary must name the criteria it matches (area, budget, quiet, commute, amenities, rooms/size) instead of a bare "A strong match for your search"; generic summaries fail validation. Input gains listing facts and requirements met; area fit is a factor.

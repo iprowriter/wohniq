@@ -10,11 +10,20 @@ v2: the summary must say *why* it's a match — naming the strongest matched cri
 with their values — instead of a bare "A strong match for your search." The model
 also sees the listing facts and the hard requirements it meets (rooms, size,
 furnished), and a summary that only grades the match fails validation.
+
+explain.batch.v1 (ADR-0022): the same rules for up to BATCH_SIZE listings in ONE call, so
+a page of results costs one or two requests instead of one per flat. Each returned item
+is validated as an `Explanation` on its own; an invalid or missing one gets the template,
+the others keep the model's text.
 """
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, field_validator
+import threading
+from collections import OrderedDict
+from concurrent.futures import ThreadPoolExecutor
+
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from core.llm import Transport, generate_structured
 from search.explain_rules import (
@@ -136,3 +145,136 @@ def explain(
         fallback=lambda: template_fallback(result, context),
         transport=transport,
     ).data
+
+
+# --- Batched explanations (explain.batch.v1, ADR-0022) --------------------------------
+
+EXPLAIN_BATCH_PROMPT_ID = "explain.batch.v1"
+BATCH_SIZE = 10
+
+EXPLAIN_BATCH_SYSTEM = (
+    EXPLAIN_SYSTEM.replace("why a specific listing fits", "why each of several listings fits")
+    .replace(
+        "how this listing scored on each factor",
+        'how each listing scored on each factor, headed "Listing #n"',
+    )
+    .replace(
+        "- Output ONLY the JSON object (summary, reasons, caveats). No prose outside it.",
+        '- Output ONLY the JSON object {"items": [...]}: one item per listing, with '
+        '"ref" set to its number n and its summary, reasons and caveats. No prose '
+        "outside it.\n- Each item uses ONLY its own listing's breakdown; never carry a "
+        "value from one listing to another.",
+    )
+)
+
+
+class BatchItem(BaseModel):
+    """One explanation as the model returns it; checked as an `Explanation` afterwards."""
+
+    ref: int
+    summary: str
+    reasons: list[str] = Field(default_factory=list)
+    caveats: list[str] = Field(default_factory=list)
+
+
+class ExplanationBatch(BaseModel):
+    items: list[BatchItem]
+
+
+class _Cache:
+    """Model explanations by their exact input, so a repeated search costs no call."""
+
+    def __init__(self, size: int = 1024) -> None:
+        self._data: OrderedDict[str, Explanation] = OrderedDict()
+        self._size = size
+        self._lock = threading.Lock()
+
+    def get(self, key: str) -> Explanation | None:
+        with self._lock:
+            hit = self._data.get(key)
+            if hit is not None:
+                self._data.move_to_end(key)
+            return hit
+
+    def put(self, key: str, value: Explanation) -> None:
+        with self._lock:
+            self._data[key] = value
+            self._data.move_to_end(key)
+            while len(self._data) > self._size:
+                self._data.popitem(last=False)
+
+    def clear(self) -> None:
+        with self._lock:
+            self._data.clear()
+
+
+_cache = _Cache()
+_chunks = ThreadPoolExecutor(max_workers=4, thread_name_prefix="explain")
+
+
+def _explain_chunk(
+    texts: list[str], *, transport: Transport | None, timeout_s: float | None
+) -> list[Explanation | None]:
+    """One call for up to BATCH_SIZE breakdowns; None where the model gave nothing usable."""
+    user = "\n\n".join(f"Listing #{i}\n{t}" for i, t in enumerate(texts, 1))
+    result = generate_structured(
+        prompt_id=EXPLAIN_BATCH_PROMPT_ID,
+        system=EXPLAIN_BATCH_SYSTEM,
+        user=user,
+        schema=ExplanationBatch,
+        temperature=0.5,
+        fallback=lambda: ExplanationBatch(items=[]),
+        transport=transport,
+        timeout_s=timeout_s,
+    )
+    out: list[Explanation | None] = [None] * len(texts)
+    for item in result.data.items:
+        if not 1 <= item.ref <= len(texts) or out[item.ref - 1] is not None:
+            continue  # unknown or repeated ref: ignore, that listing keeps the template
+        try:
+            out[item.ref - 1] = Explanation(
+                summary=item.summary, reasons=item.reasons, caveats=item.caveats
+            )
+        except ValidationError:
+            continue
+    return out
+
+
+def explain_many(
+    items: list[tuple[RankingResult, MatchContext | None]],
+    *,
+    transport: Transport | None = None,
+    timeout_s: float | None = None,
+) -> list[tuple[Explanation, bool]]:
+    """(explanation, written_by_model) per item, in order. Never raises.
+
+    Cached explanations are reused; the rest go to the model BATCH_SIZE at a time, the
+    batches in parallel. Anything the model doesn't deliver gets the template.
+    """
+    texts = [_breakdown_text(r, c) for r, c in items]
+    out: list[tuple[Explanation, bool] | None] = [None] * len(items)
+    todo: list[int] = []
+    for i, t in enumerate(texts):
+        hit = _cache.get(t)
+        if hit is not None:
+            out[i] = (hit, True)
+        else:
+            todo.append(i)
+
+    groups = [todo[k : k + BATCH_SIZE] for k in range(0, len(todo), BATCH_SIZE)]
+    futures = [
+        _chunks.submit(
+            _explain_chunk, [texts[i] for i in g], transport=transport, timeout_s=timeout_s
+        )
+        for g in groups
+    ]
+    for g, fut in zip(groups, futures, strict=True):
+        for i, exp in zip(g, fut.result(), strict=True):
+            if exp is not None:
+                _cache.put(texts[i], exp)
+                out[i] = (exp, True)
+
+    return [
+        o if o is not None else (template_fallback(r, c), False)
+        for o, (r, c) in zip(out, items, strict=True)
+    ]

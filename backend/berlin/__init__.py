@@ -32,5 +32,6 @@ def get_berlin_data() -> BerlinData:
         max_overflow=5,
         pool_recycle=240,
         pool_pre_ping=False,
+        connect_args=settings.db_connect_args,
     )
     return PostgresBerlinData(engine)

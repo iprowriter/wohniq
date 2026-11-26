@@ -13,6 +13,12 @@ with commute + neighborhood and re-rank — so we don't pay ~20 Overpass/transit
 per search for listings we'll never show. (Neighborhood lookups can be pre-warmed into
 the cache; commute is per-query but cached per origin+destination.)
 
+Speed (ADR-0022): the page comes back in seconds. Parsing has a time limit (the keyword
+parser answers after it); the page's trip and neighbourhood lookups run in parallel with
+a time limit (offline answers after it); and results carry the rule-based explanation.
+The page then asks POST /search/explanations for the model's wording, one batched call
+per ten flats, and swaps it in.
+
 `is_scam`/`scam_type` are NEVER serialized (AGENTS rule).
 """
 
@@ -26,6 +32,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.repository import ListingRepository, get_repository
+from core.config import settings
 from core.logging import get_logger
 from data.kieze import ALL_KIEZE, BERLIN_BBOX
 from data.models import Listing, Photo, RiskAssessment
@@ -46,14 +53,16 @@ from search.diagnostics import (
     requirements_phrase,
 )
 from search.explain_rules import MatchContext
-from search.explanation import Explanation, explain
+from search.explanation import Explanation, explain, explain_many, template_fallback
 from search.parser import parse_query
 from search.ranking import (
     IN_AREA,
     NEARBY,
     OUTSIDE,
+    FactorScore,
     RankCriteria,
     RankingInput,
+    RankingResult,
     rank,
     score_listing,
 )
@@ -488,7 +497,7 @@ def _nearby_pool(
 def search(
     req: SearchRequest, repo: ListingRepository = Depends(get_repository)
 ) -> SearchResponse:
-    criteria = parse_query(req.query)
+    criteria = parse_query(req.query, timeout_s=settings.search_parse_timeout_s)
     if req.max_warm_rent is not None:
         criteria = criteria.model_copy(update={"max_warm_rent": req.max_warm_rent})
     rank_criteria = _rank_criteria(criteria)
@@ -536,10 +545,14 @@ def search(
     commute_by_id = {}
     neighborhood_by_id = {}
     enriched_inputs: list[RankingInput] = []
-    for inp, _ in page:
+    page_points = [
+        (listings_by_id[i.listing_id].lat, listings_by_id[i.listing_id].lng) for i, _ in page
+    ]
+    enriched = repo.enrich(
+        page_points, criteria.work_location, timeout_s=settings.search_enrich_timeout_s
+    )
+    for (inp, _), (neighborhood, commute) in zip(page, enriched, strict=True):
         listing = listings_by_id[inp.listing_id]
-        neighborhood = repo.neighborhood(listing.lat, listing.lng)
-        commute = repo.commute(listing.lat, listing.lng, criteria.work_location)
         if neighborhood is not None:
             neighborhood_by_id[inp.listing_id] = neighborhood
         if commute is not None:
@@ -569,7 +582,8 @@ def search(
                 listing=_to_listing_out(listing, photos_by_set.get(listing.photo_set_id, [])),
                 score=round(result.total, 4),
                 factors=[FactorOut(**vars(f)) for f in result.factors],
-                explanation=explain(result, context=_match_context(listing, criteria)),
+                # Rule-based now; the page fetches the model's wording separately.
+                explanation=template_fallback(result, _match_context(listing, criteria)),
                 risk=_to_risk_out(risk_by_id.get(inp.listing_id)),
                 commute=_to_commute_out(commute),
                 neighborhood=(
@@ -674,6 +688,76 @@ class MapListingOut(BaseModel):
 
 # Every listing inside Berlin; the map aggregates medians client-side from these.
 MAP_LISTINGS_LIMIT = 2000
+
+
+
+# --- AI explanations for a page of results (ADR-0022) ---------------------------------
+
+
+class FactorIn(BaseModel):
+    name: str = Field(max_length=32)
+    score: float = Field(ge=0, le=1)
+    weight: float = Field(ge=0, le=10)
+    detail: str = Field(max_length=300)
+    highlight: str = Field(default="", max_length=200)
+
+
+class ExplainItemIn(BaseModel):
+    listing_id: str = Field(max_length=64)
+    score: float = Field(ge=0, le=1)
+    factors: list[FactorIn] = Field(max_length=16)
+
+
+class ExplainRequest(BaseModel):
+    """What /search returned: the criteria and each result's score breakdown. The model
+    writes only from these numbers (golden rule 3); they describe the asker's own page."""
+
+    criteria: SearchCriteria
+    items: list[ExplainItemIn] = Field(min_length=1, max_length=20)
+
+
+class ExplainItemOut(BaseModel):
+    listing_id: str
+    explanation: Explanation
+    source: str  # "ai" (model wording) | "rules" (the template, as /search returned)
+
+
+class ExplainResponse(BaseModel):
+    items: list[ExplainItemOut]
+
+
+@router.post("/search/explanations", response_model=ExplainResponse)
+def search_explanations(
+    req: ExplainRequest, repo: Annotated[ListingRepository, Depends(get_repository)]
+) -> ExplainResponse:
+    """The model's explanations for results /search already returned, batched."""
+    ids: list[uuid.UUID] = []
+    for item in req.items:
+        try:
+            ids.append(uuid.UUID(item.listing_id))
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail="invalid listing id") from exc
+    listings = {str(x.id): x for x in repo.get_listings(ids)}
+    known = [i for i in req.items if i.listing_id in listings]
+    work = [
+        (
+            RankingResult(
+                total=i.score, factors=[FactorScore(**f.model_dump()) for f in i.factors]
+            ),
+            _match_context(listings[i.listing_id], req.criteria),
+        )
+        for i in known
+    ]
+    out = explain_many(work, timeout_s=settings.search_explain_timeout_s)
+    logger.info(
+        "search explanations items=%d ai=%d", len(known), sum(1 for _, ai in out if ai)
+    )
+    return ExplainResponse(
+        items=[
+            ExplainItemOut(listing_id=i.listing_id, explanation=e, source="ai" if ai else "rules")
+            for i, (e, ai) in zip(known, out, strict=True)
+        ]
+    )
 
 
 @router.get("/listings/map", response_model=list[MapListingOut])

@@ -143,6 +143,8 @@ export interface SearchResultItem {
   score: number;
   factors: FactorOut[];
   explanation: Explanation;
+  /** Set once the page has asked for the model's wording (ADR-0022); absent = rule-based. */
+  explanation_source?: "ai" | "rules";
   commute?: CommuteOut | null;
   neighborhood?: NeighborhoodOut | null;
   risk?: RiskOut | null;
@@ -161,6 +163,10 @@ export interface SearchCriteria {
   areas?: string[]; // Berlin areas to live in (hard filter)
   excluded_areas?: string[];
   notes?: string | null;
+}
+
+export interface ExplainResponse {
+  items: { listing_id: string; explanation: Explanation; source: "ai" | "rules" }[];
 }
 
 export interface SearchResponse {

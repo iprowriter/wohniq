@@ -43,6 +43,40 @@ def _from_cache(row: NeighborhoodCache) -> NeighborhoodResult:
     )
 
 
+def fetch_neighborhood(
+    lat: float, lng: float, *, radius: int = DEFAULT_RADIUS_M
+) -> NeighborhoodResult | None:
+    """Live Overpass counts for a coordinate (network only, no database), or None."""
+    try:
+        resp = httpx.post(
+            OVERPASS_URL,
+            data={"data": build_overpass_query(lat, lng, radius)},
+            headers=_OVERPASS_HEADERS,
+            timeout=5,
+        )
+        resp.raise_for_status()
+        return parse_overpass(resp.json())
+    except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully
+        logger.warning(
+            "neighborhood lookup failed (%s): %s", _location_key(lat, lng), type(exc).__name__
+        )
+        return None
+
+
+def store_neighborhood(
+    session: Session, lat: float, lng: float, result: NeighborhoodResult
+) -> None:
+    session.add(
+        NeighborhoodCache(
+            location_key=_location_key(lat, lng),
+            poi_counts=result.counts,
+            pois=result.pois,
+            summary=result.summary,
+        )
+    )
+    session.commit()
+
+
 def get_neighborhood(
     session: Session,
     lat: float,
@@ -55,37 +89,14 @@ def get_neighborhood(
 
     Pass cache_only=True to skip the live Overpass lookup (returns None when not cached).
     """
-    location_key = _location_key(lat, lng)
-
-    cached = session.get(NeighborhoodCache, location_key)
+    cached = session.get(NeighborhoodCache, _location_key(lat, lng))
     if cached is not None:
         return _from_cache(cached)
-
     if cache_only:
         return None
-
-    try:
-        resp = httpx.post(
-            OVERPASS_URL,
-            data={"data": build_overpass_query(lat, lng, radius)},
-            headers=_OVERPASS_HEADERS,
-            timeout=5,
-        )
-        resp.raise_for_status()
-        result = parse_overpass(resp.json())
-    except (httpx.HTTPError, ValueError) as exc:  # network/parse issues degrade gracefully
-        logger.warning("neighborhood lookup failed (%s): %s", location_key, exc)
-        return None
-
-    session.add(
-        NeighborhoodCache(
-            location_key=location_key,
-            poi_counts=result.counts,
-            pois=result.pois,
-            summary=result.summary,
-        )
-    )
-    session.commit()
+    result = fetch_neighborhood(lat, lng, radius=radius)
+    if result is not None:
+        store_neighborhood(session, lat, lng, result)
     return result
 
 

@@ -141,7 +141,7 @@ export function ResultCard({
           )}
           {area_match && <AreaBadge match={area_match} />}
         </div>
-        <p className="text-[14.5px] leading-relaxed text-text-body" data-testid="result-why">
+        <p className="text-[14.5px] leading-relaxed text-text-body" data-testid="result-why" data-source={item.explanation_source ?? "pending"}>
           {explanation.summary}
         </p>
         {ask && <p className="text-[14px] leading-relaxed text-warn">{ask}</p>}

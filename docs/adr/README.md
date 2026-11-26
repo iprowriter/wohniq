@@ -27,3 +27,4 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0019](0019-offline-basemap-and-berlin-ink-foundations.md) | Offline base map (PMTiles) and the Berlin Ink design foundations | Accepted (amends 0008, 0015) |
 | [0020](0020-saved-searches-in-the-browser.md) | Saved searches in the browser, with download and import | Accepted |
 | [0021](0021-online-tiles-for-deployment.md) | Online Protomaps tiles for the deployed site | Accepted (amends 0019) |
+| [0022](0022-fast-hybrid-search.md) | Fast hybrid search: results first, AI wording after | Accepted (amends 0001, 0004) |

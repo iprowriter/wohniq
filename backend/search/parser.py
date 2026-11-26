@@ -104,8 +104,13 @@ def merge_areas(criteria: SearchCriteria, text: str) -> SearchCriteria:
     )
 
 
-def parse_query(text: str, *, transport: Transport | None = None) -> SearchCriteria:
-    """Parse a free-text apartment request into validated SearchCriteria."""
+def parse_query(
+    text: str, *, transport: Transport | None = None, timeout_s: float | None = None
+) -> SearchCriteria:
+    """Parse a free-text apartment request into validated SearchCriteria.
+
+    With `timeout_s`, the keyword parser answers if the model hasn't by then (ADR-0022).
+    """
     result = generate_structured(
         prompt_id=PARSER_PROMPT_ID,
         system=PARSER_SYSTEM,
@@ -114,5 +119,6 @@ def parse_query(text: str, *, transport: Transport | None = None) -> SearchCrite
         temperature=0.2,
         fallback=lambda: keyword_fallback(text),
         transport=transport,
+        timeout_s=timeout_s,
     )
     return merge_areas(result.data, text)

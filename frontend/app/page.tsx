@@ -10,7 +10,8 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getMapListings, getRandomListings, search } from "@/lib/api";
+import { getExplanations, getMapListings, getRandomListings, search } from "@/lib/api";
+import { explainRequest, mergeExplanations, needsExplanations } from "@/lib/explanations";
 import type { ListingOut, SearchResponse } from "@/lib/types";
 import type { Bounds, MapListing } from "@/lib/map/listingsMap";
 import {
@@ -320,10 +321,28 @@ function Results({
 
   useEffect(() => {
     let cancelled = false;
+    const abort = new AbortController();
+    // Results first (rule-based explanations), then the model's wording swapped in when
+    // it arrives (ADR-0022). If that request fails, the rules text simply stays.
+    const addExplanations = (res: SearchResponse) => {
+      if (!res.results.length || !needsExplanations(res)) return;
+      getExplanations(explainRequest(res), abort.signal)
+        .then((e) => {
+          if (cancelled) return;
+          const merged = mergeExplanations(res, e);
+          setData(merged);
+          cacheSet(cacheKey, merged);
+        })
+        .catch(() => {});
+    };
     const cached = cacheGet(cacheKey);
     if (cached) {
       setData(cached);
-      return;
+      addExplanations(cached);
+      return () => {
+        cancelled = true;
+        abort.abort();
+      };
     }
     setLoading(true);
     setError(null);
@@ -333,11 +352,13 @@ function Results({
         setData(res);
         cacheSet(cacheKey, res);
         setTimeout(() => chipsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+        addExplanations(res);
       })
       .catch((e) => !cancelled && (setError(e instanceof Error ? e.message : "Something went wrong"), setData(null)))
       .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
+      abort.abort();
     };
   }, [cacheKey, params.q, params.budget]);
 

@@ -252,6 +252,11 @@ class DemoRepository:
     def commute(self, lat: float, lng: float, work_location: str | None) -> CommuteResult | None:
         return estimate_commute_to(lat, lng, work_location)  # offline estimate, no network
 
+    def enrich(
+        self, points: list[tuple[float, float]], work_location: str | None, *, timeout_s: float
+    ) -> list[tuple[NeighborhoodResult | None, CommuteResult | None]]:
+        return [(self.neighborhood(a, b), self.commute(a, b, work_location)) for a, b in points]
+
     # -----------------------------------------------------------------------------
 
     @staticmethod
