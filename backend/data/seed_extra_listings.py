@@ -1,4 +1,5 @@
-"""Add the 40 extra listings (ADR-0018) to a database that already has the original 100.
+"""Add the listings beyond the original 100 to a seeded database: the 40 extras (ADR-0018)
+and the district batch (Marzahn-Hellersdorf, Reinickendorf).
 
     uv run python -m data.seed_extra_listings      # or: make seed-extra
 

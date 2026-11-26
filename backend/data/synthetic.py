@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
 
-from data.kieze import KIEZE, Kiez
+from data.kieze import KIEZE, OUTER_KIEZE, Kiez
 
 ROOM_CHOICES = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 ROOM_WEIGHTS = [10, 12, 26, 14, 20, 8, 10]
@@ -48,8 +48,16 @@ _TRANSIT = [
 _FIRST = ["Anna", "Lukas", "Sophie", "Max", "Marie", "Jonas", "Laura", "Felix", "Mia", "Paul"]
 _LAST = ["Müller", "Schmidt", "Weber", "Fischer", "Becker", "Wagner", "Hoffmann", "Schulz"]
 _STREETS = [
-    "Stargarder", "Boxhagener", "Torstraße", "Kastanienallee", "Sonnenallee",
-    "Bergmannstraße", "Weserstraße", "Schönhauser Allee", "Kantstraße", "Turmstraße",
+    "Stargarder",
+    "Boxhagener",
+    "Torstraße",
+    "Kastanienallee",
+    "Sonnenallee",
+    "Bergmannstraße",
+    "Weserstraße",
+    "Schönhauser Allee",
+    "Kantstraße",
+    "Turmstraße",
 ]
 _DOMAINS = ["gmail.com", "web.de", "gmx.de", "mail.com"]
 
@@ -155,9 +163,15 @@ def year_built_for(listing_id: uuid.UUID) -> int:
 
 
 def _make_listing(
-    rng, ref: date, *, scam_type: str | None = None, hard_negative: str | None = None
+    rng,
+    ref: date,
+    *,
+    scam_type: str | None = None,
+    hard_negative: str | None = None,
+    kiez: Kiez | None = None,
 ) -> SyntheticListing:
-    kiez: Kiez = rng.choice(KIEZE)
+    # A given Kiez skips the draw, so existing callers consume the rng exactly as before.
+    kiez = kiez or rng.choice(KIEZE)
     rooms = rng.choices(ROOM_CHOICES, weights=ROOM_WEIGHTS, k=1)[0]
     size_m2 = max(18, round(rooms * rng.uniform(18, 26) + rng.uniform(-5, 8)))
 
@@ -418,14 +432,47 @@ def generate_extra_listings(
     return out
 
 
+# --- The district batch: every Berlin district has listings ------------------------------
+# The first 140 listings covered 10 of Berlin's 12 districts. These add Marzahn-Hellersdorf
+# and Reinickendorf (two Kieze each), with the same mix as the original catalogue: mostly
+# honest, plus one price-bait scam (Marzahn, Reinickendorf) and one tricky-but-honest listing
+# (Hellersdorf, Tegel). Own seed, so the first 140 never change; photos reuse images
+# already in the catalogue.
+
+DISTRICT_SEED = 4343
+PER_KIEZ = 6
+
+
+def generate_district_listings(
+    *, seed: int = DISTRICT_SEED, reference_date: date | None = None
+) -> list[SyntheticListing]:
+    rng = random.Random(seed)
+    ref = reference_date or date.today()
+    out: list[SyntheticListing] = []
+    for i, kiez in enumerate(OUTER_KIEZE):
+        specs: list[tuple[str | None, str | None]] = [(None, None)] * PER_KIEZ
+        if i % 2 == 0:
+            specs[0] = ("price_bait", None)  # one scam per district
+        else:
+            # One tricky-but-honest listing: landlord abroad, a local agent shows the flat.
+            # ("cheap" would sit far below the index here, where asking rents are close to it.)
+            specs[0] = (None, "travel")
+        rng.shuffle(specs)
+        for scam_type, hard in specs:
+            out.append(_make_listing(rng, ref, scam_type=scam_type, hard_negative=hard, kiez=kiez))
+    return out
+
+
 def generate_catalogue(
     *, reference_date: date | None = None, apply_overrides: bool = True
 ) -> list[SyntheticListing]:
-    """The full demo catalogue: the original 100 listings (seed 42) plus the 40 extras."""
+    """The full demo catalogue: the original 100 listings (seed 42), the 40 extras and the
+    district batch (Marzahn-Hellersdorf, Reinickendorf)."""
     base = generate_listings(
         100, seed=42, reference_date=reference_date, apply_overrides=apply_overrides
     )
     extra = generate_extra_listings(base, reference_date=reference_date)
+    extra += generate_district_listings(reference_date=reference_date)
     overrides = _rent_overrides() if apply_overrides else {}
     for x in extra:
         x.year_built = year_built_for(x.id)

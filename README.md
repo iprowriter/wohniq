@@ -329,7 +329,7 @@ plus the deterministic seed-42 generator, so it matches the live database. In of
   estimates when the transit API fails, instead of showing nothing. `make eval-commute` (online)
   measures both estimates against live journeys.
 - Featured listings are drawn from the 38 that have cached neighborhood data, so every card
-  opens onto photos, amenities, and a risk rating. Search covers all 140 listings, as live does.
+  opens onto photos, amenities, and a risk rating. Search covers all 164 listings in all 12 districts, as live does (after `make seed-extra`). New catalogue listings reach the demo files with `make demo-extend` (photos reuse existing images; risk from the same detector, no LLM).
 - Without `make demo-photos`, photos load from Pexels if there's internet, otherwise a
   placeholder is shown.
 - Berlin data (rent check, Around this flat, stops) comes from the local build of

@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 
 from app.repository import ListingRepository, get_repository
 from core.logging import get_logger
-from data.kieze import BERLIN_BBOX, KIEZE
+from data.kieze import ALL_KIEZE, BERLIN_BBOX
 from data.models import Listing, Photo, RiskAssessment
 from enrich.commute_parse import CommuteResult
 from enrich.neighborhood_parse import DEFAULT_RADIUS_M
@@ -64,7 +64,7 @@ from search.similar import rank_similar
 logger = get_logger(__name__)
 router = APIRouter(tags=["search"])
 
-_NIGHTLIFE = {k.name: k.nightlife for k in KIEZE}
+_NIGHTLIFE = {k.name: k.nightlife for k in ALL_KIEZE}
 
 # Listings examined when looking for nearby flats or diagnosing the budget. The whole
 # catalogue is ~100 listings; this keeps the extra passes bounded if it grows.

@@ -109,12 +109,33 @@ def test_catalogue_keeps_the_original_hundred_and_adds_forty():
 
     cat = generate_catalogue(reference_date=REF)
     base = generate_listings(100, seed=42, reference_date=REF)
-    assert len(cat) == 140 and len({x.id for x in cat}) == 140
+    assert len(cat) == 164 and len({x.id for x in cat}) == 164
     assert cat[:100] == base
     kinds = Counter(
-        x.scam_type or ("tricky" if x.is_hard_negative else "honest") for x in cat[100:]
+        x.scam_type or ("tricky" if x.is_hard_negative else "honest") for x in cat[100:140]
     )
     assert kinds == {"honest": 14, "tricky": 10, "advance_fee": 5, "overseas_landlord": 4,
                      "photo_reuse": 3, "subtle": 2, "fake_platform": 2}
     genuine_sets = {x.photo_set_id for x in base if not x.is_scam}
     assert all(x.photo_set_id in genuine_sets for x in cat[100:] if x.scam_type == "photo_reuse")
+
+
+def test_every_berlin_district_has_listings():
+    """The district batch adds Marzahn-Hellersdorf and Reinickendorf (12 each), so all 12
+    Bezirke have listings; the first 140 stay as they were."""
+    from collections import Counter
+
+    from data.kieze import BERLIN_BBOX as BOX
+    from data.synthetic import generate_catalogue, generate_district_listings
+
+    cat = generate_catalogue(reference_date=REF)
+    districts = Counter(x.district for x in cat)
+    assert len(districts) == 12
+    assert districts["Marzahn-Hellersdorf"] == 12 and districts["Reinickendorf"] == 12
+    batch = generate_district_listings(reference_date=REF)
+    assert [x.id for x in cat[140:]] == [x.id for x in batch]
+    kinds = Counter(x.scam_type or ("tricky" if x.is_hard_negative else "honest") for x in batch)
+    assert kinds == {"honest": 20, "price_bait": 2, "tricky": 2}
+    for x in batch:
+        assert BOX["lat_min"] <= x.lat <= BOX["lat_max"] and BOX["lng_min"] <= x.lng <= BOX["lng_max"]
+        assert x.kiez in {"Marzahn", "Hellersdorf", "Reinickendorf", "Tegel"}

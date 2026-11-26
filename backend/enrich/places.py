@@ -24,7 +24,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from core.logging import get_logger
-from data.kieze import KIEZE
+from data.kieze import ALL_KIEZE
 
 logger = get_logger(__name__)
 
@@ -88,7 +88,7 @@ class PlaceIndex:
                 else self.other
             )
             bucket.setdefault(key, place)  # first occurrence wins (stable)
-        self.kiez = {normalize(k.name): Place(k.name, k.lat, k.lng, "kiez") for k in KIEZE}
+        self.kiez = {normalize(k.name): Place(k.name, k.lat, k.lng, "kiez") for k in ALL_KIEZE}
         self._all_keys = list({**self.other, **self.kiez, **self.rail})
 
     @property

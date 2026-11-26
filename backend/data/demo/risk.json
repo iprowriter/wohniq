@@ -1361,5 +1361,211 @@
     "band": "low",
     "signals": [],
     "engine_version": "v2"
+  },
+  {
+    "listing_id": "6b4ed5c8-b8e0-4b39-b46f-3e911380fa38",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "6dda4b32-3d33-47df-b834-6410994af556",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "f7b077cf-b7ac-46e1-ab2d-6deba4f64cc1",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "e46ff3e9-8512-4b59-9817-4efdd4b6d692",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "0ed1337f-045d-4e78-856c-403c7858a482",
+    "score": 97,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_index",
+        "severity": 1.0,
+        "source": "rule",
+        "evidence": "€3.71/m² cold is 47% below the lowest rent-index value for this flat (€7.01/m², Mietspiegel 2026, row 3)"
+      },
+      {
+        "name": "no_anmeldung",
+        "severity": 0.6,
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address"
+      },
+      {
+        "name": "urgency_pressure",
+        "severity": 0.3,
+        "source": "rule",
+        "evidence": "\"Incredible price for this area — it won't last!\""
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "a238617d-6576-4afc-a899-fdbbe20e2b8e",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "618c987b-2fe0-4fd7-b931-2caead0bc380",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "9006da2d-a84b-48f0-94d3-de8b67267e18",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "e0160895-84f7-4119-80fa-98ed6f1675c4",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "9686a664-a1f0-4505-910d-537bdb9fa733",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "faf8c118-032e-4517-9714-d7a873b5d6ed",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "90ed8e6e-9eae-4956-a0e8-2d419613ae94",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "51c7aa22-2ab9-4736-909c-fa5045ebdfe4",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "7169f05a-c873-44fb-a91a-2c614ccc65ec",
+    "score": 97,
+    "band": "high",
+    "signals": [
+      {
+        "name": "price_below_index",
+        "severity": 1.0,
+        "source": "rule",
+        "evidence": "€3.25/m² cold is 50% below the lowest rent-index value for this flat (€6.45/m², Mietspiegel 2026, row 6)"
+      },
+      {
+        "name": "no_anmeldung",
+        "severity": 0.6,
+        "source": "rule",
+        "evidence": "Anmeldung (legal residence registration) not possible at this address"
+      },
+      {
+        "name": "urgency_pressure",
+        "severity": 0.3,
+        "source": "rule",
+        "evidence": "\"Incredible price for this area — it won't last!\""
+      }
+    ],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "03677445-1df0-4662-b49c-34d781fc7088",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "0357c33b-4a8c-4f48-b1b7-587ea6f5cee2",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "48c25fc5-74e0-4912-9811-4ee8f8267940",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "8cc89aed-60e3-48e4-b952-1e96850022a1",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "c87cb014-3c1c-4a8d-add2-feb143383be5",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "4b844059-dcb7-4a59-b793-13e798c479c5",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "91632681-c199-4903-88e2-a77f9f9d4ddb",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "e0491fed-fef0-4273-ad78-2712387214a5",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "2015a8c4-8cd4-4798-8a2a-caa196deb640",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
+  },
+  {
+    "listing_id": "91723283-98bd-4fa3-9bf3-74bd54bd5e3b",
+    "score": 0,
+    "band": "low",
+    "signals": [],
+    "engine_version": "v2"
   }
 ]
