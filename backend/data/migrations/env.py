@@ -13,7 +13,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from core.config import settings
-from data.models import Base
+from data.models import Base, Geography
 
 config = context.config
 
@@ -25,6 +25,30 @@ config.set_main_option("sqlalchemy.url", settings.sqlalchemy_url)
 
 target_metadata = Base.metadata
 
+# Tables that belong to Postgres extensions, never to our models. Supabase installs
+# PostGIS into the `extensions` schema, but if it ever lands in `public` these must not be
+# picked up — autogenerate would otherwise propose dropping them (AGENTS.md guardrail 2).
+EXTENSION_TABLES = {
+    "spatial_ref_sys",
+    "geometry_columns",
+    "geography_columns",
+    "raster_columns",
+    "raster_overviews",
+}
+
+
+def include_object(obj, name, type_, reflected, compare_to):
+    if type_ == "table" and name in EXTENSION_TABLES:
+        return False
+    return True
+
+
+def compare_type(context, inspected_column, metadata_column, inspected_type, metadata_type):
+    # SQLAlchemy can't reflect PostGIS `geography`, so it would report a change every time.
+    if isinstance(metadata_column.type, Geography):
+        return False
+    return None  # default comparison for everything else
+
 
 def run_migrations_offline() -> None:
     context.configure(
@@ -32,7 +56,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        compare_type=True,
+        compare_type=compare_type,
+        include_object=include_object,
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -48,7 +73,8 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
-            compare_type=True,
+            compare_type=compare_type,
+            include_object=include_object,
         )
         with context.begin_transaction():
             context.run_migrations()

@@ -31,8 +31,9 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.types import UserDefinedType
 
 
 class Base(DeclarativeBase):
@@ -68,6 +69,9 @@ class Listing(Base):
     available_from: Mapped[date | None] = mapped_column(Date)
     floor: Mapped[int | None] = mapped_column(Integer)
     total_floors: Mapped[int | None] = mapped_column(Integer)
+    # Year the building was first ready for occupancy (Bezugsfertigkeit): picks the
+    # Mietspiegel building-age row for the rent check (ADR-0016).
+    year_built: Mapped[int | None] = mapped_column(SmallInteger)
     anmeldung_possible: Mapped[bool] = mapped_column(Boolean, server_default="true")
 
     contact_name: Mapped[str | None] = mapped_column(Text)
@@ -212,4 +216,209 @@ class RiskAssessment(Base):
         CheckConstraint("score between 0 and 100", name="ck_risk_score_range"),
         CheckConstraint("band in ('low', 'caution', 'high')", name="ck_risk_band"),
         Index("idx_risk_band", "band"),
+    )
+
+
+# --- Berlin open data (rent check, Around this flat, Right now; ADR-0016) ----------------
+# Loaded by `make berlin-load` from the `make berlin-data` build. Read with raw SQL in
+# berlin/postgres.py; these models exist so Alembic owns the schema.
+
+
+class Geography(UserDefinedType):
+    """PostGIS `geography(<type>, 4326)` (PostGIS lives in the `extensions` schema)."""
+
+    cache_ok = True
+
+    def __init__(self, geometry_type: str = "Point"):
+        self.geometry_type = geometry_type
+
+    def get_col_spec(self, **kw) -> str:
+        return f"geography({self.geometry_type},4326)"
+
+
+def _gist(table: str) -> Index:
+    return Index(f"idx_{table}_geog", "geog", postgresql_using="gist")
+
+
+class BerlinAddress(Base):
+    """The 400,505 residential addresses of the Mietspiegel Wohnlagenverzeichnis 2026."""
+
+    __tablename__ = "berlin_address"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    street: Mapped[str] = mapped_column(Text)
+    house_number: Mapped[str] = mapped_column(Text)
+    postcode: Mapped[str] = mapped_column(Text)
+    district: Mapped[str] = mapped_column(Text)
+    location_class: Mapped[str] = mapped_column(Text)
+    east: Mapped[bool] = mapped_column(Boolean)
+    plr_id: Mapped[str] = mapped_column(Text)
+    search_key: Mapped[str] = mapped_column(Text)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+    __table_args__ = (
+        Index(
+            "idx_berlin_address_search_key",
+            "search_key",
+            postgresql_ops={"search_key": "text_pattern_ops"},
+        ),
+        _gist("berlin_address"),
+        CheckConstraint(
+            "location_class in ('simple', 'medium', 'good')", name="ck_berlin_address_class"
+        ),
+    )
+
+
+class BerlinPlanningArea(Base):
+    """LOR 2021 planning areas (542), with each measure's typical value in `stats`."""
+
+    __tablename__ = "berlin_planning_area"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    bzr_id: Mapped[str] = mapped_column(Text)
+    bzr_name: Mapped[str] = mapped_column(Text)
+    district: Mapped[str] = mapped_column(Text)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    stats: Mapped[dict] = mapped_column(JSONB, server_default="{}")
+    geog = mapped_column(Geography("MultiPolygon"))
+
+    __table_args__ = (_gist("berlin_planning_area"),)
+
+
+class BerlinDistrictRegion(Base):
+    """LOR 2021 district regions (143), with neighbourhood offences per 100,000 residents."""
+
+    __tablename__ = "berlin_district_region"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    district: Mapped[str] = mapped_column(Text)
+    crime_rate: Mapped[float | None] = mapped_column(Double)
+
+
+class BerlinStop(Base):
+    __tablename__ = "berlin_stop"
+
+    id: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    modes: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default="{}")
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+    __table_args__ = (_gist("berlin_stop"),)
+
+
+class BerlinSchool(Base):
+    __tablename__ = "berlin_school"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(Text)
+    kind: Mapped[str] = mapped_column(Text)  # primary|secondary|vocational|special|adult
+    school_type: Mapped[str] = mapped_column(Text)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+    __table_args__ = (_gist("berlin_school"),)
+
+
+class BerlinKita(Base):
+    __tablename__ = "berlin_kita"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(Text)
+    places: Mapped[int | None] = mapped_column(Integer)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+    __table_args__ = (_gist("berlin_kita"),)
+
+
+class BerlinPark(Base):
+    """Public green spaces of 1 ha or more (outlines simplified to 3 m)."""
+
+    __tablename__ = "berlin_park"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(Text)
+    area_m2: Mapped[int] = mapped_column(Integer)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("MultiPolygon"))
+
+    __table_args__ = (_gist("berlin_park"),)
+
+
+class BerlinPlayground(Base):
+    __tablename__ = "berlin_playground"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(Text)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+    __table_args__ = (_gist("berlin_playground"),)
+
+
+class BerlinAccident(Base):
+    """Road accidents with personal injury, 2025 (Unfallatlas)."""
+
+    __tablename__ = "berlin_accident"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    category: Mapped[int] = mapped_column(SmallInteger)  # 1 killed, 2 serious, 3 light
+    bike: Mapped[bool] = mapped_column(Boolean)
+    pedestrian: Mapped[bool] = mapped_column(Boolean)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+    __table_args__ = (_gist("berlin_accident"),)
+
+
+class BerlinAirStation(Base):
+    __tablename__ = "berlin_air_station"
+
+    code: Mapped[str] = mapped_column(Text, primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    station_type: Mapped[str] = mapped_column(Text)
+    lqi: Mapped[int | None] = mapped_column(SmallInteger)
+    measured_at: Mapped[str | None] = mapped_column(Text)
+    lat: Mapped[float] = mapped_column(Double)
+    lng: Mapped[float] = mapped_column(Double)
+    geog = mapped_column(Geography("Point"))
+
+
+class BerlinRentRow(Base):
+    """Berliner Mietspiegeltabelle 2026: €/m² net cold by location, building age, size."""
+
+    __tablename__ = "berlin_rent_row"
+
+    row: Mapped[int] = mapped_column(SmallInteger, primary_key=True, autoincrement=False)
+    location: Mapped[str] = mapped_column(Text)
+    period: Mapped[str] = mapped_column(Text)
+    size_min: Mapped[int] = mapped_column(SmallInteger)
+    size_max: Mapped[int | None] = mapped_column(SmallInteger)
+    low: Mapped[float] = mapped_column(Numeric(5, 2))
+    mean: Mapped[float] = mapped_column(Numeric(5, 2))
+    high: Mapped[float] = mapped_column(Numeric(5, 2))
+
+
+class BerlinDataset(Base):
+    """Small JSON documents of the loaded build, keyed by name: the build manifest,
+    Mietspiegel periods and checklist, air snapshot time, Berlin-wide crime rate."""
+
+    __tablename__ = "berlin_dataset"
+
+    name: Mapped[str] = mapped_column(Text, primary_key=True)
+    content: Mapped[dict] = mapped_column(JSONB, server_default="{}")
+    loaded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
     )

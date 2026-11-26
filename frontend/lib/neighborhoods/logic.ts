@@ -142,18 +142,18 @@ export function orderLabel(order: Order, bestLabel: string | null, worstLabel: s
 // --- Colours and tiers ---------------------------------------------------------------------------
 
 /**
- * Five rank bands (quintiles of Berlin's 143 areas), a colour-blind-safe indigo→orange
- * diverging scale: deep indigo = best 20%, orange = bottom 20%. Rank-based (not
+ * Five rank bands (quintiles of Berlin's 143 areas) on one calm Berlin Ink blue scale:
+ * deep blue = best 20%, palest = bottom 20% (no alarm colour; T9.6). Rank-based (not
  * score-based), so every category uses the full scale.
  */
 export const BANDS: { color: string; label: string }[] = [
-  { color: "#3730a3", label: "Top 20%" },
-  { color: "#818cf8", label: "20–40%" },
-  { color: "#e0e7ff", label: "Middle" },
-  { color: "#fdba74", label: "60–80%" },
-  { color: "#ea580c", label: "Bottom 20%" },
+  { color: "#1A33B3", label: "Top 20%" },
+  { color: "#2747E6", label: "20–40%" },
+  { color: "#6F8BFF", label: "Middle" },
+  { color: "#B4C2FF", label: "60–80%" },
+  { color: "#E3E8FF", label: "Bottom 20%" },
 ];
-export const MUTED_COLOR = "#e5e7eb";
+export const MUTED_COLOR = "#E3E6EC";
 
 export function bandIndex(rank: number, total: number): number {
   if (total <= 0) return 2;
@@ -164,9 +164,9 @@ export function rankColor(rank: number, total: number): string {
   return BANDS[bandIndex(rank, total)].color;
 }
 
-/** Readable text on a band colour: white on the dark ends, deep indigo on the light middle. */
+/** Readable text on a band colour: white on the two dark bands, ink on the lighter ones. */
 export function rankTextColor(rank: number, total: number): string {
-  return [0, 1, 4].includes(bandIndex(rank, total)) ? "#ffffff" : "#312e81";
+  return [0, 1].includes(bandIndex(rank, total)) ? "#ffffff" : "#0D1321";
 }
 
 export function tierBadge(
@@ -177,12 +177,12 @@ export function tierBadge(
   if (tier === "best" && bestLabel)
     return {
       text: bestLabel,
-      className: "bg-indigo-50 text-indigo-700 ring-indigo-200",
+      className: "bg-accent-tint text-accent ring-accent/30",
     };
   if (tier === "worst" && worstLabel)
     return {
       text: worstLabel,
-      className: "bg-orange-50 text-orange-700 ring-orange-200",
+      className: "bg-chip text-text-body ring-line-strong",
     };
   return null;
 }

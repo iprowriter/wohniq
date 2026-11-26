@@ -9,17 +9,17 @@ export function WeightBars({ weights, max = 8 }: { weights: WeightOut[]; max?: n
       {active.map((w, i) => (
         <li key={w.attribute} className="animate-fade-up" style={{ animationDelay: `${i * 50}ms` }}>
           <div className="flex items-baseline justify-between text-sm">
-            <span className="font-medium text-gray-800">{w.label}</span>
-            <span className="text-xs tabular-nums text-gray-400">{w.value}/5</span>
+            <span className="font-medium text-text">{w.label}</span>
+            <span className="text-xs tabular-nums text-text-muted">{w.value}/5</span>
           </div>
-          <div className="mt-1 h-2 overflow-hidden rounded-full bg-gray-100">
+          <div className="mt-1 h-2 overflow-hidden rounded-full bg-chip">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-[width] duration-700 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-accent to-accent transition-[width] duration-700 ease-out"
               style={{ width: `${(w.value / 5) * 100}%` }}
             />
           </div>
           {w.reasons.length > 0 && (
-            <p className="mt-1 truncate text-xs text-gray-400" title={w.reasons.join(" · ")}>
+            <p className="mt-1 truncate text-xs text-text-muted" title={w.reasons.join(" · ")}>
               because: {w.reasons[0].split(" → ").pop()}
             </p>
           )}

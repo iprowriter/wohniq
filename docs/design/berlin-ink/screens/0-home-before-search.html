@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>0 · Home before a search · WohnIQ redesign mockup</title>
+<!-- WohnIQ "Berlin Ink" redesign mockup. Static reference: all figures are sample data, photos and maps are placeholders.
+     Design tokens: ../tokens.css · Intent and rules: ../DESIGN.md -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#2747E6}a:hover{color:#1A33B3}
+</style>
+</head>
+<body>
+<div style="font-family: Geist, Inter, system-ui, sans-serif; color: #0D1321; background: #F4F5F7; min-height: 100%">
+
+  <header style="background: #0D1321; color: #FFFFFF">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 24px">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 20px; letter-spacing: -0.02em">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="1" y="1" width="26" height="26" rx="8" stroke="#6F8BFF" stroke-width="2"></rect><path d="M8 18V11l6-4 6 4v7" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"></path><path d="M12 18v-4h4v4" stroke="#6F8BFF" stroke-width="2"></path></svg>
+        WohnIQ
+      </a>
+      <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto">
+        <a href="#" style="color: #FFFFFF; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.08)">Search</a>
+        <a href="#" style="color: #C9D0DC; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px">Lifestyle match</a>
+        <a href="#" style="color: #C9D0DC; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px">Neighbourhoods</a>
+        <a href="3-rent-check.html" style="color: #C9D0DC; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px">Rent check</a>
+      </nav>
+      <span style="font-size: 13px; color: #C9D0DC; border: 1px solid rgba(255,255,255,0.2); padding: 6px 10px; border-radius: 999px">Demo data · offline</span>
+    </div>
+
+    <div style="max-width: 1280px; margin: 0 auto; padding: 72px 32px 88px; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+      <div style="flex: 999 1 560px; min-width: 0">
+        <p style="margin: 0 0 14px; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: #8FA4FF; font-weight: 600">Berlin flat search you can trust</p>
+        <h1 style="margin: 0; font-size: 64px; line-height: 1.02; letter-spacing: -0.04em; font-weight: 700">Find your Berlin flat. Know it’s fair before you call.</h1>
+        <p style="margin: 20px 0 0; font-size: 19px; line-height: 1.5; color: #C9D0DC; max-width: 600px">Say what you need in plain words. WohnIQ ranks the flats, checks each rent against the official Mietspiegel and flags likely scams, and tells you why.</p>
+
+        <form style="margin-top: 36px; background: #FFFFFF; border-radius: 18px; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.35)">
+          <label for="q0" style="position: absolute; left: -9999px">Describe your flat</label>
+          <input id="q0" type="text" placeholder="e.g. 2 rooms near Alexanderplatz, quiet, under €1,400 warm" style="flex: 1 1 360px; min-width: 0; font: inherit; font-size: 17px; color: #0D1321; border: 0; outline: none; padding: 14px 16px; background: transparent">
+          <a href="1-search-results.html" style="font-size: 16px; font-weight: 600; color: #FFFFFF; background: #2747E6; text-decoration: none; border-radius: 12px; padding: 0 26px; min-height: 52px; display: flex; align-items: center; gap: 8px">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            Search
+          </a>
+        </form>
+
+        <div style="margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+          <span style="font-size: 14px; color: #C9D0DC; margin-right: 4px">Try:</span>
+          <a href="1-search-results.html" style="font-size: 14px; color: #FFFFFF; text-decoration: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 999px">Quiet 2 rooms in Mitte near a park</a>
+          <a href="1-search-results.html" style="font-size: 14px; color: #FFFFFF; text-decoration: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 999px">Family flat, good schools, under €1,800</a>
+          <a href="1-search-results.html" style="font-size: 14px; color: #FFFFFF; text-decoration: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 999px">Furnished, 20 min to TU Berlin</a>
+        </div>
+      </div>
+
+      <aside aria-label="What every listing gets" style="flex: 1 1 360px; min-width: 0; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <p style="margin: 0; font-size: 13px; color: #8FA4FF; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase">Every listing, checked</p>
+        <div style="background: #FFFFFF; color: #0D1321; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline">
+            <strong style="font-size: 16px">2 rooms · 61 m² · Mitte</strong>
+            <strong style="font-size: 18px; font-variant-numeric: tabular-nums">€1,284</strong>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px">
+            <span style="font-size: 12px; font-weight: 500; color: #0F6B5E; background: #E3F4F0; padding: 5px 8px; border-radius: 7px">Fair rent · in Mietspiegel range</span>
+            <span style="font-size: 12px; font-weight: 500; color: #0F6B5E; background: #E3F4F0; padding: 5px 8px; border-radius: 7px">Low scam risk</span>
+            <span style="font-size: 12px; font-weight: 500; color: #3B4352; background: #EEF0F4; padding: 5px 8px; border-radius: 7px">U8 · 4 min walk</span>
+          </div>
+        </div>
+        <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 15px; color: #E6EAF1">
+          <li style="display: flex; gap: 10px; align-items: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9FF0DC" stroke-width="2.2"><path d="m5 12 5 5L20 7"></path></svg>Rent checked against the official rent index</li>
+          <li style="display: flex; gap: 10px; align-items: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9FF0DC" stroke-width="2.2"><path d="m5 12 5 5L20 7"></path></svg>Scam signals explained, not just scored</li>
+          <li style="display: flex; gap: 10px; align-items: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9FF0DC" stroke-width="2.2"><path d="m5 12 5 5L20 7"></path></svg>Transit, schools, parks and air around the flat</li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <main style="max-width: 1280px; margin: 0 auto; padding: 48px 32px 64px; display: flex; flex-direction: column; gap: 56px">
+
+    <section aria-labelledby="start">
+      <h2 id="start" style="margin: 0; font-size: 28px; letter-spacing: -0.02em">Not sure where to start?</h2>
+      <p style="margin: 8px 0 0; font-size: 16px; color: #5B6475">Three ways in, besides the search.</p>
+      <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+        <a href="#" style="text-decoration: none; color: #0D1321; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 44px; height: 44px; border-radius: 12px; background: #EEF1FF; display: flex; align-items: center; justify-content: center; color: #2747E6"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>
+          <strong style="font-size: 18px">Lifestyle match</strong>
+          <span style="font-size: 15px; color: #5B6475; line-height: 1.5">Answer a few questions about your days and evenings. Get the neighbourhoods that fit, with reasons.</span>
+          <span style="font-size: 14px; color: #2747E6; font-weight: 600; margin-top: 4px">Start the match</span>
+        </a>
+        <a href="#" style="text-decoration: none; color: #0D1321; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 44px; height: 44px; border-radius: 12px; background: #EEF1FF; display: flex; align-items: center; justify-content: center; color: #2747E6"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z"></path><path d="M9 3v15M15 6v15"></path></svg></span>
+          <strong style="font-size: 18px">Explore neighbourhoods</strong>
+          <span style="font-size: 15px; color: #5B6475; line-height: 1.5">All 143 areas on one map: transit, green space, schools, safety and rents, ranked by what matters to you.</span>
+          <span style="font-size: 14px; color: #2747E6; font-weight: 600; margin-top: 4px">Open the map</span>
+        </a>
+        <a href="3-rent-check.html" style="text-decoration: none; color: #0D1321; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 44px; height: 44px; border-radius: 12px; background: #E3F4F0; display: flex; align-items: center; justify-content: center; color: #0F6B5E"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"></path></svg></span>
+          <strong style="font-size: 18px">Check a rent</strong>
+          <span style="font-size: 15px; color: #5B6475; line-height: 1.5">Already have an offer? Check any Berlin address against the Mietspiegel and the rent brake.</span>
+          <span style="font-size: 14px; color: #2747E6; font-weight: 600; margin-top: 4px">Check a rent</span>
+        </a>
+      </div>
+    </section>
+
+    <section aria-labelledby="explore">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px">
+        <div>
+          <h2 id="explore" style="margin: 0; font-size: 28px; letter-spacing: -0.02em">Explore Berlin</h2>
+          <p style="margin: 8px 0 0; font-size: 16px; color: #5B6475">A few flats on the market today. Move the map to see what’s around.</p>
+        </div>
+        <button type="button" style="font: inherit; font-size: 14px; color: #0D1321; background: #FFFFFF; border: 1px solid #DDE1E8; border-radius: 10px; padding: 0 14px; min-height: 44px">Show others</button>
+      </div>
+      <div style="margin-top: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch">
+        <div style="flex: 999 1 560px; min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+          
+            <a href="2-listing-dossier.html" style="text-decoration: none; color: #0D1321; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+              <div style="height: 150px; background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Listing photo</div>
+              <div style="padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <strong style="font-size: 15px">Mitte</strong>
+                  <strong style="font-size: 17px; font-variant-numeric: tabular-nums">€1,284</strong>
+                </div>
+                <span style="font-size: 13px; color: #5B6475">2 rooms · 61 m² · U8 4 min</span>
+                <span style="align-self: flex-start; font-size: 12px; font-weight: 500; color: #0F6B5E; background: #E3F4F0; padding: 5px 8px; border-radius: 7px; margin-top: 4px">Fair rent</span>
+              </div>
+            </a>
+          
+            <a href="2-listing-dossier.html" style="text-decoration: none; color: #0D1321; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+              <div style="height: 150px; background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Listing photo</div>
+              <div style="padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <strong style="font-size: 15px">Neukölln</strong>
+                  <strong style="font-size: 17px; font-variant-numeric: tabular-nums">€980</strong>
+                </div>
+                <span style="font-size: 13px; color: #5B6475">1.5 rooms · 44 m² · U7 6 min</span>
+                <span style="align-self: flex-start; font-size: 12px; font-weight: 500; color: #0F6B5E; background: #E3F4F0; padding: 5px 8px; border-radius: 7px; margin-top: 4px">Fair rent</span>
+              </div>
+            </a>
+          
+            <a href="2-listing-dossier.html" style="text-decoration: none; color: #0D1321; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+              <div style="height: 150px; background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Listing photo</div>
+              <div style="padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <strong style="font-size: 15px">Prenzlauer Berg</strong>
+                  <strong style="font-size: 17px; font-variant-numeric: tabular-nums">€1,650</strong>
+                </div>
+                <span style="font-size: 13px; color: #5B6475">3 rooms · 78 m² · M10 3 min</span>
+                <span style="align-self: flex-start; font-size: 12px; font-weight: 500; color: #8A3F06; background: #FCEFD9; padding: 5px 8px; border-radius: 7px; margin-top: 4px">Above index</span>
+              </div>
+            </a>
+          
+        </div>
+        <div aria-label="Map of flats" role="img" style="flex: 1 1 320px; min-width: 0; min-height: 300px; border-radius: 18px; overflow: hidden; background: #EBEEF3; position: relative; border: 1px solid #E3E6EC">
+          <svg aria-hidden="true" width="100%" height="100%" viewBox="0 0 320 300" preserveAspectRatio="xMidYMid slice" style="position: absolute; inset: 0">
+            <rect width="320" height="300" fill="#EBEEF3"></rect>
+            <path d="M0 180 C 70 160, 130 210, 200 175 S 290 150, 320 165" stroke="#B9C8E8" stroke-width="14" fill="none"></path>
+            <path d="M30 0 L 100 300 M 210 0 L 170 300 M 0 90 L 320 70 M 0 250 L 320 262" stroke="#FFFFFF" stroke-width="6"></path>
+            <rect x="120" y="205" width="56" height="40" rx="8" fill="#D3E7DA"></rect>
+          </svg>
+          <span style="position: absolute; left: 90px; top: 70px; font-size: 12px; font-weight: 700; color: #0D1321; background: #FFFFFF; padding: 5px 9px; border-radius: 999px; box-shadow: 0 6px 16px rgba(13,19,33,0.18)">€1,284</span>
+          <span style="position: absolute; left: 200px; top: 130px; font-size: 12px; font-weight: 700; color: #0D1321; background: #FFFFFF; padding: 5px 9px; border-radius: 999px; box-shadow: 0 6px 16px rgba(13,19,33,0.18)">€980</span>
+          <span style="position: absolute; left: 60px; top: 200px; font-size: 12px; font-weight: 700; color: #0D1321; background: #FFFFFF; padding: 5px 9px; border-radius: 999px; box-shadow: 0 6px 16px rgba(13,19,33,0.18)">€1,650</span>
+          <span style="position: absolute; left: 12px; bottom: 10px; font-size: 11px; color: #3B4352; background: rgba(255,255,255,0.9); padding: 3px 7px; border-radius: 6px">Offline map · © OpenStreetMap contributors</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="how" style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 20px; padding: 32px">
+      <h2 id="how" style="margin: 0; font-size: 28px; letter-spacing: -0.02em">How WohnIQ works</h2>
+      <div style="margin-top: 22px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 14px; color: #2747E6; font-weight: 500">01</span>
+          <strong style="font-size: 18px">You describe it</strong>
+          <span style="font-size: 15px; color: #5B6475; line-height: 1.55">Budget, rooms, area, commute, quiet or lively: in your own words, English or German.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 14px; color: #2747E6; font-weight: 500">02</span>
+          <strong style="font-size: 18px">We rank and check</strong>
+          <span style="font-size: 15px; color: #5B6475; line-height: 1.55">Each flat is scored on fit, its rent compared with the Mietspiegel, and screened for scam patterns.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 14px; color: #2747E6; font-weight: 500">03</span>
+          <strong style="font-size: 18px">You see why</strong>
+          <span style="font-size: 15px; color: #5B6475; line-height: 1.55">Every result explains itself: what matches, what doesn’t, and what to ask the landlord.</span>
+        </div>
+      </div>
+    </section>
+
+    <footer style="border-top: 1px solid #DDE1E8; padding-top: 24px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; font-size: 13px; color: #5B6475; line-height: 1.6">
+      <span style="max-width: 760px">Sample listings are synthetic. Data: Berliner Mietspiegel 2026, Senate open data, VBB timetables, © OpenStreetMap contributors. Rent results are estimates, not legal advice.</span>
+      <span>Works offline · No account needed</span>
+    </footer>
+  </main>
+</div>
+</body>
+</html>

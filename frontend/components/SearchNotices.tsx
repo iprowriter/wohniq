@@ -1,13 +1,13 @@
 import type { SearchNotice } from "@/lib/types";
 
 function euro(n: number) {
-  return `€${n.toLocaleString("de-DE")}`;
+  return `€${n.toLocaleString("en-GB")}`;
 }
 
 const STYLES: Record<string, { box: string; icon: string; title: string }> = {
-  budget: { box: "border-amber-200 bg-amber-50", icon: "text-amber-600", title: "text-amber-900" },
-  nearby: { box: "border-indigo-200 bg-indigo-50", icon: "text-indigo-600", title: "text-indigo-900" },
-  empty: { box: "border-gray-200 bg-white", icon: "text-gray-500", title: "text-gray-900" },
+  budget: { box: "border-transparent bg-warn-bg", icon: "text-warn", title: "text-warn" },
+  nearby: { box: "border-transparent bg-accent-tint", icon: "text-accent", title: "text-text" },
+  empty: { box: "border-line bg-surface", icon: "text-text-muted", title: "text-text" },
 };
 
 function styleFor(kind: SearchNotice["kind"]) {
@@ -81,7 +81,7 @@ export function SearchNotices({ notices, onRaiseBudget, busy = false }: Props) {
             </span>
             <div className="min-w-0 flex-1">
               <p className={`text-sm font-semibold ${s.title}`}>{n.title}</p>
-              <p className="mt-0.5 text-sm leading-relaxed text-gray-700">{n.message}</p>
+              <p className="mt-0.5 text-sm leading-relaxed text-text-body">{n.message}</p>
               {onRaiseBudget && budgets.length > 0 && (
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   {budgets.map((b, i) => (
@@ -92,8 +92,8 @@ export function SearchNotices({ notices, onRaiseBudget, busy = false }: Props) {
                       onClick={() => onRaiseBudget(b.value)}
                       className={
                         i === 0
-                          ? "rounded-full bg-amber-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-amber-500 disabled:opacity-50"
-                          : "rounded-full border border-amber-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100 disabled:opacity-50"
+                          ? "inline-flex min-h-tap items-center rounded-md bg-ink px-4 text-sm font-semibold text-white hover:bg-[#1c2436] disabled:opacity-50"
+                          : "inline-flex min-h-tap items-center rounded-md border border-line-strong bg-surface px-4 text-sm font-semibold text-text hover:bg-ground disabled:opacity-50"
                       }
                     >
                       {b.label}

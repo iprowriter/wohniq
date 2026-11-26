@@ -21,8 +21,8 @@ export function OptionGroup({ question, answers, labels, onChange }: Props) {
 
   return (
     <fieldset className="space-y-3">
-      <legend className="text-base font-semibold text-gray-900">{question.prompt}</legend>
-      {question.help && <p className="-mt-1 text-xs leading-relaxed text-gray-500">{question.help}</p>}
+      <legend className="text-base font-semibold text-text">{question.prompt}</legend>
+      {question.help && <p className="-mt-1 text-xs leading-relaxed text-text-muted">{question.help}</p>}
       <div className="flex flex-wrap gap-2">
         {question.options.map((option) => {
           const chosen = isChosen(answers, question, option.id);
@@ -57,10 +57,10 @@ export function OptionGroup({ question, answers, labels, onChange }: Props) {
                 }}
               />
               <span
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-200 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 ${
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-200 peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2 ${
                   chosen
-                    ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                    : "border-gray-200 bg-white text-gray-700 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-sm"
+                    ? "border-accent bg-accent text-white shadow-md shadow-accent/20"
+                    : "border-line bg-white text-text-body hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-sm"
                 }`}
               >
                 {chosen && (
@@ -75,7 +75,7 @@ export function OptionGroup({ question, answers, labels, onChange }: Props) {
         })}
       </div>
       {question.multi && (
-        <p className="text-xs text-gray-400" aria-live="polite">
+        <p className="text-xs text-text-muted" aria-live="polite">
           {chosenCount}/{question.max_choices} chosen
         </p>
       )}

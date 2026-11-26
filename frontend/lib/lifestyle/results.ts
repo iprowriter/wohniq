@@ -61,15 +61,15 @@ export function removeExcluded(list: string[], key: string): string[] {
 
 // --- Map colours ------------------------------------------------------------------------
 
-/** Sequential scale (light → deep indigo) in five bands of match score. */
+/** One calm Berlin Ink blue scale (dark → light) in five bands of match score. */
 export const SCORE_BANDS: { min: number; color: string; label: string }[] = [
-  { min: 80, color: "#3730a3", label: "80+" },
-  { min: 70, color: "#4f46e5", label: "70–79" },
-  { min: 60, color: "#818cf8", label: "60–69" },
-  { min: 50, color: "#c7d2fe", label: "50–59" },
-  { min: 0, color: "#eef2ff", label: "< 50" },
+  { min: 80, color: "#1A33B3", label: "80+" },
+  { min: 70, color: "#2747E6", label: "70–79" },
+  { min: 60, color: "#6F8BFF", label: "60–69" },
+  { min: 50, color: "#B4C2FF", label: "50–59" },
+  { min: 0, color: "#E3E8FF", label: "< 50" },
 ];
-export const EXCLUDED_COLOR = "#e5e7eb";
+export const EXCLUDED_COLOR = "#E3E6EC";
 
 export function scoreColor(score: number | null | undefined): string {
   if (score == null) return EXCLUDED_COLOR;

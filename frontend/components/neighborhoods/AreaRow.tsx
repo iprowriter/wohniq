@@ -22,20 +22,20 @@ export function AreaRow({ area: a, total, bestLabel, worstLabel, selected, onSel
     <li
       id={`area-${a.key}`}
       data-key={a.key}
+      data-label={`#${a.rank} ${a.name}, ${a.district}`}
       onMouseEnter={() => onHover(a.key)}
       onMouseLeave={() => onHover(null)}
       className={`scroll-mt-40 rounded-2xl border bg-white transition-shadow ${
         selected
-          ? "border-indigo-300 shadow-lg shadow-indigo-600/10 ring-1 ring-indigo-300"
-          : "border-gray-200 hover:shadow-md"
+          ? "border-accent/50 shadow-lg shadow-accent/10 ring-1 ring-accent/40"
+          : "border-line hover:shadow-md"
       }`}
     >
       <button
         type="button"
         onClick={() => onSelect(a.key)}
         aria-expanded={selected}
-        aria-label={`#${a.rank} ${a.name}, ${a.district}`}
-        className="flex w-full items-start gap-3 rounded-2xl p-3.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+        className="flex w-full items-start gap-3 rounded-2xl p-3.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <span
           className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold tabular-nums"
@@ -48,15 +48,15 @@ export function AreaRow({ area: a, total, bestLabel, worstLabel, selected, onSel
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-baseline justify-between gap-2">
-            <span className="truncate font-semibold text-gray-900">{a.name}</span>
+            <span className="truncate font-semibold text-text">{a.name}</span>
             <span
-              className="flex-shrink-0 text-sm font-semibold tabular-nums text-gray-900"
+              className="flex-shrink-0 text-sm font-semibold tabular-nums text-text"
               title="Score 0–100 (Berlin percentile)"
             >
               {Math.round(a.score)}
             </span>
           </span>
-          <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
+          <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-muted">
             <span className="truncate">
               {a.area_group} · {a.district}
             </span>
@@ -67,11 +67,11 @@ export function AreaRow({ area: a, total, bestLabel, worstLabel, selected, onSel
             )}
           </span>
           {a.headline && (
-            <span className="mt-1 block text-xs text-gray-600">
-              {a.headline.label}: <span className="font-medium tabular-nums text-gray-800">{a.headline.text}</span>
+            <span className="mt-1 block text-xs text-text-body">
+              {a.headline.label}: <span className="font-medium tabular-nums text-text">{a.headline.text}</span>
             </span>
           )}
-          <span className="mt-2 block h-1 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
+          <span className="mt-2 block h-1 overflow-hidden rounded-full bg-chip" aria-hidden="true">
             <span
               className="block h-full rounded-full"
               style={{

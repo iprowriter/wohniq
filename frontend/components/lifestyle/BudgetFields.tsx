@@ -25,7 +25,7 @@ function Stepper({
   label: string;
 }) {
   const btn =
-    "flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-lg text-gray-700 transition hover:border-indigo-300 hover:text-indigo-600 disabled:opacity-30";
+    "flex h-9 w-9 items-center justify-center rounded-full border border-line text-lg text-text-body transition hover:border-accent/50 hover:text-accent disabled:opacity-30";
   return (
     <div className="flex items-center gap-3" role="group" aria-label={label}>
       <button type="button" className={btn} onClick={() => onChange(clampNumber(value - step, min, max, step))} disabled={value <= min} aria-label={`Fewer ${label}`}>
@@ -49,11 +49,11 @@ export function BudgetFields({ answers, city, onChange }: Props) {
     <div className="space-y-7">
       <div>
         <div className="flex items-end justify-between">
-          <label htmlFor="budget" className="text-base font-semibold text-gray-900">
-            Monthly budget <span className="font-normal text-gray-500">(warm, all-in)</span>
+          <label htmlFor="budget" className="text-base font-semibold text-text">
+            Monthly budget <span className="font-normal text-text-muted">(warm, all-in)</span>
           </label>
           <div className="flex items-baseline gap-1">
-            <span className="text-gray-400">€</span>
+            <span className="text-text-muted">€</span>
             <input
               type="number"
               inputMode="numeric"
@@ -64,7 +64,7 @@ export function BudgetFields({ answers, city, onChange }: Props) {
               value={answers.budget_eur}
               onChange={(e) => onChange({ ...answers, budget_eur: Number(e.target.value) })}
               onBlur={() => onChange({ ...answers, budget_eur: clampNumber(answers.budget_eur, b.min, b.max, b.step) })}
-              className="w-24 rounded-lg border border-transparent bg-transparent text-right text-2xl font-bold tabular-nums text-gray-900 outline-none focus:border-indigo-300 focus:bg-indigo-50/40"
+              className="w-24 rounded-lg border border-transparent bg-transparent text-right text-2xl font-bold tabular-nums text-text outline-none focus:border-accent/50 focus:bg-accent-tint/40"
             />
           </div>
         </div>
@@ -85,7 +85,7 @@ export function BudgetFields({ answers, city, onChange }: Props) {
                 key={r.label}
                 type="button"
                 onClick={() => onChange({ ...answers, budget_eur: clampNumber(r.value, b.min, b.max, b.step) })}
-                className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 transition hover:bg-indigo-50 hover:text-indigo-700"
+                className="rounded-full bg-chip px-3 py-1 text-xs text-text-body transition hover:bg-accent-tint hover:text-accent"
                 title="Use this as my budget"
               >
                 {r.label}: <span className="font-semibold">{euro(r.value)}</span>
@@ -98,12 +98,12 @@ export function BudgetFields({ answers, city, onChange }: Props) {
       <div className="grid gap-7 sm:grid-cols-2">
         <div>
           <div className="flex items-end justify-between">
-            <label htmlFor="size" className="text-base font-semibold text-gray-900">
+            <label htmlFor="size" className="text-base font-semibold text-text">
               Flat size
             </label>
-            <span className="text-2xl font-bold tabular-nums text-gray-900">
+            <span className="text-2xl font-bold tabular-nums text-text">
               {answers.size_m2}
-              <span className="ml-1 text-base font-normal text-gray-400">m²</span>
+              <span className="ml-1 text-base font-normal text-text-muted">m²</span>
             </span>
           </div>
           <input
@@ -116,10 +116,10 @@ export function BudgetFields({ answers, city, onChange }: Props) {
             value={Math.min(Math.max(answers.size_m2, s.sliderMin), s.sliderMax)}
             onChange={(e) => onChange({ ...answers, size_m2: Number(e.target.value) })}
           />
-          <p className="mt-1 text-xs text-gray-400">Used to estimate typical rents in each area.</p>
+          <p className="mt-1 text-xs text-text-muted">Used to estimate typical rents in each area.</p>
         </div>
         <div>
-          <p className="mb-2 text-base font-semibold text-gray-900">Rooms</p>
+          <p className="mb-2 text-base font-semibold text-text">Rooms</p>
           <Stepper
             label="rooms"
             value={answers.rooms}

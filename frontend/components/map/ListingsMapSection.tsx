@@ -32,10 +32,10 @@ export function ListingsMapSection({
     <section className="pb-14" id="map" aria-labelledby="map-heading">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 id="map-heading" className="text-lg font-semibold">
+          <h2 id="map-heading" className="text-[22px] font-semibold tracking-tight text-text">
             See on the map
           </h2>
-          <p className="mt-0.5 text-sm text-gray-500">
+          <p className="mt-1 text-[15px] text-text-muted">
             Every listing with its warm rent. Zoom out for median rents by neighbourhood, district
             and for all of Berlin; click a price to see the flat. Explore Berlin above follows the
             map.
@@ -56,7 +56,7 @@ export function ListingsMapSection({
             type="button"
             onClick={onCardsNoteClick}
             data-testid="map-cards-note"
-            className="inline-flex items-center gap-1 text-xs font-medium text-violet-700 hover:text-violet-900"
+            className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:text-accent-hover"
           >
             <span aria-hidden="true">↑</span> {cardsNote}
           </button>

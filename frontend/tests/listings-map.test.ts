@@ -81,9 +81,9 @@ describe("medians", () => {
   });
 
   test("formatEuro uses the app's German thousands separator", () => {
-    assert.equal(formatEuro(1068), "€1.068");
+    assert.equal(formatEuro(1068), "€1,068");
     assert.equal(formatEuro(835), "€835");
-    assert.equal(formatEuro(12500), "€12.500");
+    assert.equal(formatEuro(12500), "€12,500");
   });
 });
 

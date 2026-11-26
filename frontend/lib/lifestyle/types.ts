@@ -79,6 +79,8 @@ export interface DestinationOut {
   name: string;
   short: string;
   kind: "university" | "hub";
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface SourceOut {

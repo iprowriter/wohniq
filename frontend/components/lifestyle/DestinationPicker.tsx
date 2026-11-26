@@ -18,10 +18,10 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-xl border px-3 py-2 text-left text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+      className={`rounded-xl border px-3 py-2 text-left text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
         active
-          ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-          : "border-gray-200 bg-white text-gray-700 hover:-translate-y-0.5 hover:border-indigo-300"
+          ? "border-accent bg-accent text-white shadow-md shadow-accent/20"
+          : "border-line bg-white text-text-body hover:-translate-y-0.5 hover:border-accent/50"
       }`}
     >
       {children}
@@ -35,16 +35,16 @@ export function DestinationPicker({ answers, destinations, frequency, labels, on
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <p className="text-base font-semibold text-gray-900">Where do you go most?</p>
-        <p className="-mt-1 text-xs text-gray-500">
+        <p className="text-base font-semibold text-text">Where do you go most?</p>
+        <p className="-mt-1 text-xs text-text-muted">
           Pick from the list — we never ask for your address. Commute times come from the VBB timetable.
         </p>
         {[
-          { title: "🎓 Universities & campuses", items: groups.university },
-          { title: "📍 City hubs", items: groups.hub },
+          { title: "Universities & campuses", items: groups.university },
+          { title: "City hubs", items: groups.hub },
         ].map((g) => (
           <div key={g.title}>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">{g.title}</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-muted">{g.title}</p>
             <div className="flex flex-wrap gap-2">
               {g.items.map((d) => (
                 <Pill
@@ -64,18 +64,18 @@ export function DestinationPicker({ answers, destinations, frequency, labels, on
       </div>
 
       {answers.destination && (
-        <div className="animate-fade-up space-y-6 rounded-2xl bg-indigo-50/50 p-4">
+        <div className="animate-fade-up space-y-6 rounded-2xl bg-accent-tint/50 p-4">
           {frequency && (
             <OptionGroup question={{ ...frequency, help: null }} answers={answers} labels={labels} onChange={onChange} />
           )}
           <div>
             <div className="flex items-end justify-between">
-              <label htmlFor="commute" className="text-base font-semibold text-gray-900">
-                Longest commute you'd accept
+              <label htmlFor="commute" className="text-base font-semibold text-text">
+                Longest commute you&apos;d accept
               </label>
-              <span className="text-2xl font-bold tabular-nums text-gray-900">
+              <span className="text-2xl font-bold tabular-nums text-text">
                 {answers.max_commute_min}
-                <span className="ml-1 text-base font-normal text-gray-400">min</span>
+                <span className="ml-1 text-base font-normal text-text-muted">min</span>
               </span>
             </div>
             <input
@@ -88,7 +88,7 @@ export function DestinationPicker({ answers, destinations, frequency, labels, on
               value={Math.min(answers.max_commute_min, c.sliderMax)}
               onChange={(e) => onChange({ ...answers, max_commute_min: Number(e.target.value) })}
             />
-            <p className="mt-1 text-xs text-gray-500">Areas beyond this are still shown, just ranked lower.</p>
+            <p className="mt-1 text-xs text-text-muted">Areas beyond this are still shown, just ranked lower.</p>
           </div>
         </div>
       )}

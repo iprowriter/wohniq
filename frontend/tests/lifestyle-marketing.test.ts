@@ -18,10 +18,9 @@ test("homepage facts match the real catalog", () => {
   assert.ok(catalog.attributes.every((a) => a.available), "every advertised factor has data");
 });
 
-test("entry points link to the questionnaire", () => {
+test("the homepage entry cards link to the explorer and quote the real area count", () => {
   assert.equal(LIFESTYLE_PATH, "/lifestyle");
-  for (const file of ["../components/lifestyle/LifestyleEntryBar.tsx", "../components/lifestyle/LifestyleFeatureCard.tsx"]) {
-    const src = readFileSync(new URL(file, import.meta.url), "utf-8");
-    assert.match(src, /href=\{LIFESTYLE_PATH\}/, file);
-  }
+  const src = readFileSync(new URL("../components/home/HomeSections.tsx", import.meta.url), "utf-8");
+  assert.match(src, /href: LIFESTYLE_PATH/);
+  assert.match(src, /All \$\{LIFESTYLE_FACTS\.areas\} areas/);
 });

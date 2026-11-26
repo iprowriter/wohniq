@@ -142,3 +142,13 @@ def get_repository() -> Iterator[ListingRepository]:
 
     with get_sessionmaker()() as session:
         yield SqlRepository(session)
+
+
+def get_repository_for_warmup() -> list[Listing]:
+    """Every listing (demo fixtures or the live table), for startup warm-ups."""
+    if settings.demo_mode:
+        from data.demo_repository import get_demo_repository
+
+        return list(get_demo_repository()._listings.values())
+    with get_sessionmaker()() as session:
+        return list(session.scalars(select(Listing)))

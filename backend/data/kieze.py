@@ -39,5 +39,19 @@ KIEZE: list[Kiez] = [
     Kiez("Spandau", "Spandau", 52.535, 13.200, 11.5, "low"),
 ]
 
+# Outer districts the first catalogue missed (Marzahn-Hellersdorf, Reinickendorf), used only
+# by the district batch in data.synthetic. A separate list on purpose: the generator draws
+# from KIEZE with its rng, so extending KIEZE would reshuffle every existing listing, and
+# the Lifestyle bundle maps its regions onto exactly these 14.
+OUTER_KIEZE: list[Kiez] = [
+    Kiez("Marzahn", "Marzahn-Hellersdorf", 52.545, 13.545, 10.5, "low"),
+    Kiez("Hellersdorf", "Marzahn-Hellersdorf", 52.535, 13.605, 10.0, "low"),
+    Kiez("Reinickendorf", "Reinickendorf", 52.575, 13.335, 12.0, "low"),
+    Kiez("Tegel", "Reinickendorf", 52.585, 13.285, 12.5, "low"),
+]
+
+# Every Kiez a listing can be in.
+ALL_KIEZE: list[Kiez] = KIEZE + OUTER_KIEZE
+
 # Berlin bounding box — used by tests to assert generated coords are sane.
 BERLIN_BBOX = {"lat_min": 52.30, "lat_max": 52.70, "lng_min": 13.05, "lng_max": 13.80}

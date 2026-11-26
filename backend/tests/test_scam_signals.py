@@ -3,6 +3,7 @@
 from scam.signals import (
     kiez_price_stats,
     no_anmeldung,
+    price_below_index,
     price_below_market,
     rule_signals,
 )
@@ -59,3 +60,27 @@ def test_rule_signals_aggregates_fired_only():
         mad_eur_per_m2=2.0,
     )
     assert clean == []
+
+
+# --- price against the rent index (ADR-0017) ------------------------------------------
+
+
+def test_price_below_index_fires_15_percent_below_the_lowest_value():
+    assert price_below_index(eur_per_m2=6.0, index_low=7.0, index_row=45) is None  # 14 %
+    sig = price_below_index(eur_per_m2=3.58, index_low=5.20, index_row=45)
+    assert sig is not None and sig.name == "price_below_index" and sig.source == "rule"
+    assert sig.evidence == (
+        "€3.58/m² cold is 31% below the lowest rent-index value for this flat "
+        "(€5.20/m², Mietspiegel 2026, row 45)"
+    )
+    assert price_below_index(2.0, 5.0, 1).severity == 1.0
+
+
+def test_rule_signals_prefer_the_rent_index_over_the_kiez_median():
+    common = {"kiez": "Mitte", "anmeldung_possible": True, "median_eur_per_m2": 20.0,
+              "mad_eur_per_m2": 2.0}
+    # Far below the Kiez asking median, but inside the rent index: no price signal.
+    assert rule_signals(eur_per_m2=9.0, index_low=8.0, index_row=3, **common) == []
+    # Without an index row the old median check still applies.
+    names = {s.name for s in rule_signals(eur_per_m2=9.0, **common)}
+    assert names == {"price_below_market"}

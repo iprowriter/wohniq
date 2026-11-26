@@ -16,12 +16,15 @@ Produces three kinds of listing:
 
 from __future__ import annotations
 
+import hashlib
+import json
 import random
 import uuid
 from dataclasses import dataclass
 from datetime import date, timedelta
+from pathlib import Path
 
-from data.kieze import KIEZE, Kiez
+from data.kieze import KIEZE, OUTER_KIEZE, Kiez
 
 ROOM_CHOICES = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 ROOM_WEIGHTS = [10, 12, 26, 14, 20, 8, 10]
@@ -45,8 +48,16 @@ _TRANSIT = [
 _FIRST = ["Anna", "Lukas", "Sophie", "Max", "Marie", "Jonas", "Laura", "Felix", "Mia", "Paul"]
 _LAST = ["Müller", "Schmidt", "Weber", "Fischer", "Becker", "Wagner", "Hoffmann", "Schulz"]
 _STREETS = [
-    "Stargarder", "Boxhagener", "Torstraße", "Kastanienallee", "Sonnenallee",
-    "Bergmannstraße", "Weserstraße", "Schönhauser Allee", "Kantstraße", "Turmstraße",
+    "Stargarder",
+    "Boxhagener",
+    "Torstraße",
+    "Kastanienallee",
+    "Sonnenallee",
+    "Bergmannstraße",
+    "Weserstraße",
+    "Schönhauser Allee",
+    "Kantstraße",
+    "Turmstraße",
 ]
 _DOMAINS = ["gmail.com", "web.de", "gmx.de", "mail.com"]
 
@@ -94,6 +105,7 @@ class SyntheticListing:
     is_scam: bool = False
     scam_type: str | None = None
     is_hard_negative: bool = False  # manifest-only; not a DB column
+    year_built: int | None = None  # derived from the id (year_built_for), not from rng
 
     @property
     def warmmiete_eur(self) -> int:
@@ -104,10 +116,62 @@ class SyntheticListing:
         return self.kaltmiete_eur / self.size_m2
 
 
+# Building-age mix for the synthetic stock: roughly Berlin's rental housing (old Altbau,
+# post-war, GDR/West-Berlin 1970s–80s, little 2002–2013, a recent new-build wave). Bands
+# follow the Mietspiegel 2026 building-age rows; 2014+ new builds are rent-brake exempt.
+_BUILD_BANDS: tuple[tuple[int, int, float], ...] = (
+    (1870, 1918, 0.24),
+    (1919, 1949, 0.13),
+    (1950, 1964, 0.13),
+    (1965, 1972, 0.08),
+    (1973, 1990, 0.17),
+    (1991, 2001, 0.10),
+    (2002, 2013, 0.04),
+    (2014, 2024, 0.11),
+)
+
+
+# Rent overrides set against the Mietspiegel (data/berlin/fair_rents.py, ADR-0017): some
+# honest listings at fair rents, price-bait scams below the index. Applied by id, after
+# generation, so nothing else changes. Missing file = the generator's own prices.
+OVERRIDES_PATH = Path(__file__).parent / "demo" / "rent_overrides.json"
+
+
+def _rent_overrides() -> dict[str, dict]:
+    try:
+        return json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+
+
+def year_built_for(listing_id: uuid.UUID) -> int:
+    """Deterministic building year from the listing id.
+
+    Hash-based on purpose: it consumes nothing from the generator's rng, so adding it left
+    every other field (and every scam label) of the seeded listings unchanged.
+    """
+    digest = hashlib.sha256(listing_id.bytes).digest()
+    u = int.from_bytes(digest[:8], "big") / 2**64
+    v = int.from_bytes(digest[8:16], "big") / 2**64
+    edge = 0.0
+    for start, end, weight in _BUILD_BANDS:
+        edge += weight
+        if u < edge:
+            return start + int(v * (end - start + 1))
+    start, end, _ = _BUILD_BANDS[-1]
+    return start + int(v * (end - start + 1))
+
+
 def _make_listing(
-    rng, ref: date, *, scam_type: str | None = None, hard_negative: str | None = None
+    rng,
+    ref: date,
+    *,
+    scam_type: str | None = None,
+    hard_negative: str | None = None,
+    kiez: Kiez | None = None,
 ) -> SyntheticListing:
-    kiez: Kiez = rng.choice(KIEZE)
+    # A given Kiez skips the draw, so existing callers consume the rng exactly as before.
+    kiez = kiez or rng.choice(KIEZE)
     rooms = rng.choices(ROOM_CHOICES, weights=ROOM_WEIGHTS, k=1)[0]
     size_m2 = max(18, round(rooms * rng.uniform(18, 26) + rng.uniform(-5, 8)))
 
@@ -204,6 +268,7 @@ def generate_listings(
     scam_ratio: float = 0.15,
     hard_negative_ratio: float = 0.08,
     reference_date: date | None = None,
+    apply_overrides: bool = True,
 ) -> list[SyntheticListing]:
     """Generate `count` listings deterministically for `seed`.
 
@@ -239,6 +304,13 @@ def generate_listings(
         if listing.scam_type == "photo_reuse" and genuine:
             listing.photo_set_id = rng.choice(genuine).photo_set_id
 
+    overrides = _rent_overrides() if apply_overrides else {}
+    for listing in listings:
+        listing.year_built = year_built_for(listing.id)
+        override = overrides.get(str(listing.id))
+        if override:
+            listing.kaltmiete_eur = override["kaltmiete_eur"]
+            listing.deposit_eur = 3 * listing.kaltmiete_eur  # Kaution: 3x cold rent
     return listings
 
 
@@ -255,3 +327,157 @@ def manifest_entry(listing: SyntheticListing) -> dict:
         "scam_type": listing.scam_type,
         "is_hard_negative": listing.is_hard_negative,
     }
+
+
+# --- The 40 extra listings (ADR-0018) ---------------------------------------------------
+# Appended to the original 100 (which stay byte-identical): scams whose *wording* gives them
+# away, in English and German; two subtle scams with no telltale phrase; three more photo
+# copies; and honest listings that use the same words innocently, so the offline wording
+# check is tested against both sides. Its own seed, so the first 100 never change.
+
+EXTRA_SEED = 4242
+EXTRA_COUNT = 40
+
+_EXTRA_SCAM_TEXTS: dict[str, tuple[str, ...]] = {
+    "advance_fee": (
+        "To secure the flat, please transfer the deposit of {deposit} € before the viewing. "
+        "After payment I send you the contract by email.",
+        "Bitte überweisen Sie die Kaution vorab, danach schicke ich Ihnen den Schlüssel per "
+        "Post.",
+        "Payment of the first month is required before we can arrange a viewing. Many people "
+        "are interested, so please act today.",
+        "Send the reservation fee by bank transfer and I will hold the apartment for you; a "
+        "viewing is possible after payment.",
+        "Die Besichtigung ist erst nach Eingang der ersten Monatsmiete möglich. Wir "
+        "akzeptieren auch Bitcoin.",
+    ),
+    "overseas_landlord": (
+        "I moved to London for work and can't show the flat. My lawyer will send the keys by "
+        "DHL once you pay the deposit.",
+        "Ich bin zur Zeit beruflich in Spanien und kann die Wohnung nicht zeigen. Die "
+        "Schlüssel schicke ich Ihnen nach Zahlung per DHL.",
+        "I'm abroad as a volunteer right now. Pay via MoneyGram and the keys will arrive by "
+        "courier within two days.",
+        "Currently living overseas. Transfer the first rent and deposit through Western Union, "
+        "then I mail you the keys.",
+    ),
+    "fake_platform": (
+        "Booking is handled by a secure payment service: you pay through the link I send, and "
+        "the money is held until you have the keys.",
+        "Die Zahlung läuft sicher über einen Treuhandservice, ich sende Ihnen den Link. Danach "
+        "erhalten Sie den Schlüssel per Post.",
+    ),
+    "photo_reuse": (
+        "Available now. Write me on WhatsApp for more photos and details.",
+        "Wohnung sofort frei. Melden Sie sich per Nachricht für weitere Infos.",
+        "Great flat, just renovated. Message me if interested.",
+    ),
+    "subtle": (
+        "Nice flat, available immediately. Send me your phone number and I'll call you back.",
+        "Schöne Wohnung, ab sofort frei. Schreiben Sie mir Ihre E-Mail, ich melde mich.",
+    ),
+}
+
+# Honest listings that use the scam words innocently (negated, or someone shows the flat).
+_EXTRA_TRICKY_TEXTS: tuple[str, ...] = (
+    "Please note: we never ask for Western Union or any transfer before you have seen the "
+    "flat. Viewings every Saturday.",
+    "Ich wohne im Ausland, aber meine Schwester zeigt die Wohnung, und den Vertrag "
+    "unterschreiben wir persönlich. Keine Vorauszahlung.",
+    "Kaution erst nach Vertragsunterzeichnung, Schlüsselübergabe persönlich vor Ort.",
+    "Keys are handed over in person at the flat. We don't post keys.",
+    "Many applicants, so we decide after the viewings next week. No payment before signing.",
+    "I'm currently abroad for work; my property manager Herr Schulz shows the flat and you "
+    "sign the contract in person.",
+    "Rent is paid by standing order after the contract is signed. We never accept cash or "
+    "crypto.",
+    "Beware of scams: never transfer money before a viewing. We are a registered "
+    "Hausverwaltung.",
+    "Bitte keine Überweisung vor der Besichtigung. Wir lernen Sie gern persönlich kennen.",
+    "Viewing first, then the contract, then the deposit into a rent deposit account "
+    "(Mietkautionskonto).",
+)
+
+
+def generate_extra_listings(
+    base: list[SyntheticListing],
+    *,
+    seed: int = EXTRA_SEED,
+    reference_date: date | None = None,
+) -> list[SyntheticListing]:
+    """The 40 extra listings. `base` is the original 100 (photo copies take a genuine set)."""
+    rng = random.Random(seed)
+    ref = reference_date or date.today()
+    specs: list[tuple[str, str | None, str]] = []
+    for scam_type, texts in _EXTRA_SCAM_TEXTS.items():
+        specs += [("scam", scam_type, t) for t in texts]
+    specs += [("hard", "wording", t) for t in _EXTRA_TRICKY_TEXTS]
+    n_plain = EXTRA_COUNT - len(specs)
+    specs += [("legit", None, "")] * n_plain
+    rng.shuffle(specs)
+
+    genuine = [x for x in base if not x.is_scam]
+    out: list[SyntheticListing] = []
+    for kind, sub, text in specs:
+        x = _make_listing(rng, ref)  # honest base: Kiez, size, price, contact
+        if kind == "scam":
+            x.is_scam, x.scam_type = True, sub
+            x.contact_text = text.format(deposit=x.deposit_eur)
+            if sub == "photo_reuse":
+                x.photo_set_id = rng.choice(genuine).photo_set_id  # the whole set
+        elif kind == "hard":
+            x.is_hard_negative = True
+            x.contact_text = text
+        out.append(x)
+    return out
+
+
+# --- The district batch: every Berlin district has listings ------------------------------
+# The first 140 listings covered 10 of Berlin's 12 districts. These add Marzahn-Hellersdorf
+# and Reinickendorf (two Kieze each), with the same mix as the original catalogue: mostly
+# honest, plus one price-bait scam (Marzahn, Reinickendorf) and one tricky-but-honest listing
+# (Hellersdorf, Tegel). Own seed, so the first 140 never change; photos reuse images
+# already in the catalogue.
+
+DISTRICT_SEED = 4343
+PER_KIEZ = 6
+
+
+def generate_district_listings(
+    *, seed: int = DISTRICT_SEED, reference_date: date | None = None
+) -> list[SyntheticListing]:
+    rng = random.Random(seed)
+    ref = reference_date or date.today()
+    out: list[SyntheticListing] = []
+    for i, kiez in enumerate(OUTER_KIEZE):
+        specs: list[tuple[str | None, str | None]] = [(None, None)] * PER_KIEZ
+        if i % 2 == 0:
+            specs[0] = ("price_bait", None)  # one scam per district
+        else:
+            # One tricky-but-honest listing: landlord abroad, a local agent shows the flat.
+            # ("cheap" would sit far below the index here, where asking rents are close to it.)
+            specs[0] = (None, "travel")
+        rng.shuffle(specs)
+        for scam_type, hard in specs:
+            out.append(_make_listing(rng, ref, scam_type=scam_type, hard_negative=hard, kiez=kiez))
+    return out
+
+
+def generate_catalogue(
+    *, reference_date: date | None = None, apply_overrides: bool = True
+) -> list[SyntheticListing]:
+    """The full demo catalogue: the original 100 listings (seed 42), the 40 extras and the
+    district batch (Marzahn-Hellersdorf, Reinickendorf)."""
+    base = generate_listings(
+        100, seed=42, reference_date=reference_date, apply_overrides=apply_overrides
+    )
+    extra = generate_extra_listings(base, reference_date=reference_date)
+    extra += generate_district_listings(reference_date=reference_date)
+    overrides = _rent_overrides() if apply_overrides else {}
+    for x in extra:
+        x.year_built = year_built_for(x.id)
+        override = overrides.get(str(x.id))
+        if override:
+            x.kaltmiete_eur = override["kaltmiete_eur"]
+            x.deposit_eur = 3 * x.kaltmiete_eur
+    return base + extra

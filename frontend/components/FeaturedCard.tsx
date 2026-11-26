@@ -1,21 +1,26 @@
 import Link from "next/link";
 import type { ListingOut } from "@/lib/types";
 import type { CardTag } from "@/lib/map/exploreCards";
+import { euro, rooms } from "@/lib/format";
+import { rentChip } from "@/lib/listing/chips";
+import { Chip } from "@/components/ui/primitives";
+import { StationChip } from "@/components/listing/VerdictChips";
 import { ListingPhoto } from "./ListingPhoto";
 
-/** What the card needs: a full listing (`photos`) or a map point (`photo_url`). */
+/** What the card needs: a full listing (`photos`, `rent`, `location`) or a map point. */
 export type CardListing = Pick<
   ListingOut,
   "id" | "title" | "kiez" | "warmmiete_eur" | "size_m2" | "rooms"
-> & { photos?: ListingOut["photos"]; photo_url?: string | null };
-
-function euro(n: number) {
-  return `€${n.toLocaleString("de-DE")}`;
-}
-
-function formatRooms(n: number) {
-  return n % 1 === 0 ? String(Math.round(n)) : n.toFixed(1);
-}
+> & {
+  photos?: ListingOut["photos"];
+  photo_url?: string | null;
+  rent?: ListingOut["rent"];
+  location?: ListingOut["location"];
+  rent_verdict?: string | null;
+  rail_stop?: string | null;
+  rail_modes?: string[];
+  rail_walk_minutes?: number | null;
+};
 
 interface Props {
   listing: CardListing;
@@ -25,7 +30,11 @@ interface Props {
 
 export function FeaturedCard({ listing, tag = null }: Props) {
   const cover = listing.photos?.[0]?.url ?? listing.photo_url ?? null;
-  const inView = tag === "in-view";
+  const verdict = listing.rent?.verdict ?? listing.rent_verdict ?? null;
+  const chip = verdict ? rentChip({ verdict } as NonNullable<ListingOut["rent"]>) : null;
+  const station = listing.location?.rail_stop ?? listing.rail_stop;
+  const modes = listing.location?.rail_modes ?? listing.rail_modes ?? [];
+  const walk = listing.location?.rail_walk_minutes ?? listing.rail_walk_minutes;
 
   return (
     <Link
@@ -33,47 +42,50 @@ export function FeaturedCard({ listing, tag = null }: Props) {
       data-testid="explore-card"
       data-tag={tag ?? "none"}
       data-id={listing.id}
-      className={`group relative block overflow-hidden rounded-2xl border bg-white transition-all hover:shadow-lg ${
-        inView
-          ? "border-violet-300 ring-2 ring-violet-200 hover:border-violet-400"
-          : "border-gray-200 hover:border-gray-300"
+      className={`group relative flex flex-col overflow-hidden rounded-lg border bg-surface transition-shadow hover:shadow-md ${
+        tag === "in-view" ? "border-accent ring-2 ring-accent-soft" : "border-line"
       }`}
     >
       {cover ? (
         <ListingPhoto
           url={cover}
           alt={listing.title}
-          className="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          className="h-40 w-full bg-placeholder object-cover"
+          placeholderClassName="h-40 w-full bg-placeholder"
         />
       ) : (
-        <div className="h-44 w-full bg-gray-100" />
+        <div className="h-40 w-full bg-placeholder" />
       )}
-      {/* Overlay tags: on the photo, so they never change the card's height. */}
       {tag === "in-view" && (
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-violet-700 px-2.5 py-1 text-[11px] font-semibold text-white shadow">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-            <path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" />
-          </svg>
+        <span className="absolute left-3 top-3 rounded-full bg-accent px-2.5 py-1 text-[12px] font-semibold text-white shadow">
           In map view
         </span>
       )}
       {tag === "elsewhere" && (
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-gray-600 shadow-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-surface/95 px-2.5 py-1 text-[12px] font-medium text-text-body shadow-sm">
           Elsewhere in Berlin
         </span>
       )}
-      <div className="p-4">
-        <p className="mb-0.5 truncate text-xs font-medium uppercase tracking-wide text-gray-400">
-          {listing.kiez}
-        </p>
-        {/* Fixed two-line height: the grid (and the map below it) never shifts. */}
-        <h3 className="mb-3 line-clamp-2 h-10 text-sm font-medium leading-snug">{listing.title}</h3>
-        <div className="flex items-center justify-between">
-          <span className="text-base font-semibold">{euro(listing.warmmiete_eur)}</span>
-          <span className="text-xs text-gray-400">
-            {listing.size_m2} m² · {formatRooms(listing.rooms)} Zi.
-          </span>
+      {/* Fixed height: Explore Berlin swaps cards as the map moves, and the map below must
+          never jump (e2e "map never moves"). One line per row, the chip row always there. */}
+      <div className="flex h-[118px] flex-col gap-1.5 p-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="truncate text-[16px] font-semibold text-text">{listing.kiez}</h3>
+          <span className="text-[17px] font-semibold tabular-nums text-text">{euro(listing.warmmiete_eur)}</span>
         </div>
+        <p className="sr-only">{listing.title}</p>
+        <div className="flex min-w-0 flex-nowrap items-center gap-x-1.5 overflow-hidden whitespace-nowrap text-[13px] text-text-muted">
+          <span>{rooms(listing.rooms)}</span>
+          <span aria-hidden="true">·</span>
+          <span>{listing.size_m2} m²</span>
+          {station && (
+            <>
+              <span aria-hidden="true">·</span>
+              <StationChip stop={station} modes={modes} minutes={walk} compact />
+            </>
+          )}
+        </div>
+        <div className="mt-auto h-6 pt-0.5">{chip && <Chip tone={chip.tone}>{chip.short}</Chip>}</div>
       </div>
     </Link>
   );

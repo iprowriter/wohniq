@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2 · Listing dossier · WohnIQ redesign mockup</title>
+<!-- WohnIQ "Berlin Ink" redesign mockup. Static reference: all figures are sample data, photos and maps are placeholders.
+     Design tokens: ../tokens.css · Intent and rules: ../DESIGN.md -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#2747E6}a:hover{color:#1A33B3}
+</style>
+</head>
+<body>
+<div style="font-family: Geist, Inter, system-ui, sans-serif; color: #0D1321; background: #F4F5F7; min-height: 100%">
+
+  <header style="background: #0D1321">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+      <a href="1-search-results.html" style="color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 20px; letter-spacing: -0.02em">WohnIQ</a>
+      <a href="1-search-results.html" style="color: #C9D0DC; text-decoration: none; font-size: 15px; display: flex; align-items: center; gap: 6px; padding: 10px 6px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"></path></svg>Back to 14 results in Mitte</a>
+      <div style="margin-left: auto; display: flex; gap: 8px">
+        <button type="button" style="font: inherit; font-size: 14px; color: #FFFFFF; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 0 14px; min-height: 44px">Share</button>
+        <button type="button" style="font: inherit; font-size: 14px; color: #FFFFFF; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 0 14px; min-height: 44px">Print / PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1280px; margin: 0 auto; padding: 28px 32px 64px">
+    <section aria-label="Photos" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 200px 200px; gap: 10px; border-radius: 20px; overflow: hidden">
+      <div style="grid-column: span 2; grid-row: span 2; background: #E2E6ED; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 14px">Living room photo</div>
+      <div style="background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Bedroom</div>
+      <div style="background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Kitchen</div>
+      <div style="background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Bathroom</div>
+      <div style="background: #E9ECF2; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Floor plan</div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 28px; margin-top: 28px; align-items: flex-start">
+      <div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+        <div>
+          <p style="margin: 0; font-size: 14px; color: #5B6475">Mitte · Rosenthaler Vorstadt · Choriner Str.</p>
+          <h1 style="margin: 6px 0 0; font-size: 38px; line-height: 1.1; letter-spacing: -0.03em">Bright 2-room flat by Weinbergspark</h1>
+          <p style="margin: 10px 0 0; font-size: 16px; color: #3B4352; font-variant-numeric: tabular-nums">2 rooms · 61 m² · 3rd floor of 5 · built 1908 · available 1 Feb · Anmeldung possible</p>
+        </div>
+
+        <section aria-label="Verdict" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+          <div style="background: #0D1321; color: #FFFFFF; border-radius: 16px; padding: 18px">
+            <div style="font-size: 13px; color: #C9D0DC">Fit for your search</div>
+            <div style="font-size: 34px; font-weight: 700; letter-spacing: -0.02em; margin-top: 4px">92<span style="font-size: 16px; color: #C9D0DC; font-weight: 500"> / 100</span></div>
+            <div style="font-size: 14px; color: #C9D0DC; margin-top: 4px">In Mitte, quiet, park 350 m</div>
+          </div>
+          <div style="background: #E3F4F0; border-radius: 16px; padding: 18px">
+            <div style="font-size: 13px; color: #0F6B5E">Rent check</div>
+            <div style="font-size: 22px; font-weight: 700; color: #0B4F45; margin-top: 8px">Within the rent index</div>
+            <div style="font-size: 14px; color: #0F6B5E; margin-top: 4px">€14.10/m² cold · limit €14.74</div>
+          </div>
+          <div style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 16px; padding: 18px">
+            <div style="font-size: 13px; color: #5B6475">Scam risk</div>
+            <div style="font-size: 22px; font-weight: 700; margin-top: 8px">Low · 12/100</div>
+            <div style="font-size: 14px; color: #5B6475; margin-top: 4px">No warning signs found</div>
+          </div>
+        </section>
+
+        <section aria-labelledby="rc" style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: baseline">
+            <h2 id="rc" style="margin: 0; font-size: 21px; letter-spacing: -0.01em">Rent check</h2>
+            <a href="3-rent-check.html" style="font-size: 14px">Open the full rent check</a>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 15px; color: #3B4352; line-height: 1.55">Location class <strong>good</strong>, 61 m², built before 1918. The Mietspiegel 2026 range for this flat is <strong style="font-variant-numeric: tabular-nums">€11.60–15.20/m²</strong>, mean €13.40. With the rent brake (index mean + 10%) the cold rent may be at most about <strong>€14.74/m²</strong>; this flat asks €14.10.</p>
+          <div style="margin-top: 22px; position: relative; height: 64px">
+            <div style="position: absolute; left: 0; right: 0; top: 26px; height: 10px; border-radius: 999px; background: #EEF0F4"></div>
+            <div style="position: absolute; left: 22%; width: 46%; top: 26px; height: 10px; border-radius: 999px; background: #BFE3D9"></div>
+            <div style="position: absolute; left: 45%; top: 18px; width: 2px; height: 26px; background: #0F6B5E"></div>
+            <div style="position: absolute; left: 66%; top: 14px; width: 2px; height: 34px; background: #8A3F06"></div>
+            <div style="position: absolute; left: 58%; top: 20px; width: 22px; height: 22px; margin-left: -11px; border-radius: 999px; background: #2747E6; border: 3px solid #FFFFFF; box-shadow: 0 2px 8px rgba(39,71,230,0.4)"></div>
+            <span style="position: absolute; left: 22%; top: 46px; font-size: 12px; color: #5B6475">€11.60</span>
+            <span style="position: absolute; left: 41%; top: 0; font-size: 12px; color: #0F6B5E">mean €13.40</span>
+            <span style="position: absolute; left: 53%; top: 46px; font-size: 12px; font-weight: 600; color: #2747E6">asked €14.10</span>
+            <span style="position: absolute; left: 62%; top: -4px; font-size: 12px; color: #8A3F06">rent-brake limit €14.74</span>
+            <span style="position: absolute; left: 64%; top: 46px; font-size: 12px; color: #5B6475">€15.20</span>
+          </div>
+          <p style="margin: 18px 0 0; font-size: 13px; color: #5B6475">Estimate from the official rent index, not legal advice. New builds first let after Oct 2014 and furnished flats are not covered by the rent brake.</p>
+        </section>
+
+        <section aria-labelledby="around" style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px">
+          <h2 id="around" style="margin: 0; font-size: 21px; letter-spacing: -0.01em">Around this flat</h2>
+          <p style="margin: 6px 0 0; font-size: 14px; color: #5B6475">Compared with Berlin’s 542 planning areas. Differences are described, not judged.</p>
+          <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Nearest S/U-Bahn</span>
+                  <span style="font-size: 12px; color: #5B6475">VBB</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Rosenthaler Platz · 4 min walk</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 88%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">Closer than 88% of Berlin</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Schools within 1 km</span>
+                  <span style="font-size: 12px; color: #5B6475">Senate</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">6 schools</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 72%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">3 primary, 2 secondary, 1 vocational</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Kitas within 500 m</span>
+                  <span style="font-size: 12px; color: #5B6475">Senate</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">11 Kitas · 640 places</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">More than in 81% of areas</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Parks and playgrounds</span>
+                  <span style="font-size: 12px; color: #5B6475">Geoportal</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Weinbergspark 350 m · 4 playgrounds</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 76%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">Green space per resident: average</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Air quality</span>
+                  <span style="font-size: 12px; color: #5B6475">luftdaten.berlin</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Index 2 · good</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 64%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">Station Mitte, last snapshot</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Road accidents nearby</span>
+                  <span style="font-size: 12px; color: #5B6475">Unfallatlas</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">14 within 300 m (2025)</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 58%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">Near the middle for central areas</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Recorded crime</span>
+                  <span style="font-size: 12px; color: #5B6475">Police atlas</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">District region Alexanderplatz</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 22%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">Higher than most regions, typical for centres</div>
+              </div>
+            
+              <div style="border: 1px solid #E3E6EC; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+                <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline">
+                  <span style="font-size: 14px; color: #5B6475">Location class</span>
+                  <span style="font-size: 12px; color: #5B6475">Mietspiegel</span>
+                </div>
+                <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Good (rent index)</div>
+                <div style="height: 6px; border-radius: 999px; background: #EEF0F4; position: relative">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 70%; border-radius: 999px; background: #8FA4FF"></div>
+                </div>
+                <div style="font-size: 13px; color: #3B4352">Used by the Mietspiegel</div>
+              </div>
+            
+          </div>
+        </section>
+
+        <section aria-labelledby="risk" style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px">
+          <h2 id="risk" style="margin: 0; font-size: 21px; letter-spacing: -0.01em">Why the risk is low</h2>
+          <ul style="margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 15px; color: #3B4352">
+            <li style="display: flex; gap: 10px"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F6B5E" stroke-width="2.2"><path d="m5 12 5 5L20 7"></path></svg>Rent sits inside the official rent index range, not suspiciously low.</li>
+            <li style="display: flex; gap: 10px"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F6B5E" stroke-width="2.2"><path d="m5 12 5 5L20 7"></path></svg>Photos don’t appear on any other listing.</li>
+            <li style="display: flex; gap: 10px"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F6B5E" stroke-width="2.2"><path d="m5 12 5 5L20 7"></path></svg>No pressure to pay before a viewing; Anmeldung is possible.</li>
+          </ul>
+        </section>
+      </div>
+
+      <aside style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+        <section aria-label="Price" style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 22px">
+          <div style="font-size: 34px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">€1,284 <span style="font-size: 15px; font-weight: 500; color: #5B6475">warm / month</span></div>
+          <dl style="margin: 14px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 8px; font-size: 14px; font-variant-numeric: tabular-nums">
+            <dt style="color: #5B6475">Cold rent</dt><dd style="margin: 0; text-align: right">€860</dd>
+            <dt style="color: #5B6475">Service charges</dt><dd style="margin: 0; text-align: right">€424</dd>
+            <dt style="color: #5B6475">Deposit</dt><dd style="margin: 0; text-align: right">€2,580</dd>
+            <dt style="color: #5B6475">Per m² cold</dt><dd style="margin: 0; text-align: right">€14.10</dd>
+          </dl>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px">
+            <button type="button" style="font: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #2747E6; border: 0; border-radius: 12px; min-height: 48px">Request a viewing</button>
+            <div style="display: flex; gap: 8px">
+              <button type="button" style="flex: 1; font: inherit; font-size: 14px; color: #0D1321; background: #FFFFFF; border: 1px solid #DDE1E8; border-radius: 12px; min-height: 44px">Save</button>
+              <button type="button" style="flex: 1; font: inherit; font-size: 14px; color: #0D1321; background: #FFFFFF; border: 1px solid #DDE1E8; border-radius: 12px; min-height: 44px">Compare</button>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="live" style="background: #0D1321; color: #FFFFFF; border-radius: 18px; padding: 22px">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+            <h2 id="live" style="margin: 0; font-size: 17px">Right now</h2>
+            <span style="font-size: 12px; color: #9FF0DC; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #3DD9B3"></span>Live · BVG</span>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 14px; color: #C9D0DC">Rosenthaler Platz (U8) · 4 min walk</p>
+          <ul style="margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-variant-numeric: tabular-nums">
+            
+              <li style="display: flex; align-items: center; gap: 10px; font-size: 14px">
+                <span style="font-weight: 700; font-size: 13px; background: #1C5FA8; color: #FFFFFF; padding: 3px 8px; border-radius: 6px; min-width: 32px; text-align: center">U8</span>
+                <span style="flex: 1; color: #E6EAF1">Hermannstraße</span>
+                <span style="font-weight: 600">2 min</span>
+              </li>
+            
+              <li style="display: flex; align-items: center; gap: 10px; font-size: 14px">
+                <span style="font-weight: 700; font-size: 13px; background: #1C5FA8; color: #FFFFFF; padding: 3px 8px; border-radius: 6px; min-width: 32px; text-align: center">U8</span>
+                <span style="flex: 1; color: #E6EAF1">Wittenau</span>
+                <span style="font-weight: 600">4 min</span>
+              </li>
+            
+              <li style="display: flex; align-items: center; gap: 10px; font-size: 14px">
+                <span style="font-weight: 700; font-size: 13px; background: #B3261E; color: #FFFFFF; padding: 3px 8px; border-radius: 6px; min-width: 32px; text-align: center">M1</span>
+                <span style="flex: 1; color: #E6EAF1">Schillerstraße</span>
+                <span style="font-weight: 600">6 min</span>
+              </li>
+            
+              <li style="display: flex; align-items: center; gap: 10px; font-size: 14px">
+                <span style="font-weight: 700; font-size: 13px; background: #3B4352; color: #FFFFFF; padding: 3px 8px; border-radius: 6px; min-width: 32px; text-align: center">N8</span>
+                <span style="flex: 1; color: #E6EAF1">Hermannstraße</span>
+                <span style="font-weight: 600">23:42</span>
+              </li>
+            
+          </ul>
+          <p style="margin: 14px 0 0; font-size: 12px; color: #9AA3B2">Offline? This card shows the nearest stations and walking times instead.</p>
+        </section>
+
+        <section aria-labelledby="commute" style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 22px">
+          <h2 id="commute" style="margin: 0; font-size: 17px">Commute</h2>
+          <div style="margin-top: 12px; display: flex; justify-content: space-between; font-size: 15px"><span>To Alexanderplatz</span><strong>14 min</strong></div>
+          <div style="margin-top: 6px; font-size: 13px; color: #5B6475">U8 · 0 changes · 6 min walking</div>
+          <div style="margin-top: 14px; height: 150px; border-radius: 12px; background: #EBEEF3; display: flex; align-items: center; justify-content: center; color: #5B6475; font-size: 13px">Map: flat, station and route</div>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+</body>
+</html>

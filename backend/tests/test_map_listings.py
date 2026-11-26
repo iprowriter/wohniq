@@ -7,6 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from berlin.geo import haversine_one
 from core.config import settings
 from data.demo_repository import get_demo_repository
 from data.kieze import BERLIN_BBOX
@@ -30,8 +31,8 @@ def test_map_returns_every_listing_with_card_details(client):
     assert resp.status_code == 200  # not swallowed by /listings/{listing_id}
     points = resp.json()
     repo = get_demo_repository()
-    assert len(points) == len(repo._listings) == 100
-    assert len({p["id"] for p in points}) == 100
+    assert len(points) == len(repo._listings) == 164
+    assert len({p["id"] for p in points}) == 164
     for p in points:
         assert BERLIN_BBOX["lat_min"] <= p["lat"] <= BERLIN_BBOX["lat_max"]
         assert BERLIN_BBOX["lng_min"] <= p["lng"] <= BERLIN_BBOX["lng_max"]
@@ -48,7 +49,9 @@ def test_map_prices_match_the_listings(client):
     for p in points[:10]:
         listing = next(x for x in repo._listings.values() if str(x.id) == p["id"])
         assert p["warmmiete_eur"] == listing.warmmiete_eur
-        assert (p["lat"], p["lng"]) == (listing.lat, listing.lng)
+        # Placed at the listing's matched address (ADR-0016): one point on every map, at
+        # most a few hundred metres from the synthetic point.
+        assert haversine_one(p["lat"], p["lng"], listing.lat, listing.lng) < 600
     # Sanity for the map's Berlin median bubble.
     median = statistics.median(p["warmmiete_eur"] for p in points)
     assert 500 < median < 2000

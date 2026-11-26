@@ -1,4 +1,15 @@
-import type { ListingDetailResponse, ListingOut, SearchResponse } from "./types";
+import type {
+  AddressOut,
+  CommuteOut,
+  ListingDetailResponse,
+  ListingOut,
+  MapStop,
+  PlaceProfile,
+  RightNowOut,
+  SearchResponse,
+  SimilarResponse,
+} from "./types";
+import type { RentIndex } from "./rent/index.ts";
 import type { MapListing } from "./map/listingsMap";
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -52,3 +63,53 @@ export async function getMapListings(): Promise<MapListing[]> {
   }
   return res.json();
 }
+
+async function getJson<T>(path: string, what: string): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`);
+  if (!res.ok) throw new Error(`Couldn't load ${what} (${res.status})`);
+  return res.json();
+}
+
+const qs = (params: Record<string, string | number>) =>
+  new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString();
+
+/** Everything the browser needs to run the rent check locally (table, checklist, texts). */
+export const getRentIndex = () => getJson<RentIndex>("/api/v1/rent/index", "the rent index");
+
+export const searchAddresses = (q: string, limit = 8) =>
+  getJson<AddressOut[]>(`/api/v1/rent/addresses?${qs({ q, limit })}`, "addresses");
+
+export const getAddress = (id: number, sizeM2?: number) =>
+  getJson<AddressOut>(
+    `/api/v1/rent/addresses/${id}${sizeM2 ? `?${qs({ size_m2: sizeM2 })}` : ""}`,
+    "the address",
+  );
+
+export const getPlaceProfile = (lat: number, lng: number, locationClass?: string) =>
+  getJson<PlaceProfile>(
+    `/api/v1/place?${qs(locationClass ? { lat, lng, location_class: locationClass } : { lat, lng })}`,
+    "the area profile",
+  );
+
+export const getListingAround = (id: string) =>
+  getJson<PlaceProfile>(`/api/v1/listings/${id}/around`, "the area profile");
+
+export const getRightNow = (lat: number, lng: number) =>
+  getJson<RightNowOut>(`/api/v1/right-now?${qs({ lat, lng })}`, "departures");
+
+export type Box = { south: number; west: number; north: number; east: number };
+
+export const getStopsInView = (b: Box) =>
+  getJson<MapStop[]>(`/api/v1/stops?${qs(b)}`, "stops");
+
+export const getParksInView = (b: Box) =>
+  getJson<GeoJSON.FeatureCollection>(`/api/v1/parks?${qs(b)}`, "parks");
+
+export const getListingCommute = (id: string, to: string) =>
+  getJson<{ to: string; commute: CommuteOut | null; note: string | null }>(
+    `/api/v1/listings/${id}/commute?${qs({ to })}`,
+    "the trip time",
+  );
+
+export const getSimilarListings = (id: string) =>
+  getJson<SimilarResponse>(`/api/v1/listings/${id}/similar`, "similar flats");

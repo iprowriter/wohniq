@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3 · Rent check · WohnIQ redesign mockup</title>
+<!-- WohnIQ "Berlin Ink" redesign mockup. Static reference: all figures are sample data, photos and maps are placeholders.
+     Design tokens: ../tokens.css · Intent and rules: ../DESIGN.md -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#2747E6}a:hover{color:#1A33B3}
+</style>
+</head>
+<body>
+<div style="font-family: Geist, Inter, system-ui, sans-serif; color: #0D1321; background: #F4F5F7; min-height: 100%">
+
+  <header style="background: #0D1321; color: #FFFFFF">
+    <div style="max-width: 1280px; margin: 0 auto; padding: 18px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 24px">
+      <a href="1-search-results.html" style="color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 20px; letter-spacing: -0.02em">WohnIQ</a>
+      <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px">
+        <a href="1-search-results.html" style="color: #C9D0DC; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px">Search</a>
+        <a href="#" style="color: #C9D0DC; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px">Lifestyle match</a>
+        <a href="#" style="color: #C9D0DC; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px">Neighbourhoods</a>
+        <a href="#" style="color: #FFFFFF; text-decoration: none; font-size: 15px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.08)">Rent check</a>
+      </nav>
+    </div>
+    <div style="max-width: 1280px; margin: 0 auto; padding: 36px 32px 44px">
+      <h1 style="margin: 0; font-size: 44px; letter-spacing: -0.03em; line-height: 1.1">Is this rent fair?</h1>
+      <p style="margin: 12px 0 0; font-size: 17px; color: #C9D0DC; max-width: 640px; line-height: 1.5">Check any of Berlin’s 400,505 residential addresses against the official Mietspiegel 2026 and the rent brake. Works offline; your details stay in your browser.</p>
+    </div>
+  </header>
+
+  <main style="max-width: 1280px; margin: 0 auto; padding: 32px; display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+    <form aria-label="Flat details" style="flex: 1 1 380px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="addr" style="font-size: 14px; font-weight: 600">Address</label>
+        <input id="addr" type="text" value="Choriner Str. 41, 10435 Berlin" style="font: inherit; font-size: 16px; border: 1px solid #CFD5DF; border-radius: 12px; padding: 12px 14px; color: #0D1321">
+        <span style="font-size: 13px; color: #0F6B5E">Found · location class: good · Mitte</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="size" style="font-size: 14px; font-weight: 600">Size (m²)</label>
+          <input id="size" type="text" value="61" style="font: inherit; font-size: 16px; border: 1px solid #CFD5DF; border-radius: 12px; padding: 12px 14px; color: #0D1321">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="year" style="font-size: 14px; font-weight: 600">Built</label>
+          <select id="year" style="font: inherit; font-size: 16px; border: 1px solid #CFD5DF; border-radius: 12px; padding: 12px 14px; color: #0D1321; background: #FFFFFF">
+            <option>before 1918</option>
+          </select>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="cold" style="font-size: 14px; font-weight: 600">Your cold rent (€)</label>
+          <input id="cold" type="text" value="860" style="font: inherit; font-size: 16px; border: 1px solid #CFD5DF; border-radius: 12px; padding: 12px 14px; color: #0D1321">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="energy" style="font-size: 14px; font-weight: 600">Energy value (kWh/m²a)</label>
+          <input id="energy" type="text" value="148" style="font: inherit; font-size: 16px; border: 1px solid #CFD5DF; border-radius: 12px; padding: 12px 14px; color: #0D1321">
+        </div>
+      </div>
+      <fieldset style="border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
+        <legend style="font-size: 14px; font-weight: 600; margin-bottom: 8px">Features that raise or lower the value (Mietspiegel checklist)</legend>
+        <label style="display: flex; gap: 10px; align-items: center; font-size: 15px; min-height: 32px"><input type="checkbox" checked style="width: 20px; height: 20px">Modern fitted kitchen</label>
+        <label style="display: flex; gap: 10px; align-items: center; font-size: 15px; min-height: 32px"><input type="checkbox" checked style="width: 20px; height: 20px">Balcony or terrace</label>
+        <label style="display: flex; gap: 10px; align-items: center; font-size: 15px; min-height: 32px"><input type="checkbox" style="width: 20px; height: 20px">Bathroom without window</label>
+        <label style="display: flex; gap: 10px; align-items: center; font-size: 15px; min-height: 32px"><input type="checkbox" style="width: 20px; height: 20px">Single-glazed windows</label>
+      </fieldset>
+      <button type="submit" style="font: inherit; font-size: 16px; font-weight: 600; color: #FFFFFF; background: #2747E6; border: 0; border-radius: 12px; min-height: 52px">Check this rent</button>
+    </form>
+
+    <section aria-label="Result" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <div style="background: #E3F4F0; border-radius: 18px; padding: 26px">
+        <p style="margin: 0; font-size: 14px; color: #0F6B5E; font-weight: 600">Result</p>
+        <h2 style="margin: 6px 0 0; font-size: 32px; letter-spacing: -0.02em; color: #0B4F45">Your rent is within the rent index</h2>
+        <p style="margin: 10px 0 0; font-size: 16px; color: #0F4F45; line-height: 1.55">You pay <strong>€14.10/m²</strong> cold. With two positive features the comparable rent is about <strong>€14.10–14.30/m²</strong>; the rent brake allows up to <strong>€14.74/m²</strong> (€899 cold). You are €39 a month under the limit.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 16px; padding: 18px">
+          <div style="font-size: 13px; color: #5B6475">Mietspiegel range</div>
+          <div style="font-size: 22px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums">€11.60–15.20</div>
+          <div style="font-size: 13px; color: #5B6475; margin-top: 2px">per m², mean €13.40</div>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 16px; padding: 18px">
+          <div style="font-size: 13px; color: #5B6475">Rent-brake limit</div>
+          <div style="font-size: 22px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums">€14.74</div>
+          <div style="font-size: 13px; color: #5B6475; margin-top: 2px">per m², mean + 10%</div>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 16px; padding: 18px">
+          <div style="font-size: 13px; color: #5B6475">You pay</div>
+          <div style="font-size: 22px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; color: #2747E6">€14.10</div>
+          <div style="font-size: 13px; color: #5B6475; margin-top: 2px">per m², €860 cold</div>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E6EC; border-radius: 18px; padding: 22px">
+        <h3 style="margin: 0; font-size: 17px">How rents compare in this area</h3>
+        <p style="margin: 6px 0 0; font-size: 14px; color: #5B6475">Mietspiegel mean by building age, location class good, 60–90 m²</p>
+        <div style="margin-top: 18px; display: flex; align-items: flex-end; gap: 14px; height: 160px">
+          
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #3B4352">€13.40</span>
+              <div style="width: 100%; height: 120px; background: #2747E6; border-radius: 8px 8px 0 0"></div>
+              <span style="font-size: 12px; color: #5B6475; text-align: center">before 1918</span>
+            </div>
+          
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #3B4352">€11.90</span>
+              <div style="width: 100%; height: 100px; background: #C9D3FF; border-radius: 8px 8px 0 0"></div>
+              <span style="font-size: 12px; color: #5B6475; text-align: center">1919–49</span>
+            </div>
+          
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #3B4352">€10.80</span>
+              <div style="width: 100%; height: 86px; background: #C9D3FF; border-radius: 8px 8px 0 0"></div>
+              <span style="font-size: 12px; color: #5B6475; text-align: center">1950–64</span>
+            </div>
+          
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #3B4352">€10.40</span>
+              <div style="width: 100%; height: 80px; background: #C9D3FF; border-radius: 8px 8px 0 0"></div>
+              <span style="font-size: 12px; color: #5B6475; text-align: center">1965–72</span>
+            </div>
+          
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #3B4352">€11.20</span>
+              <div style="width: 100%; height: 92px; background: #C9D3FF; border-radius: 8px 8px 0 0"></div>
+              <span style="font-size: 12px; color: #5B6475; text-align: center">1973–90</span>
+            </div>
+          
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px">
+              <span style="font-size: 12px; font-variant-numeric: tabular-nums; color: #3B4352">€13.10</span>
+              <div style="width: 100%; height: 116px; background: #C9D3FF; border-radius: 8px 8px 0 0"></div>
+              <span style="font-size: 12px; color: #5B6475; text-align: center">1991–2013</span>
+            </div>
+          
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <a href="2-listing-dossier.html" style="font-size: 14px; font-weight: 600; color: #FFFFFF; background: #0D1321; text-decoration: none; border-radius: 10px; padding: 13px 16px">See flats here with fair rents</a>
+        <button type="button" style="font: inherit; font-size: 14px; color: #0D1321; background: #FFFFFF; border: 1px solid #DDE1E8; border-radius: 10px; padding: 0 14px; min-height: 44px">Print / PDF</button>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #5B6475; line-height: 1.6">Estimate based on the Berliner Mietspiegel 2026 (Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen). Not legal advice: the rent brake has exceptions (new builds first let after 1 Oct 2014, comprehensive modernisation, furnished flats, a previous rent that was already higher). For a binding check, contact a tenants’ association.</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

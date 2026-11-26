@@ -12,7 +12,7 @@ const MUGGELHEIM = "094016";
 const rows = (page: Page) => page.locator("li[data-key]");
 const row = (page: Page, key: string) => page.locator(`li[data-key="${key}"]`);
 const firstRowName = async (page: Page) =>
-  (await rows(page).first().locator("button").first().getAttribute("aria-label")) ?? "";
+  (await rows(page).first().getAttribute("data-label")) ?? "";
 
 async function clickArea(page: Page, key: string) {
   // Leaflet draws each area as an SVG path tagged with its key (NeighborhoodsMap). Click
@@ -42,12 +42,16 @@ async function clickArea(page: Page, key: string) {
   throw new Error(`area ${key} is not clickable on the map`);
 }
 
+/** The main navigation; on phones it sits behind the header's menu button. */
+async function mainNav(page: Page) {
+  const menu = page.getByRole("button", { name: "Open menu" });
+  if (await menu.isVisible()) await menu.click();
+  return page.getByRole("navigation", { name: "Main" });
+}
+
 async function openFromMenu(page: Page) {
   await page.goto("/");
-  await page
-    .getByRole("navigation")
-    .getByRole("link", { name: /Neighborhoods/ })
-    .click();
+  await (await mainNav(page)).getByRole("link", { name: "Neighbourhoods" }).click();
   await expect(page).toHaveURL(/\/neighborhoods$/);
   await expect(rows(page)).toHaveCount(143);
 }
@@ -96,7 +100,7 @@ test("list → map: selecting a row outlines the area on the map", async ({ page
   await expect(rows(page)).toHaveCount(143);
   await row(page, MUGGELHEIM).locator("button").first().click();
   await expect(row(page, MUGGELHEIM).getByTestId("area-detail")).toBeVisible();
-  await expect(page.locator(`path.nbh-area-${MUGGELHEIM}`)).toHaveAttribute("stroke", "#111827");
+  await expect(page.locator(`path.nbh-area-${MUGGELHEIM}`)).toHaveAttribute("stroke", "#0D1321");
   // Tapping the row again collapses it.
   await row(page, MUGGELHEIM).locator("button").first().click();
   await expect(row(page, MUGGELHEIM).getByTestId("area-detail")).toHaveCount(0);
@@ -105,11 +109,11 @@ test("list → map: selecting a row outlines the area on the map", async ({ page
 test("search and district filter keep Berlin-wide ranks", async ({ page }) => {
   await page.goto("/neighborhoods?category=safety");
   await expect(rows(page)).toHaveCount(143);
-  const rankBefore = await row(page, MUGGELHEIM).locator("button").first().getAttribute("aria-label");
+  const rankBefore = await row(page, MUGGELHEIM).getAttribute("data-label");
 
   await page.getByPlaceholder("Find an area…").fill("muggel");
   await expect(rows(page)).toHaveCount(1);
-  await expect(row(page, MUGGELHEIM).locator("button").first()).toHaveAttribute("aria-label", rankBefore!);
+  await expect(row(page, MUGGELHEIM)).toHaveAttribute("data-label", rankBefore!);
 
   await page.getByPlaceholder("Find an area…").fill("");
   await page.getByLabel("District").selectOption("Mitte");
@@ -160,7 +164,7 @@ test("no horizontal overflow and the menu entry is reachable", async ({ page }) 
   await expect(rows(page)).toHaveCount(143);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflow).toBe(false);
-  await expect(page.getByRole("navigation").getByRole("link", { name: /Neighborhoods/ })).toHaveAttribute(
+  await expect((await mainNav(page)).getByRole("link", { name: "Neighbourhoods" })).toHaveAttribute(
     "aria-current",
     "page",
   );

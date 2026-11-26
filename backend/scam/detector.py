@@ -16,6 +16,7 @@ from scam.fusion import RiskResult, fuse
 from scam.photo_dups import duplicate_photo_signal
 from scam.signals import rule_signals
 from scam.text_signals import analyze_text, to_signals
+from scam.wording import merge, wording_signals
 
 
 def assess_listing(
@@ -31,6 +32,9 @@ def assess_listing(
     contact_text: str,
     skip_text: bool = False,
     text_transport: Transport | None = None,
+    index_low: float | None = None,
+    index_row: int | None = None,
+    description: str = "",
 ) -> RiskResult:
     """Run all signal sources for one listing and fuse them into a risk result."""
     signals = rule_signals(
@@ -39,13 +43,20 @@ def assess_listing(
         anmeldung_possible=anmeldung_possible,
         median_eur_per_m2=median_eur_per_m2,
         mad_eur_per_m2=mad_eur_per_m2,
+        index_low=index_low,
+        index_row=index_row,
     )
 
     dup = duplicate_photo_signal(listing_id=listing_id, phashes=phashes, corpus=photo_corpus)
     if dup is not None:
         signals.append(dup)
 
-    if not skip_text:
-        signals += to_signals(analyze_text(contact_text, transport=text_transport))
+    # Offline wording check always runs; the LLM pass adds tone and intent when available,
+    # and a signal both find is counted once, at the stronger severity (ADR-0018).
+    wording = wording_signals(f"{description}\n{contact_text}")
+    if skip_text:
+        signals += wording
+    else:
+        signals += merge(wording, to_signals(analyze_text(contact_text, transport=text_transport)))
 
     return fuse(signals)

@@ -516,7 +516,9 @@ def test_budget_too_low_citywide(client):
 
 
 def test_budget_blocking_one_of_several_areas_is_reported(client):
-    data = _search(client, REPORTED_QUERY + ", budget 1000")
+    # Mitte's cheapest flat is €668 warm (fair-rent overrides, ADR-0017); the other three
+    # areas have flats under €600.
+    data = _search(client, REPORTED_QUERY + ", budget 600")
     assert data["results"]
     kinds = [n["kind"] for n in data["notices"]]
     assert kinds == ["budget_too_low_in_some_areas"]

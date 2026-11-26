@@ -17,6 +17,7 @@ from dataclasses import asdict
 
 from sqlalchemy import delete, select
 
+from berlin.listings import index_bounds
 from core.db import get_sessionmaker
 from core.logging import configure_logging, get_logger
 from data.models import Listing, Photo, RiskAssessment
@@ -55,6 +56,7 @@ def score_all(*, skip_text: bool = False) -> int:
 
         for x in listings:
             median, mad = stats[x.kiez]
+            index_low, index_row = index_bounds(x)
             result = assess_listing(
                 listing_id=str(x.id),
                 kiez=x.kiez,
@@ -66,6 +68,9 @@ def score_all(*, skip_text: bool = False) -> int:
                 photo_corpus=corpus,
                 contact_text=x.contact_text,
                 skip_text=skip_text,
+                index_low=index_low,
+                index_row=index_row,
+                description=x.description,
             )
             session.add(
                 RiskAssessment(
@@ -73,7 +78,7 @@ def score_all(*, skip_text: bool = False) -> int:
                     score=result.score,
                     band=result.band,
                     signals=[asdict(s) for s in result.signals],
-                    engine_version="v1",
+                    engine_version="v2",
                 )
             )
         session.commit()

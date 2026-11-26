@@ -11,6 +11,11 @@ hundred photos; production scale would index with multi-index hashing or LSH.
 
 Note both the scam and the genuine "victim" it copied from will fire this signal —
 fusion (T3.4) + the other signals separate the two.
+
+Reuse only counts when at least MIN_SHARED_PHOTOS of this listing's photos match *one*
+other listing (ADR-0017). A copied listing takes the whole set (all 5 photos), while the
+demo's honest listings share at most 3 stock photos by chance; counting any single match
+flagged every listing.
 """
 
 from __future__ import annotations
@@ -20,6 +25,7 @@ from collections.abc import Iterable
 from scam.signals import Signal
 
 DUP_THRESHOLD = 5  # Hamming distance <= this counts as the same photo (0 = identical)
+MIN_SHARED_PHOTOS = 4  # photos that must match one other listing for the signal to fire
 
 
 def hamming(a_hex: str, b_hex: str) -> int:
@@ -33,31 +39,31 @@ def duplicate_photo_signal(
     phashes: Iterable[str | None],
     corpus: Iterable[tuple[str, str | None]],
     threshold: int = DUP_THRESHOLD,
+    min_shared: int = MIN_SHARED_PHOTOS,
 ) -> Signal | None:
-    """Fire if this listing's photos appear on other listings.
+    """Fire if at least `min_shared` of this listing's photos appear on one other listing.
 
     `corpus` is (other_listing_id, phash) for photos across the DB (may include this
     listing's own rows — they're skipped by id).
     """
     corpus_list = [(lid, ph) for lid, ph in corpus if ph is not None and lid != listing_id]
+    own = [ph for ph in phashes if ph is not None]
 
-    matched_listings: set[str] = set()
-    matched_photos = 0
-    for ph in phashes:
-        if ph is None:
-            continue
-        for other_id, other_ph in corpus_list:
-            if hamming(ph, other_ph) <= threshold:
-                matched_listings.add(other_id)
-                matched_photos += 1
-                break  # this photo is accounted for; move to the next
+    shared_with: dict[str, int] = {}  # other listing → how many of our photos it has
+    for ph in own:
+        matched_here = {oid for oid, oph in corpus_list if hamming(ph, oph) <= threshold}
+        for oid in matched_here:
+            shared_with[oid] = shared_with.get(oid, 0) + 1
 
-    if not matched_listings:
+    copies = {oid: n for oid, n in shared_with.items() if n >= min_shared}
+    if not copies:
         return None
 
-    severity = min(1.0, 0.5 + 0.1 * matched_photos)  # more reused photos → stronger
-    plural = "s" if len(matched_listings) != 1 else ""
+    most = max(copies.values())
+    severity = min(1.0, 0.5 + 0.1 * most)  # more reused photos → stronger
+    others = len(copies)
     evidence = (
-        f"{matched_photos} photo(s) also appear on {len(matched_listings)} other listing{plural}"
+        f"{most} of {len(own)} photos also appear on "
+        + ("another listing" if others == 1 else f"{others} other listings")
     )
     return Signal(name="photo_reuse", severity=severity, source="image", evidence=evidence)

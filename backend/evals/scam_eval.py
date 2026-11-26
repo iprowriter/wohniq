@@ -22,6 +22,7 @@ from pathlib import Path
 
 from sqlalchemy import select
 
+from berlin.listings import index_bounds
 from core.db import get_sessionmaker
 from core.logging import configure_logging, get_logger
 from data.models import Listing, Photo
@@ -38,7 +39,10 @@ MANIFEST_PATH = Path(__file__).parent.parent / "data" / "generated" / "seed_mani
 
 def _load_hard_negative_ids() -> set[str]:
     if not MANIFEST_PATH.exists():
-        return set()
+        # No seed manifest on this machine: the generator's own labels are the same truth.
+        from data.synthetic import generate_catalogue
+
+        return {str(x.id) for x in generate_catalogue() if x.is_hard_negative}
     manifest = json.loads(MANIFEST_PATH.read_text())
     return {row["id"] for row in manifest if row.get("is_hard_negative")}
 
@@ -76,6 +80,7 @@ def run(*, skip_text: bool = False) -> dict:
 
     for x in listings:
         median, mad = stats_by_kiez[x.kiez]
+        index_low, index_row = index_bounds(x)
         result = assess_listing(
             listing_id=str(x.id),
             kiez=x.kiez,
@@ -87,6 +92,9 @@ def run(*, skip_text: bool = False) -> dict:
             photo_corpus=corpus,
             contact_text=x.contact_text,
             skip_text=skip_text,
+            index_low=index_low,
+            index_row=index_row,
+            description=x.description,
         )
         predicted = result.band == "high"
         y_true.append(bool(x.is_scam))

@@ -16,9 +16,9 @@ const AREAS = ["Mitte", "Spandau", "Lichtenberg", "Treptow"];
 
 async function searchFor(page: Page, query: string) {
   await page.goto("/");
-  await page.getByPlaceholder(/quiet 2-room/).fill(query);
+  await page.getByPlaceholder(/2 rooms near Alexanderplatz/).fill(query);
   await page.getByRole("button", { name: "Search", exact: true }).click();
-  await expect(page.getByText(/ranked by fit/)).toBeVisible();
+  await expect(page.getByTestId("results-heading")).toHaveText(/^\d+ flats? /);
 }
 
 test("Definition of Done: districts in the query are respected and every match is explained", async ({ page }) => {
@@ -32,7 +32,7 @@ test("Definition of Done: districts in the query are respected and every match i
   for (const label of labels) expect(AREAS.some((a) => label.trim() === `In ${a}`)).toBe(true);
 
   // No bare "A strong match for your search." — the summary says why.
-  const summaries = await page.locator("article p.font-medium").allInnerTexts();
+  const summaries = await page.getByTestId("result-why").allInnerTexts();
   for (const s of summaries) {
     expect(s).not.toMatch(/^A (strong|solid|partial) (match|fit)( for your search)?\.?$/);
     expect(s).toMatch(/in (Mitte|Spandau|Lichtenberg|Treptow)/);
@@ -44,10 +44,10 @@ test("Definition of Done: a too-low budget is explained, with a one-click minimu
   const notice = page.locator("[data-kind=budget_too_low]");
   await expect(notice).toContainText("Your budget is too low for Mitte");
   await expect(notice).toContainText("raise your budget to at least");
-  await expect(page.getByText("0 results")).toBeVisible();
+  await expect(page.getByTestId("results-heading")).toHaveText("0 flats in Mitte");
 
   await notice.getByRole("button", { name: /^Search with €/ }).click();
-  await expect(page.getByText(/^1 result|^\d+ results/)).toBeVisible();
+  await expect(page.getByTestId("results-heading")).toHaveText(/^[1-9]\d* flats? in Mitte$/);
   await expect(page.getByTestId("area-badge").first()).toHaveText("In Mitte");
   await expect(page.locator("[data-kind=budget_too_low]")).toHaveCount(0);
 });
@@ -65,7 +65,7 @@ test("after the auto-scroll to results, the header stays on top and doesn't cove
   await page.waitForTimeout(800); // smooth scroll to the results
   const layout = await page.evaluate(() => {
     const header = document.querySelector("header")!.getBoundingClientRect();
-    const label = [...document.querySelectorAll("span")].find((s) => s.textContent === "Understood as")!;
+    const label = [...document.querySelectorAll("span")].find((s) => s.textContent === "We understood:")!;
     const chips = label.parentElement!.getBoundingClientRect();
     const hit = document.elementFromPoint(chips.left + 40, chips.top + chips.height / 2)!;
     return {
@@ -118,10 +118,10 @@ test("Definition of Done: the map under Explore Berlin shows prices; a click ope
   expect(headings.indexOf("See on the map")).toBe(headings.indexOf("Explore Berlin") + 1);
 
   await expect(map).toHaveAttribute("data-tier", "listing");
-  await expect(page.getByTestId("map-status")).toContainText(/Showing \d+ of 100 listings/);
+  await expect(page.getByTestId("map-status")).toContainText(/Showing \d+ of 164 listings/);
   const pill = await clickableInMap(page, "[data-testid=map-pill]");
   const price = (await pill.innerText()).trim();
-  expect(price).toMatch(/^€\d{1,3}(\.\d{3})?$/); // just the rent
+  expect(price).toMatch(/^€\d{1,3}(,\d{3})?$/); // just the rent
 
   await pill.click();
   const card = page.getByTestId("map-card");
@@ -143,7 +143,7 @@ test("Definition of Done: zooming out clusters into neighbourhood, district and 
 
   await zoomOut(page, "neighbourhood");
   await expect(page.locator("[data-testid=map-area][data-tier=neighbourhood]").first()).toBeAttached();
-  await expect(page.locator("[data-testid=map-area][data-name=Kreuzberg]")).toContainText(/€[\d.]+ median/);
+  await expect(page.locator("[data-testid=map-area][data-name=Kreuzberg]")).toContainText(/€[\d,]+ median/);
   await expect(page.getByTestId("map-pill")).toHaveCount(0);
 
   await zoomOut(page, "district");
@@ -153,7 +153,7 @@ test("Definition of Done: zooming out clusters into neighbourhood, district and 
   const berlin = page.locator("[data-testid=map-area][data-tier=city]");
   await expect(berlin).toHaveCount(1);
   await expect(berlin).toContainText("Berlin median rent");
-  await expect(berlin).toContainText("100 listings");
+  await expect(berlin).toContainText("164 listings");
   await expect(page.getByTestId("map-status")).toContainText("Berlin median warm rent");
 
   // And back in: the Berlin bubble opens the districts.
@@ -278,4 +278,33 @@ test("the homepage never gets wider than the screen, also after the cards follow
   await page.locator(".leaflet-control-zoom-in").click();
   await expect(page.getByTestId("map-cards-note")).toBeVisible();
   expect(await fits()).toBe(true);
+});
+
+// --- Results toolbar (T9.4) -------------------------------------------------------------
+
+test("results: only fair rents, sort and save are reflected in the link and the header", async ({ page }) => {
+  await searchFor(page, "2 rooms in Kreuzberg");
+  const fair = page.getByTestId("fair-toggle");
+  const count = Number((await fair.innerText()).match(/\((\d+)\)/)![1]);
+  await fair.click();
+  await expect(page).toHaveURL(/fair=1/);
+  await expect(page.getByTestId("result-card")).toHaveCount(count);
+  for (const chip of await page.getByTestId("rent-chip").all()) {
+    await expect(chip).toHaveAttribute("data-verdict", "within_limit");
+  }
+
+  await page.getByRole("combobox").filter({ hasText: "Best fit" }).selectOption("price");
+  await expect(page).toHaveURL(/sort=price/);
+  const prices = await page.locator("[data-testid=result-card] p.text-\\[22px\\]").allInnerTexts();
+  const values = prices.map((p) => Number(p.replace(/\D/g, "")));
+  expect(values).toEqual([...values].sort((a, b) => a - b));
+
+  // The link reproduces the view.
+  await page.reload();
+  await expect(page.getByTestId("fair-toggle")).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByTestId("result-card").first().getByRole("button", { name: "Save" }).click();
+  if (await page.getByTestId("saved-link").isVisible()) {
+    await expect(page.getByTestId("saved-link")).toHaveText("Saved (1)");
+  }
 });

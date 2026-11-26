@@ -3,7 +3,7 @@
 # `uv run` executes inside that venv (no manual activation needed).
 # Mirrors the commands documented in AGENTS.md.
 
-.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture eval-neighborhoods test test-all lint frontend-test format frontend-dev
+.PHONY: help install migrate migrate-status seed dev demo demo-photos demo-stops lifestyle-data lifestyle-fixture neighborhoods-data neighborhoods-fixture berlin-data berlin-load demo-all demo-extend map-web eval-neighborhoods test test-all lint frontend-test format frontend-dev
 
 help:
 	@echo "install        uv sync — create .venv + install deps (incl. dev group)"
@@ -11,6 +11,7 @@ help:
 	@echo "migrate-status List applied vs pending migrations"
 	@echo "seed           Seed synthetic listings (use ARGS='--reset')"
 	@echo "seed-images    Seed listing photos from Pexels (use ARGS='--reset')"
+	@echo "seed-extra     Add the 40 extra listings (ADR-0018) to a seeded database"
 	@echo "embed          Backfill listing embeddings into pgvector"
 	@echo "score          Score all listings into risk_assessment (ARGS='--no-llm')"
 	@echo "eval-parser    Run the parser eval (20 canonical queries; hits Gemini)"
@@ -22,10 +23,15 @@ help:
 	@echo "neighboorhood  Populate neighboorhood_cache table"
 	@echo "dev            Run the FastAPI backend with reload"
 	@echo "demo           Run the backend in offline demo mode (no DB/APIs; WOHNIQ_DEMO=1)"
+	@echo "demo-all       Offline backend (:8000) + frontend (:3000) together; Ctrl+C stops both"
+	@echo "demo-extend    Add new catalogue listings to the offline demo files (photos + risk, no DB)"
 	@echo "demo-photos    Download local copies of demo photos (run once while online)"
 	@echo "demo-stops     Download VBB stops + peak network for offline commute estimates (once, online)"
 	@echo "lifestyle-data Rebuild Lifestyle Match region profiles from the official files in data/lifestyle/raw/"
 	@echo "neighborhoods-data Rebuild the Berlin Neighbourhoods bundle from data/neighborhoods/raw/"
+	@echo "berlin-data    Build rent index, addresses, stops, schools… from Berlin Visualized raw files (BERLIN_RAW_DIR)"
+	@echo "berlin-load    Load the berlin-data build into Supabase (needs make migrate)"
+	@echo "map-web        Zoom-14 copy of the map (~38 MB) for hosting, e.g. Supabase Storage (needs: brew install pmtiles)"
 	@echo "neighborhoods-fixture Refresh the frontend's neighbourhoods contract fixture from the API"
 	@echo "test           Run pytest (unit tests + AI evals)"
 	@echo "test-all       Run pytest including slow tests (e.g. Lifestyle data rebuild)"
@@ -47,6 +53,9 @@ migrate-status:
 
 seed:
 	cd backend && uv run python -m data.seed_listings $(ARGS)
+
+seed-extra:
+	cd backend && uv run python -m data.seed_extra_listings
 
 seed-images:
 	cd backend && uv run python -m data.seed_images $(ARGS)
@@ -84,6 +93,17 @@ dev:
 demo:
 	cd backend && WOHNIQ_DEMO=1 uv run uvicorn app.main:app --reload
 
+# Both servers in one terminal, no extra package: Ctrl+C (or either server exiting)
+# stops the other one too.
+demo-all:
+	@trap 'kill 0' INT TERM EXIT; \
+	(cd backend && WOHNIQ_DEMO=1 uv run uvicorn app.main:app --reload --port 8000) & \
+	(cd frontend && npm run dev -- --port 3000) & \
+	wait -n 2>/dev/null || wait
+
+demo-extend:
+	cd backend && WOHNIQ_DEMO=1 uv run python -m data.berlin.fair_rents && WOHNIQ_DEMO=1 uv run python -m data.extend_demo_data
+
 demo-photos:
 	cd backend && uv run python -m data.fetch_demo_photos
 
@@ -98,6 +118,19 @@ lifestyle-fixture:
 
 neighborhoods-data:
 	cd backend && uv run python -m data.neighborhoods.build_index $(ARGS)
+
+berlin-data:
+	cd backend && uv run python -m data.berlin.build $(ARGS)
+
+# A copy of the offline map small enough for a 50 MB upload limit (Supabase Storage free
+# plan). Deeper zooms reuse zoom 14; the app reads the max zoom from the file's header.
+map-web:
+	@command -v pmtiles >/dev/null || { echo "pmtiles CLI missing: brew install pmtiles"; exit 1; }
+	pmtiles extract backend/data/berlin/build/map/berlin.pmtiles backend/data/berlin/build/map/berlin-web.pmtiles --maxzoom=14
+	@ls -lh backend/data/berlin/build/map/berlin-web.pmtiles
+
+berlin-load:
+	cd backend && uv run python -m data.berlin.load $(ARGS)
 
 neighborhoods-fixture:
 	cd backend && uv run python -m data.neighborhoods.export_fixture

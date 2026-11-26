@@ -69,6 +69,49 @@ export interface RiskOut {
   signals: RiskSignalOut[];
 }
 
+/** Listing matched to its nearest real address (ADR-0016). Street only, no number. */
+export interface ListingLocationOut {
+  street: string;
+  postcode: string;
+  district: string;
+  planning_area?: string | null;
+  district_region?: string | null;
+  location_class: "simple" | "medium" | "good";
+  east: boolean;
+  rail_stop?: string | null;
+  rail_modes: string[];
+  rail_walk_minutes?: number | null;
+  lat?: number | null;
+  lng?: number | null;
+  address_id?: number | null; // matched address: prefill for the rent check
+}
+
+export type RentVerdict =
+  | "within_limit"
+  | "above_limit"
+  | "below_index"
+  | "new_build"
+  | "not_covered"
+  | "unknown";
+
+/** Rent check against the Mietspiegel 2026 (ADR-0017); an estimate for listings. */
+export interface RentOut {
+  verdict: RentVerdict;
+  verdict_text: string;
+  explanation: string;
+  estimate: boolean;
+  covered: boolean;
+  asked?: number | null;
+  low?: number | null;
+  mean?: number | null;
+  high?: number | null;
+  limit?: number | null;
+  over_per_m2?: number | null;
+  over_per_month?: number | null;
+  row?: number | null;
+  period?: string | null;
+}
+
 export interface ListingOut {
   id: string;
   title: string;
@@ -84,6 +127,9 @@ export interface ListingOut {
   furnished: boolean;
   available_from?: string | null;
   photos: PhotoOut[];
+  year_built?: number | null;
+  location?: ListingLocationOut | null;
+  rent?: RentOut | null;
 }
 
 export interface Explanation {
@@ -152,4 +198,98 @@ export interface ListingDetailResponse {
   listing: ListingDetailOut;
   risk?: RiskOut | null;
   neighborhood?: NeighborhoodDetailOut | null;
+  location?: ListingLocationOut | null;
+  rent?: RentOut | null;
+}
+
+// --- Berlin data (rent check, Around this flat, Right now) ---
+
+export interface AddressOut {
+  id: number;
+  label: string;
+  street: string;
+  house_number: string;
+  postcode: string;
+  district: string;
+  location_class: "simple" | "medium" | "good";
+  east: boolean;
+  lat: number;
+  lng: number;
+  planning_area?: string | null;
+  district_region?: string | null;
+  location_class_share_300m?: number;
+  mean_by_period?: { period: string; label: string; mean: number; row: number }[];
+}
+
+export interface Measure {
+  key: string;
+  label: string;
+  source: string;
+  headline: string;
+  position: number;
+  comparison: string;
+  detail: string;
+  value?: number | null;
+}
+
+export interface PlaceProfile {
+  lat: number;
+  lng: number;
+  planning_area?: string | null;
+  district_region?: string | null;
+  district?: string | null;
+  measures: Measure[];
+}
+
+export interface StopOut {
+  id: string;
+  name: string;
+  modes: string[];
+  distance_m: number;
+  walk_minutes: number;
+  lat: number;
+  lng: number;
+}
+
+export interface DepartureOut {
+  line: string;
+  mode: string;
+  direction: string;
+  stop: string;
+  when?: string | null;
+  planned?: string | null;
+  delay_minutes?: number | null;
+  platform?: string | null;
+  cancelled: boolean;
+}
+
+export interface RightNowOut {
+  status: "live" | "offline";
+  note: string;
+  stops: StopOut[];
+  departures: DepartureOut[];
+  fetched_at?: string | null;
+}
+
+export interface MapStop {
+  id: string;
+  name: string;
+  modes: string[];
+  lat: number;
+  lng: number;
+}
+
+// --- Similar apartments (T9.7) ---
+
+export interface SimilarItem {
+  listing: ListingOut;
+  risk?: RiskOut | null;
+  score: number;
+  distance_km: number;
+  reasons: string[];
+}
+
+export interface SimilarResponse {
+  within_limit_first: boolean;
+  items: SimilarItem[];
 }

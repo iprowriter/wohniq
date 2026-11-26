@@ -21,3 +21,9 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0013](0013-berlin-neighborhoods.md) | Berlin Neighborhoods: ranked area profiles from official data | Accepted (amends 0010's data-ethics section for this feature) |
 | [0014](0014-area-aware-search.md) | Area-aware search: Berlin areas are a hard filter, with a labelled nearby fallback | Accepted (amends 0008 decision 6) |
 | [0015](0015-homepage-listings-map.md) | Homepage listings map: zoom tiers, median clusters and price pills | Accepted |
+| [0016](0016-berlin-open-data-in-supabase.md) | Berlin open data in Supabase (PostGIS), with offline build files | Accepted |
+| [0017](0017-rent-check-and-scam-price-signal.md) | Rent check against the Mietspiegel, and the scam price signal that uses it | Accepted (amends 0002) |
+| [0018](0018-offline-scam-wording-check.md) | Offline scam wording check, and 40 extra listings to test it | Accepted (amends 0002) |
+| [0019](0019-offline-basemap-and-berlin-ink-foundations.md) | Offline base map (PMTiles) and the Berlin Ink design foundations | Accepted (amends 0008, 0015) |
+| [0020](0020-saved-searches-in-the-browser.md) | Saved searches in the browser, with download and import | Accepted |
+| [0021](0021-online-tiles-for-deployment.md) | Online Protomaps tiles for the deployed site | Accepted (amends 0019) |

@@ -1,20 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import type { SearchResultItem } from "@/lib/types";
-import { RiskBadge } from "./RiskBadge";
+import { euro } from "@/lib/format";
+import { worthAsking } from "@/lib/listing/chips";
+import { commuteMinutes, commuteTooltip } from "@/lib/commute";
+import { Button, buttonClass, Chip } from "@/components/ui/primitives";
+import { RentChip, RiskChip, StationChip, locationLine } from "@/components/listing/VerdictChips";
 import { ListingPhoto } from "./ListingPhoto";
-import { commuteDetail, commuteMinutes, commuteTooltip } from "@/lib/commute";
 
 const NAV_FLAG = "wohniq_navigating_to_listing";
 
-function euro(n: number) {
-  return `€${n.toLocaleString("de-DE")}`;
-}
-
 interface Props {
   item: SearchResultItem;
-  selected?: boolean;
-  onToggleSelect?: (id: string) => void;
-  selectionDisabled?: boolean;
+  compared?: boolean;
+  onToggleCompare?: (id: string) => void;
+  compareDisabled?: boolean;
+  saved?: boolean;
+  onToggleSave?: (id: string) => void;
+  highlighted?: boolean;
+  onHover?: (id: string | null) => void;
+  isNew?: boolean; // new since the last run of this saved search
 }
 
 function AreaBadge({ match }: { match: NonNullable<SearchResultItem["area_match"]> }) {
@@ -27,119 +33,142 @@ function AreaBadge({ match }: { match: NonNullable<SearchResultItem["area_match"
           ? `In ${match.area}, an area you asked for`
           : `Not in the areas you asked for: ${match.distance_km?.toFixed(1)} km from ${match.area}`
       }
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-        inArea ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
+      className={`inline-flex items-center rounded-sm px-2 py-0.5 text-[13px] font-medium ${
+        inArea ? "bg-accent-tint text-accent" : "bg-warn-bg text-warn"
       }`}
     >
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-        <path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" />
-      </svg>
       {match.label}
     </span>
   );
 }
 
-export function ResultCard({ item, selected = false, onToggleSelect, selectionDisabled = false }: Props) {
-  const { listing, explanation, commute, neighborhood, risk, area_match } = item;
+function facts(item: SearchResultItem): string {
+  const l = item.listing;
+  const r = `${l.rooms % 1 === 0 ? Math.round(l.rooms) : l.rooms} rooms`;
+  const parts = [r, `${l.size_m2} m²`];
+  if (l.year_built) parts.push(`built ${l.year_built}`);
+  if (l.available_from) {
+    const d = new Date(l.available_from);
+    parts.push(`from ${d.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`);
+  }
+  if (l.furnished) parts.push("furnished");
+  return parts.join(" · ");
+}
+
+/** One search result: fit, rent check, risk, station or commute, and why it ranks here. */
+export function ResultCard({
+  item,
+  compared = false,
+  onToggleCompare,
+  compareDisabled = false,
+  saved = false,
+  onToggleSave,
+  highlighted = false,
+  onHover,
+  isNew = false,
+}: Props) {
+  const { listing, explanation, commute, risk, area_match } = item;
   const cover = listing.photos[0];
-  const isHighRisk = risk?.band === "high";
+  const fit = Math.round(item.score * 100);
+  const ask = worthAsking(listing.rent, risk);
+  const href = `/listings/${listing.id}`;
 
   return (
     <article
-      className={`overflow-hidden rounded-xl border bg-white ${
-        isHighRisk ? "border-red-200" : selected ? "border-indigo-400 ring-1 ring-indigo-400" : "border-gray-200"
+      data-testid="result-card"
+      data-id={listing.id}
+      onMouseEnter={() => onHover?.(listing.id)}
+      onMouseLeave={() => onHover?.(null)}
+      className={`grid overflow-hidden rounded-lg border bg-surface sm:grid-cols-[260px_1fr] ${
+        highlighted ? "border-accent ring-1 ring-accent" : compared ? "border-accent" : "border-line"
       }`}
     >
-      {onToggleSelect && (
-        <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-2">
-          <label className="flex cursor-pointer items-center gap-2 text-xs text-gray-500 select-none">
-            <input
-              type="checkbox"
-              checked={selected}
-              disabled={selectionDisabled && !selected}
-              onChange={() => onToggleSelect(listing.id)}
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-40"
-            />
-            {selected ? "Selected for comparison" : selectionDisabled ? "Max 4 selected" : "Add to comparison"}
-          </label>
-        </div>
-      )}
       <Link
-        href={`/listings/${listing.id}`}
-        className="flex gap-4 p-4 hover:bg-gray-50"
+        href={href}
+        className="relative block min-h-[180px] bg-placeholder"
         onClick={() => sessionStorage.setItem(NAV_FLAG, "1")}
+        tabIndex={-1}
+        aria-hidden="true"
       >
-        {cover ? (
+        {cover && (
           <ListingPhoto
             url={cover.url}
-            alt={listing.title}
-            className="h-28 w-36 flex-shrink-0 rounded-lg object-cover"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            placeholderClassName="absolute inset-0 h-full w-full bg-placeholder"
           />
-        ) : (
-          <div className="h-28 w-36 flex-shrink-0 rounded-lg bg-gray-100" />
         )}
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="text-base font-medium leading-tight">{listing.title}</h3>
-              <p className="mt-0.5 text-sm text-gray-500">
-                {listing.kiez} · {listing.size_m2} m² · {listing.rooms} rooms
-              </p>
-              {area_match && (
-                <div className="mt-1">
-                  <AreaBadge match={area_match} />
-                </div>
-              )}
-            </div>
-            <RiskBadge risk={risk} />
+        <span className="absolute left-3 top-3 rounded-full bg-ink px-2.5 py-1 text-[13px] font-semibold text-white">
+          {fit} fit
+        </span>
+        {isNew && (
+          <span className="absolute right-3 top-3 rounded-full bg-accent px-2.5 py-1 text-[13px] font-semibold text-white" data-testid="new-badge">
+            New
+          </span>
+        )}
+      </Link>
+      <div className="flex min-w-0 flex-col gap-2.5 p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h3 className="text-[18px] font-semibold leading-snug text-text">
+              <Link href={href} onClick={() => sessionStorage.setItem(NAV_FLAG, "1")} className="hover:underline">
+                {listing.title}
+              </Link>
+            </h3>
+            <p className="text-[14px] text-text-muted">{locationLine(listing.location, listing.kiez)}</p>
           </div>
-
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-            <span>{euro(listing.warmmiete_eur)} warm</span>
-            {commute && (
-              <span title={commuteTooltip(commute)}>
-                {commuteMinutes(commute)}
-                {commuteDetail(commute) && ` · ${commuteDetail(commute)}`}
-              </span>
-            )}
-            {neighborhood?.summary && <span>{neighborhood.summary}</span>}
+          <div className="shrink-0 text-right">
+            <p className="text-[22px] font-bold tabular-nums text-text">{euro(listing.warmmiete_eur)}</p>
+            <p className="text-[13px] text-text-muted">warm / month</p>
           </div>
         </div>
-      </Link>
-
-      <div
-        className={`mx-4 mb-4 rounded-lg px-3 py-2.5 ${
-          isHighRisk ? "bg-red-50" : "bg-gray-50"
-        }`}
-      >
-        <p className={`text-sm font-medium ${isHighRisk ? "text-red-800" : ""}`}>
+        <p className="text-[14px] text-text-body">{facts(item)}</p>
+        <div className="flex flex-wrap gap-1.5">
+          <RentChip rent={listing.rent} />
+          <RiskChip risk={risk} />
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {commute ? (
+            <span title={commuteTooltip(commute)}>
+              <Chip>{commuteMinutes(commute)}</Chip>
+            </span>
+          ) : (
+            <StationChip
+              stop={listing.location?.rail_stop}
+              modes={listing.location?.rail_modes}
+              minutes={listing.location?.rail_walk_minutes}
+            />
+          )}
+          {area_match && <AreaBadge match={area_match} />}
+        </div>
+        <p className="text-[14.5px] leading-relaxed text-text-body" data-testid="result-why">
           {explanation.summary}
         </p>
-        <ul className="mt-1 space-y-0.5">
-          {explanation.reasons.map((r) => (
-            <li key={r} className="text-sm text-gray-700">
-              + {r}
-            </li>
-          ))}
-          {explanation.caveats.map((c) => (
-            <li key={c} className="text-sm text-amber-700">
-              ! {c}
-            </li>
-          ))}
-        </ul>
-
-        {risk && risk.band !== "low" && risk.signals.length > 0 && (
-          <div className="mt-2 border-t border-black/5 pt-2">
-            <ul className="space-y-0.5">
-              {risk.signals.map((s) => (
-                <li key={s.name} className="text-sm text-red-700">
-                  ⚠ {s.evidence}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {ask && <p className="text-[14px] leading-relaxed text-warn">{ask}</p>}
+        <div className="mt-1 flex flex-wrap gap-2">
+          <Link
+            href={href}
+            className={buttonClass("dark")}
+            onClick={() => sessionStorage.setItem(NAV_FLAG, "1")}
+          >
+            View dossier
+          </Link>
+          {onToggleCompare && (
+            <Button
+              variant="outline"
+              aria-pressed={compared}
+              disabled={compareDisabled && !compared}
+              onClick={() => onToggleCompare(listing.id)}
+            >
+              {compared ? "Comparing" : "Compare"}
+            </Button>
+          )}
+          {onToggleSave && (
+            <Button variant="outline" aria-pressed={saved} onClick={() => onToggleSave(listing.id)}>
+              {saved ? "Saved" : "Save"}
+            </Button>
+          )}
+        </div>
       </div>
     </article>
   );

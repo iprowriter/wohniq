@@ -1,392 +1,348 @@
 "use client";
 
+/**
+ * Lifestyle match explorer (design B in two columns, T9.6): settings on the left; the map
+ * with "Best areas for you" under it on the right. Every change re-ranks live. Ranking is
+ * the backend's deterministic engine (ADR-0011); answers stay in this tab (ADR-0012).
+ */
+
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { Answers, Catalog, PresetOut, ProfileResponse } from "@/lib/lifestyle/types";
-import { getCatalog, getProfile } from "@/lib/lifestyle/api";
-import {
-  SUMMARY,
-  WELCOME,
-  clearState,
-  defaultAnswers,
-  fromPreset,
-  hasAnyPreference,
-  loadState,
-  nextStep,
-  pageIssues,
-  prevStep,
-  saveState,
-  stepsFor,
-} from "@/lib/lifestyle/logic";
-import { StepProgress } from "@/components/lifestyle/StepProgress";
-import { PresetCards } from "@/components/lifestyle/PresetCards";
-import { OptionGroup } from "@/components/lifestyle/OptionGroup";
-import { BudgetFields } from "@/components/lifestyle/BudgetFields";
-import { DestinationPicker } from "@/components/lifestyle/DestinationPicker";
-import { PersonaCard } from "@/components/lifestyle/PersonaCard";
-import { ChoicesSummary } from "@/components/lifestyle/ChoicesSummary";
-import { WeightBars } from "@/components/lifestyle/WeightBars";
-import { PrivacyNote } from "@/components/lifestyle/PrivacyNote";
+import type { Answers, Catalog, MatchResponse, PresetOut, RegionCollection, RegionResult } from "@/lib/lifestyle/types";
+import { getCatalog, getMatches, getRegionShapes } from "@/lib/lifestyle/api";
+import { clearState, fromPreset, loadState, saveState } from "@/lib/lifestyle/logic";
+import { addExcluded, loadAdjustments, removeExcluded, saveAdjustments, SCORE_BANDS, sourceIndex } from "@/lib/lifestyle/results";
+import { liveSummary, MAX_COMPARE, PAGE, tripLabel } from "@/lib/lifestyle/explorer";
+import { euro } from "@/lib/format";
+import { ExplorerMap } from "@/components/lifestyle/explorer/ExplorerMap";
+import { SettingsPanel } from "@/components/lifestyle/explorer/SettingsPanel";
+import { CompareAreas, RankingList } from "@/components/lifestyle/explorer/RankingList";
+import { ProfileIcon } from "@/components/lifestyle/explorer/icons";
+import { ListingsPanel } from "@/components/lifestyle/ListingsPanel";
+import { Button } from "@/components/ui/primitives";
 
-const HOW_IT_WORKS = [
-  { icon: "💬", title: "Tell us how you live", body: "Four short pages. No sign-up, no address, nothing stored." },
-  { icon: "📊", title: "We score every area", body: "Official Berlin data on rent, safety, noise, green space and more." },
-  { icon: "🎛️", title: "You stay in control", body: "See why each area fits, tune the weights, remove areas." },
-];
+const DEBOUNCE_MS = 250;
 
-export default function LifestylePage() {
-  const router = useRouter();
+export default function LifestyleExplorer() {
+  const [ready, setReady] = useState(false); // tab state read (avoids a first-visit flash)
   const [catalog, setCatalog] = useState<Catalog | null>(null);
-  const [catalogError, setCatalogError] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Answers>(defaultAnswers);
+  const [shapes, setShapes] = useState<RegionCollection | null>(null);
+  const [answers, setAnswers] = useState<Answers | null>(null);
   const [presetId, setPresetId] = useState<string | null>(null);
-  const [step, setStep] = useState<string>(WELCOME);
-  const [visited, setVisited] = useState<Set<string>>(new Set([WELCOME]));
-  const [restored, setRestored] = useState(false);
-  const [profile, setProfile] = useState<ProfileResponse | null>(null);
-  const [profileError, setProfileError] = useState<string | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const [overrides, setOverrides] = useState<Record<string, number>>({});
+  const [excluded, setExcluded] = useState<string[]>([]);
+  const [limit, setLimit] = useState(PAGE);
+  const [data, setData] = useState<MatchResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [mode, setMode] = useState<"top" | "all">("top");
+  const [compare, setCompare] = useState<string[]>([]);
+  const [flatsFor, setFlatsFor] = useState<{ key: string; name: string } | null>(null);
+  const [adjust, setAdjust] = useState(false);
+  const seq = useRef(0);
 
-  const loadCatalog = useCallback(() => {
-    setCatalogError(null);
-    getCatalog()
-      .then(setCatalog)
-      .catch((e: Error) => setCatalogError(e.message));
-  }, []);
-
-  // Restore this tab's answers (sessionStorage only), then load the questionnaire.
   useEffect(() => {
     const saved = loadState(window.sessionStorage);
     if (saved) {
       setAnswers(saved.answers);
-      setStep(saved.step);
       setPresetId(saved.presetId);
-      setVisited(new Set([WELCOME, saved.step]));
+      const adj = loadAdjustments(window.sessionStorage, saved.answers);
+      setOverrides(adj.overrides);
+      setExcluded(adj.excluded);
     }
-    setRestored(true);
-    loadCatalog();
-  }, [loadCatalog]);
+    setReady(true);
+    getCatalog().then(setCatalog).catch((e: Error) => setError(e.message));
+    getRegionShapes().then(setShapes).catch(() => {});
+  }, []);
 
+  // Re-rank on every change (debounced); keep the last ranking on screen meanwhile.
   useEffect(() => {
-    if (restored) saveState(window.sessionStorage, { answers, step, presetId });
-  }, [answers, step, presetId, restored]);
+    if (!answers) return;
+    saveState(window.sessionStorage, { answers, step: "explorer", presetId });
+    saveAdjustments(window.sessionStorage, { overrides, excluded }, answers);
+    const n = ++seq.current;
+    setLoading(true);
+    const t = setTimeout(() => {
+      getMatches(answers, { weights: overrides, excluded, limit })
+        .then((d) => {
+          if (n !== seq.current) return;
+          setData(d);
+          setError(null);
+        })
+        .catch((e: Error) => n === seq.current && setError(e.message))
+        .finally(() => n === seq.current && setLoading(false));
+    }, DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [answers, presetId, overrides, excluded, limit]);
 
-  const steps = useMemo(() => (catalog ? stepsFor(catalog) : [WELCOME, SUMMARY]), [catalog]);
-
-  // A step restored from an older session may no longer exist: start over gracefully.
-  useEffect(() => {
-    if (catalog && !steps.includes(step)) setStep(WELCOME);
-  }, [catalog, steps, step]);
-  const labels = useMemo(
-    () => Object.fromEntries((catalog?.attributes ?? []).map((a) => [a.id, a.label])),
-    [catalog],
+  const names = useMemo(
+    () => Object.fromEntries((shapes?.features ?? []).map((f) => [f.properties.key, f.properties.name])),
+    [shapes],
   );
-  const stepLabels = useMemo(
-    () => [
-      { id: WELCOME, label: "Start" },
-      ...(catalog?.pages ?? []).map((p) => ({ id: p.id, label: p.title })),
-      { id: SUMMARY, label: "Your match profile" },
-    ],
-    [catalog],
+  const scores = useMemo(() => new Map((data?.scores ?? []).map((s) => [s.key, s.score])), [data]);
+  const sources = useMemo(() => sourceIndex(catalog?.sources ?? []), [catalog]);
+  const destination = catalog?.destinations.find((d) => d.id === answers?.destination) ?? null;
+  const results = data?.results ?? [];
+  const top = results.slice(0, 10);
+  // Weights as shown: the server's, with the user's latest changes on top (instant feedback).
+  const weights = useMemo(
+    () => (data?.weights ?? []).map((w) => (w.attribute in overrides ? { ...w, value: overrides[w.attribute], overridden: true } : w)),
+    [data, overrides],
   );
-
-  // The summary shows what the server derived from the answers (weights, persona).
-  useEffect(() => {
-    if (step !== SUMMARY || !catalog) return;
-    let cancelled = false;
-    setProfileError(null);
-    getProfile(answers)
-      .then((p) => !cancelled && setProfile(p))
-      .catch((e: Error) => !cancelled && setProfileError(e.message));
-    return () => {
-      cancelled = true;
-    };
-  }, [step, answers, catalog]);
-
-  function go(target: string) {
-    setStep(target);
-    setVisited((v) => new Set(v).add(target));
-    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 
   function pickPreset(p: PresetOut) {
     setAnswers(fromPreset(p));
     setPresetId(p.id);
-    setProfile(null);
-    go(steps[1]);
+    setOverrides({});
+    setLimit(PAGE);
+    setOpen(null);
   }
 
-  function startFromScratch() {
-    setAnswers(defaultAnswers());
-    setPresetId(null);
-    setProfile(null);
-    go(steps[1]);
+  function resetProfile() {
+    const p = catalog?.presets.find((x) => x.id === presetId);
+    if (p) pickPreset(p);
   }
 
   function clearAll() {
     clearState(window.sessionStorage);
-    setAnswers(defaultAnswers());
+    setAnswers(null);
     setPresetId(null);
-    setProfile(null);
-    setVisited(new Set([WELCOME]));
-    setStep(WELCOME);
+    setOverrides({});
+    setExcluded([]);
+    setData(null);
+    setCompare([]);
+    setOpen(null);
   }
 
-  function update(next: Answers) {
-    setAnswers(next);
-    setProfile(null);
+  const openArea = useCallback(
+    (key: string, scroll = false) => {
+      const s = data?.scores.find((x) => x.key === key);
+      if (s && s.rank > limit) setLimit(Math.ceil(s.rank / PAGE) * PAGE);
+      setOpen(key);
+      if (scroll) setTimeout(() => document.getElementById(`area-${key}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
+    },
+    [data, limit],
+  );
+
+  function exclude(key: string) {
+    setExcluded((e) => addExcluded(e, key));
+    setCompare((c) => c.filter((k) => k !== key));
+    if (open === key) setOpen(null);
   }
 
-  const page = catalog?.pages.find((p) => p.id === step);
-  const issues = page ? pageIssues(page.id, answers) : [];
-  const anyPreference = catalog ? hasAnyPreference(answers, catalog) : false;
-  const presetLabel = catalog?.presets.find((p) => p.id === presetId)?.label;
+  const selected = open ? (results.find((r) => r.key === open) ?? null) : null;
+  const selectedScore = open ? data?.scores.find((s) => s.key === open) : undefined;
+  const comparing = compare.map((k) => results.find((r) => r.key === k)).filter(Boolean) as RegionResult[];
 
-  function pageForQuestion(question: string): string | null {
-    if (question === "Budget (warm)" || question === "Flat") return "move";
-    if (question === "Where you go most") return "days";
-    return catalog?.questions.find((q) => q.prompt === question)?.page ?? null;
-  }
+  const settings =
+    catalog && answers ? (
+      <SettingsPanel
+        catalog={catalog}
+        answers={answers}
+        presetId={presetId}
+        weights={weights}
+        removed={excluded.map((k) => ({ key: k, name: names[k] ?? k }))}
+        onPreset={pickPreset}
+        onAnswers={(a) => setAnswers(a)}
+        onWeight={(attr, v) => setOverrides((o) => ({ ...o, [attr]: v }))}
+        onResetProfile={resetProfile}
+        onRestore={(k) => setExcluded((e) => removeExcluded(e, k))}
+        onClear={clearAll}
+      />
+    ) : null;
 
   return (
-    <>
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gray-950 px-4 pb-28 pt-14 text-white">
-        <div
-          className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-indigo-600/30 blur-3xl"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-fuchsia-600/20 blur-3xl"
-          aria-hidden="true"
-        />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-indigo-200">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" aria-hidden="true" />
-            New · Lifestyle Match
-          </span>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            Find the Berlin neighbourhood that{" "}
-            <span className="animate-shimmer whitespace-nowrap bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-indigo-300 bg-[length:200%_auto] bg-clip-text text-transparent">
-              fits your life.
-            </span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-xl text-base text-gray-400 sm:text-lg">
-            Tell us how you live. We match you to {catalog?.region_count ?? 143} Berlin areas using official
-            data — and show you exactly why.
-          </p>
-        </div>
-      </section>
+    <div className="mx-auto max-w-[1440px] px-[18px] py-6 md:px-6">
+      <div className="grid items-start gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+        {/* Settings: left column on desktop */}
+        <aside className="hidden rounded-lg border border-line bg-surface p-5 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+          {settings ?? <FirstVisitIntro catalog={catalog} />}
+        </aside>
 
-      {/* ── Questionnaire card ── */}
-      <div ref={cardRef} className="relative mx-auto -mt-20 max-w-3xl scroll-mt-24 px-4 pb-16">
-        <div className="rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl shadow-gray-900/10 sm:p-8">
-          {catalogError ? (
-            <div className="py-10 text-center">
-              <p className="text-4xl" aria-hidden="true">😴</p>
-              <p className="mt-3 font-semibold text-gray-900">The questionnaire didn&apos;t load</p>
-              <p className="mt-1 text-sm text-gray-500">{catalogError}</p>
-              <button
-                type="button"
-                onClick={loadCatalog}
-                className="mt-5 rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-              >
-                Try again
-              </button>
-            </div>
-          ) : !catalog ? (
-            <div className="space-y-4 py-4" aria-busy="true" aria-label="Loading the questionnaire">
-              <div className="h-1.5 animate-pulse rounded-full bg-gray-100" />
-              <div className="h-8 w-2/3 animate-pulse rounded-lg bg-gray-100" />
-              <div className="grid gap-3 sm:grid-cols-3">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-36 animate-pulse rounded-2xl bg-gray-100" />
+        <div className="flex min-w-0 flex-col gap-4">
+          {/* Phone: settings behind "Adjust" */}
+          <div className="flex items-center justify-between gap-3 lg:hidden">
+            <h1 className="text-[22px] font-bold tracking-tight text-text">Lifestyle match</h1>
+            {answers && <Button variant="outline" onClick={() => setAdjust(true)}>Adjust</Button>}
+          </div>
+
+          {/* Map */}
+          <section className="relative overflow-hidden rounded-lg border border-line bg-surface" aria-label="Map of Berlin's areas by match">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2 text-[13px]">
+              <span className="text-text-body" aria-live="polite" data-testid="live-summary">
+                {data ? (
+                  <>
+                    <span className="mr-1.5 inline-flex items-center gap-1 font-semibold text-ok"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-live" />Live</span>
+                    {liveSummary(data, !!answers?.destination)}
+                    {loading && <span className="ml-2 text-text-muted">updating…</span>}
+                  </>
+                ) : answers ? "Ranking Berlin's 143 areas…" : "Pick a profile to rank Berlin's 143 areas."}
+              </span>
+              <div className="flex gap-1" role="group" aria-label="Map view">
+                {(["top", "all"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-pressed={mode === m}
+                    onClick={() => setMode(m)}
+                    className={`min-h-[34px] rounded-md px-3 ${mode === m ? "bg-accent-tint font-semibold text-accent" : "text-text-body hover:bg-ground"}`}
+                  >
+                    {m === "top" ? "Top 10" : "All of Berlin"}
+                  </button>
                 ))}
               </div>
             </div>
-          ) : (
-            <>
-              <StepProgress steps={stepLabels} current={step} visited={visited} onJump={go} />
-
-              <div key={step} className="animate-fade-up mt-8">
-                {/* ── Welcome ── */}
-                {step === WELCOME && (
-                  <div className="space-y-8">
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      {HOW_IT_WORKS.map((h) => (
-                        <div key={h.title} className="rounded-2xl bg-gray-50 p-4">
-                          <p className="text-2xl" aria-hidden="true">{h.icon}</p>
-                          <p className="mt-2 text-sm font-semibold text-gray-900">{h.title}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-gray-500">{h.body}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900">Start with a profile that sounds like you</h2>
-                      <p className="mt-1 text-sm text-gray-500">
-                        It pre-fills the questions — you can change every answer.
-                      </p>
-                      <div className="mt-4">
-                        <PresetCards
-                          presets={catalog.presets}
-                          selected={presetId}
-                          onPick={pickPreset}
-                          onScratch={startFromScratch}
-                        />
-                      </div>
-                    </div>
-                    <PrivacyNote text={catalog.privacy} compact />
-                  </div>
-                )}
-
-                {/* ── Question pages ── */}
-                {page && (
-                  <div className="space-y-8">
-                    <div>
-                      <h2 className="text-2xl font-bold tracking-tight text-gray-900">{page.title}</h2>
-                      <p className="mt-1 text-sm text-gray-500">{page.subtitle}</p>
-                      {presetLabel && (
-                        <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs text-indigo-700">
-                          Pre-filled from “{presetLabel}” — adjust anything, or
-                          <button type="button" className="font-semibold underline" onClick={() => go(SUMMARY)}>
-                            skip to your profile
-                          </button>
-                        </p>
-                      )}
-                    </div>
-                    {page.id === "move" && <BudgetFields answers={answers} city={catalog.city} onChange={update} />}
-                    {page.id === "days" && (
-                      <DestinationPicker
-                        answers={answers}
-                        destinations={catalog.destinations}
-                        frequency={catalog.questions.find((q) => q.id === "frequency")}
-                        labels={labels}
-                        onChange={update}
-                      />
-                    )}
-                    {catalog.questions
-                      .filter((q) => q.page === page.id && q.id !== "frequency")
-                      .map((q) => (
-                        <OptionGroup key={q.id} question={q} answers={answers} labels={labels} onChange={update} />
-                      ))}
-                    {issues.length > 0 && (
-                      <ul className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-                        {issues.map((i) => (
-                          <li key={i}>{i}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-
-                {/* ── Summary ── */}
-                {step === SUMMARY && (
-                  <div className="space-y-8">
-                    <div>
-                      <h2 className="text-2xl font-bold tracking-tight text-gray-900">Here&apos;s what we heard</h2>
-                      <p className="mt-1 text-sm text-gray-500">
-                        Did we capture your lifestyle? Change anything before we match you.
-                      </p>
-                    </div>
-                    {profileError && (
-                      <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-                        {profileError}
-                      </p>
-                    )}
-                    {!profile && !profileError && (
-                      <div className="grid gap-6 md:grid-cols-2" aria-busy="true">
-                        <div className="h-72 animate-pulse rounded-3xl bg-gray-100" />
-                        <div className="h-72 animate-pulse rounded-2xl bg-gray-100" />
-                      </div>
-                    )}
-                    {profile && (
-                      <div className="grid gap-6 md:grid-cols-2">
-                        <div className="min-w-0 space-y-6">
-                          <PersonaCard persona={profile.persona} />
-                          {profile.weights.some((w) => w.value > 0) && (
-                            <div>
-                              <p className="mb-3 text-sm font-semibold text-gray-900">How we&apos;ll weigh things</p>
-                              <WeightBars weights={profile.weights} />
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 space-y-4">
-                          <p className="text-sm font-semibold text-gray-900">You told us</p>
-                          <ChoicesSummary
-                            choices={profile.choices}
-                            pageFor={pageForQuestion}
-                            pageTitle={(id) => catalog.pages.find((p) => p.id === id)?.title ?? id}
-                            onEdit={go}
-                          />
-                          {Object.values(profile.unscored).map((msg) => (
-                            <p key={msg} className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                              {msg}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {profile && !anyPreference && (
-                      <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
-                        Tell us at least one thing you care about (evenings, weekends, neighbourhood…) so we can
-                        match you.
-                      </p>
-                    )}
-                    <div className="flex flex-col-reverse items-stretch gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex flex-wrap justify-center gap-1 sm:justify-start">
-                        <button
-                          type="button"
-                          onClick={() => go(steps[1])}
-                          className="whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
-                        >
-                          ← Change answers
-                        </button>
-                        <button
-                          type="button"
-                          onClick={clearAll}
-                          className="whitespace-nowrap rounded-full px-4 py-2.5 text-sm text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                        >
-                          Clear my answers
-                        </button>
-                      </div>
-                      <button
-                        type="button"
-                        disabled={!profile || !anyPreference}
-                        onClick={() => router.push("/lifestyle/results")}
-                        className="group whitespace-nowrap rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:shadow-xl hover:shadow-indigo-600/40 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Yes, that&apos;s me — show my areas{" "}
-                        <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* ── Back / Next for the question pages ── */}
-              {page && (
-                <div className="mt-10 flex items-center justify-between border-t border-gray-100 pt-6">
-                  <button
-                    type="button"
-                    onClick={() => go(prevStep(steps, step))}
-                    className="rounded-full px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
-                  >
-                    ← Back
-                  </button>
-                  <button
-                    type="button"
-                    disabled={issues.length > 0}
-                    onClick={() => go(nextStep(steps, step))}
-                    className="rounded-full bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700 disabled:opacity-40"
-                  >
-                    {nextStep(steps, step) === SUMMARY ? "See my lifestyle →" : "Next →"}
-                  </button>
+            <div className="relative">
+              <ExplorerMap
+                shapes={shapes}
+                scores={scores}
+                excluded={new Set(excluded)}
+                top={top}
+                mode={mode}
+                hovered={hovered}
+                selected={open}
+                onHover={setHovered}
+                onSelect={(k) => openArea(k)}
+                destination={destination}
+                height={360}
+              />
+              {open && selectedScore && (
+                <div className="absolute left-3 right-3 top-3 z-[500] flex items-center gap-3 rounded-md bg-surface px-3 py-2 shadow-md sm:right-auto sm:max-w-[320px]" data-testid="map-card">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-[12px] font-bold text-white">{selectedScore.rank}</span>
+                  <span className="min-w-0 text-[13px]">
+                    <span className="block truncate font-semibold text-text">{names[open] ?? open}</span>
+                    <span className="block text-text-muted">
+                      {Math.round(selectedScore.score)} match
+                      {selected ? ` · ${euro(selected.warm_rent_eur)}` : ""}
+                      {selected && tripLabel(selected) ? ` · ${tripLabel(selected)}` : ""}
+                    </span>
+                  </span>
+                  <Button variant="ghost" className="shrink-0 !min-h-[36px] !px-2 text-[13px]" onClick={() => openArea(open, true)}>
+                    Details below
+                  </Button>
                 </div>
               )}
-            </>
+              {data && (
+                <div className="pointer-events-none absolute bottom-2 left-2 z-[500] flex items-center gap-1.5 rounded-sm bg-surface/95 px-2 py-1 text-[11px] text-text-muted shadow-sm">
+                  Match
+                  {SCORE_BANDS.map((b) => (
+                    <span key={b.label} className="inline-flex items-center gap-1">
+                      <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-[2px]" style={{ background: b.color }} />
+                      {b.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {error && (
+            <p role="alert" className="rounded-md bg-warn-bg px-4 py-3 text-[14px] text-warn">
+              {error}
+            </p>
           )}
+          {data && Object.values(data.unscored).map((msg) => (
+            <p key={msg} className="rounded-md bg-chip px-4 py-2 text-[13px] text-text-body">{msg}</p>
+          ))}
+
+          {ready && !answers && catalog && <ProfileCards catalog={catalog} onPick={pickPreset} />}
+          {answers && !data && !error && <div className="h-80 animate-pulse rounded-lg bg-chip" aria-busy="true" />}
+          {data && (
+            <div className={loading ? "opacity-80 transition-opacity" : ""}>
+              <RankingList
+                results={results}
+                weights={weights}
+                persona={data.persona}
+                sources={sources}
+                destination={destination?.short}
+                open={open}
+                hovered={hovered}
+                compare={compare}
+                remaining={(data.scores.length ?? 0) - results.length}
+                onOpen={setOpen}
+                onHover={setHovered}
+                onToggleCompare={(k) => setCompare((c) => (c.includes(k) ? c.filter((x) => x !== k) : c.length < MAX_COMPARE ? [...c, k] : c))}
+                onExclude={exclude}
+                onSeeFlats={(key, name) => setFlatsFor({ key, name })}
+                onMore={() => setLimit((l) => l + PAGE)}
+              />
+            </div>
+          )}
+          {comparing.length >= 2 && (
+            <CompareAreas regions={comparing} weights={weights} destination={destination?.short} onRemove={(k) => setCompare((c) => c.filter((x) => x !== k))} />
+          )}
+          {compare.length === 1 && <p className="text-[13px] text-text-muted">Pick one or two more areas to compare them side by side.</p>}
         </div>
       </div>
-    </>
+
+      {/* Phone settings drawer */}
+      {adjust && settings && (
+        <div className="fixed inset-0 z-[1200] bg-[rgba(13,19,33,0.5)] lg:hidden" onClick={() => setAdjust(false)}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Adjust your match"
+            className="absolute inset-x-0 bottom-0 max-h-[88vh] overflow-y-auto rounded-t-xl bg-surface p-5"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.key === "Escape" && setAdjust(false)}
+          >
+            <div className="mb-3 flex justify-end">
+              <Button onClick={() => setAdjust(false)}>Show results</Button>
+            </div>
+            {settings}
+          </div>
+        </div>
+      )}
+
+      <ListingsPanel region={flatsFor} budget={answers?.budget_eur ?? 0} onClose={() => setFlatsFor(null)} />
+    </div>
+  );
+}
+
+function FirstVisitIntro({ catalog }: { catalog: Catalog | null }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <h1 className="text-[20px] font-bold tracking-tight text-text">Lifestyle match</h1>
+      <p className="text-[14px] leading-relaxed text-text-body">
+        Pick a profile under the map, then change anything: budget, where you go, what matters. The
+        map and the ranking of all {catalog?.region_count ?? 143} areas update as you go.
+      </p>
+      <Link href="/lifestyle/questions" className="inline-flex min-h-tap items-center justify-center rounded-md border border-line-strong px-3 text-[14px] font-medium text-text hover:bg-ground">
+        Answer questions instead
+      </Link>
+      {catalog && <p className="text-[12.5px] leading-relaxed text-text-muted">{catalog.privacy}</p>}
+    </div>
+  );
+}
+
+function ProfileCards({ catalog, onPick }: { catalog: Catalog; onPick: (p: PresetOut) => void }) {
+  return (
+    <section aria-labelledby="profiles-heading" className="rounded-lg border border-line bg-surface p-5" data-testid="profile-cards">
+      <h2 id="profiles-heading" className="text-[20px] font-semibold text-text">Start with a profile</h2>
+      <p className="text-[14px] text-text-muted">You can change everything afterwards.</p>
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {catalog.presets.map((p) => (
+          <li key={p.id}>
+            <button
+              type="button"
+              onClick={() => onPick(p)}
+              className="flex h-full w-full flex-col gap-1.5 rounded-md border border-line p-4 text-left hover:border-accent hover:bg-accent-tint/40"
+            >
+              <span className="flex items-center gap-2 text-[16px] font-semibold text-text">
+                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-tint text-accent"><ProfileIcon id={p.id} /></span>
+                {p.label}
+              </span>
+              <span className="text-[13.5px] leading-snug text-text-muted">{p.blurb}</span>
+              <span className="text-[12.5px] text-text-muted">Budget {euro(p.answers.budget_eur)} warm · {p.answers.size_m2} m²</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <Link href="/lifestyle/questions" className="mt-4 inline-block text-[14px] text-accent underline underline-offset-2">
+        Answer questions instead
+      </Link>
+    </section>
   );
 }

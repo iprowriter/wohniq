@@ -19,3 +19,6 @@ evals/results/
 # them — the API ships the generated data/neighborhoods/neighborhoods.json).
 data/neighborhoods/raw/*
 !data/neighborhoods/raw/README.md
+
+# Berlin open-data build (live mode reads Supabase; ADR-0016)
+data/berlin/build/

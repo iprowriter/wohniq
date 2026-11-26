@@ -77,8 +77,8 @@ Summarize each listing's Kiez: cafes, parks, supermarkets, nightlife, transport.
 
 ### F7 — Scam / risk detection *(showpiece)*
 Hybrid engine producing an explained 0–100 risk score and Low/Caution/High band per listing. See ADR-0002.
-- **AC1.** Deterministic signals (price z-score vs. Kiez median, pHash photo duplication, metadata rules) run with no API cost.
-- **AC2.** An LLM pass extracts fuzzy text signals (off-platform payment, landlord-abroad, urgency, no-Anmeldung) as validated structured output with evidence quotes.
+- **AC1.** Deterministic signals (price vs. the Mietspiegel's lowest value for the flat, falling back to the Kiez median; pHash photo duplication with at least 4 photos shared with one listing; metadata rules) run with no API cost. See ADR-0017.
+- **AC2.** An offline wording check (English/German, negation-aware; ADR-0018) catches the classic phrases without an API; an LLM pass extracts fuzzy text signals (off-platform payment, landlord-abroad, urgency, no-Anmeldung) as validated structured output with evidence quotes.
 - **AC3.** Fused score is explainable: output lists the contributing signals with evidence.
 - **AC4.** Evaluated against the labeled synthetic set with a reported precision/recall + confusion matrix in the repo.
 
@@ -103,6 +103,29 @@ All 143 Berlin areas as a ranked list next to an OSM map, re-rankable by categor
 - **AC4.** Every figure cites its source, period and method; category caveats are shown; missing data is marked pending, never scored as zero.
 - **AC5.** Deterministic, no LLM; labels describe the measure, never the residents; no "avoid" wording.
 
+### F11 — Rent check
+Every listing and any Berlin address checked against the Berliner Mietspiegel 2026 and the rent brake. See ADR-0016/0017.
+- **AC1.** A listing shows the index range, the rent-brake limit (index mean + 10 %, labelled an estimate) and a verdict: within the limit, above it (with € per m² and per month), below the index, or a new build without a limit.
+- **AC2.** For any of the 400,505 residential addresses, the user enters size, building age and cold rent, optionally an energy value and the official checklist; the result follows the brochure's method (its worked example, €7.30 → €7.75, is a test).
+- **AC3.** The flat's rent and features are computed in the browser and never sent to the server or put in a URL.
+- **AC3b.** "Check this rent" on a listing opens `/rent-check?listing=<id>`: the form is filled from that sample listing (its matched address, size, building age, cold rent) and the check runs; only the listing id is in the URL, never the figures.
+- **AC4.** The rent-brake exemptions and "not legal advice" are shown with every verdict; every figure cites the Mietspiegel row.
+- **AC5.** Works offline (demo mode) and live (Supabase) with the same answers.
+
+### F12 — Around this flat & Right now
+- **AC1.** For any point: nearest S/U-Bahn (walking minutes), schools within 1 km, Kitas and places within 500 m, nearest park ≥ 1 ha and playgrounds, air quality at the nearest station, road accidents within 300 m, recorded crime for the district region, and the location class — each with its source and its position among Berlin's 542 planning areas (crime: 143 regions).
+- **AC2.** Wording describes and never judges ("closer than", "more than in", "higher than in"); no area is coloured or ranked by who lives there.
+- **AC3.** A listing's street, planning area, rent check and profile all come from the same matched address.
+- **AC4.** Right now always lists the six nearest stops with transport types and walking minutes, without a network; with one, live departures at the nearest S/U-Bahn station and bus/tram stop, labelled live.
+
+### F13 — Saved searches, similar flats, compare (T9.7)
+- **AC1.** "Save search" keeps the query, filter, sort and budget in this browser only (ADR-0020); saved searches appear under the home search box and on `/saved` (Flats / Searches tabs: run, rename, delete, delete all); the header count covers flats and searches.
+- **AC2.** Running a saved search again marks flats not seen on the previous run as "New" and says how many since when.
+- **AC3.** "Download my saved items" gives one small file; "Import" adds only what is missing, never overwrites, and refuses files that didn't come from WohnIQ.
+- **AC4.** The listing page shows "Similar apartments to this" from `GET /listings/{id}/similar`: a deterministic score from named factors (distance, rooms, size ±20 %, warm rent ±20 %, furnished, building period; `search/similar.py`, no LLM), each card saying why ("Same area · 0.8 km away", "2 rooms, 48 m² (this: 46)", "€70 less warm") with rent and risk chips. High-risk flats are included with their chip; the flat itself and copies reusing its photos are left out. If the flat is above the rent-brake limit, flats within it come first ("Similar flats within the rent limit"). Six cards on desktop, three on phones plus "Show more".
+- **AC5.** One compare list of up to four flats, kept in this browser, fed from result cards, the listing page ("Compare with…": similar flats, saved flats, the last search, a pasted listing link), similar cards and `/saved`; a "Compare (n) · Open" bar follows across pages.
+- **AC6.** `/compare?ids=…` replaces the old pop-up: reloadable and shareable; rows for price, rent check, scam risk, the flat, location (+ a trip to a place the user types), around; the best value per row is marked, never for accidents or crime; remove a column or add a flat; on phones the first column stays and flats scroll sideways.
+
 ## 6. User flows
 
 **Primary flow**
@@ -114,14 +137,15 @@ All 143 Berlin areas as a ranked list next to an OSM map, re-rankable by categor
 6. User opens a listing for detail, or selects several to compare (F8).
 
 **Lifestyle Match flow (F9)**
-1. Homepage entry bar / card → `/lifestyle`: pick a preset or start from scratch.
-2. Four question pages → summary with persona → "Yes, that's me".
-3. `/lifestyle/results`: ranked areas with reasons and sources, shaded map, tune weights → Update results, remove areas.
-4. "See flats here" → WohnIQ listings located in the area (with risk badges) → listing detail.
+1. Homepage entry card → `/lifestyle` (the explorer, T9.6): on a first visit, profile cards under the map; pick one.
+2. Two columns: settings on the left (profile, budget, size, budget firmness, destination, longest trip, what matters 0–5, removed areas); on the right the map (all 143 areas shaded on one blue scale, top 10 numbered, destination marked, Top 10 / All of Berlin) above "Best areas for you". Every change re-ranks live (debounced); the ranking stays the deterministic engine.
+3. Open an area: score bars for what you weigh, reasons with sources, the data behind it; See flats here, Compare (up to 3, side by side, best value marked), Not for me (restorable). Clicking an area on the map shows a small card with "Details below".
+4. "Answer questions instead" → `/lifestyle/questions` (the four question pages + persona summary), which end in the explorer. `/lifestyle/results` redirects to `/lifestyle`.
+5. Phone: map first, list below, settings behind "Adjust". No emoji anywhere (line icons). Answers stay in this tab only (ADR-0012).
 
 **Berlin Neighborhoods flow (F10)**
 1. Header menu "Berlin Neighborhoods" → `/neighborhoods`: overall ranking, list + map.
-2. Pick a category (e.g. Safety) → re-ranked list and recoloured map; toggle best-first / worst-first.
+2. Pick a category (e.g. Safety, line icons on the tabs) → re-ranked list and recoloured map on one calm blue scale (deep blue = top 20%, palest = bottom 20%; no alarm colour); toggle best-first / worst-first. The Affluence category stays.
 3. Click an area on the map (or a row) → its detail: strengths, watch-outs, metrics vs. Berlin with sources, rank in every category.
 4. Optional: adjust weights → Update ranking; share the URL.
 
