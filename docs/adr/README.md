@@ -25,3 +25,4 @@ Format: lightweight [MADR](https://adr.github.io/madr/)-style.
 | [0017](0017-rent-check-and-scam-price-signal.md) | Rent check against the Mietspiegel, and the scam price signal that uses it | Accepted (amends 0002) |
 | [0018](0018-offline-scam-wording-check.md) | Offline scam wording check, and 40 extra listings to test it | Accepted (amends 0002) |
 | [0019](0019-offline-basemap-and-berlin-ink-foundations.md) | Offline base map (PMTiles) and the Berlin Ink design foundations | Accepted (amends 0008, 0015) |
+| [0020](0020-saved-searches-in-the-browser.md) | Saved searches in the browser, with download and import | Accepted |

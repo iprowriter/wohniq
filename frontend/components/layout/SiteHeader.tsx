@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { NAV, isActive } from "@/lib/nav";
 import { StatusBadge } from "./StatusBadge";
 import { useSaved } from "@/lib/useSaved";
+import { useSavedSearches } from "@/lib/useSavedSearches";
 
 export function Logo() {
   return (
@@ -26,7 +27,8 @@ export function SiteHeader() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
   useEffect(() => setOpen(false), [pathname]); // close the phone menu on navigation
-  const saved = useSaved().ids.length;
+  const searches = useSavedSearches().searches.length;
+  const saved = useSaved().ids.length + searches; // flats and searches
 
   return (
     <header className="sticky top-0 z-[1100] bg-ink text-text-on-ink">

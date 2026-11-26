@@ -8,6 +8,7 @@
  */
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getMapListings, getRandomListings, search } from "@/lib/api";
 import type { ListingOut, SearchResponse } from "@/lib/types";
@@ -32,6 +33,8 @@ import {
 } from "@/lib/results";
 import { isFairRent } from "@/lib/listing/chips";
 import { useSaved } from "@/lib/useSaved";
+import { useSavedSearches } from "@/lib/useSavedSearches";
+import { addSearch, findSearch, readSearches, recordRun, removeSearch, writeSearches, searchHref } from "@/lib/savedSearches";
 import { saveLastSearch } from "@/lib/listing/lastSearch";
 import { CriteriaChips } from "@/components/CriteriaChips";
 import { SearchNotices } from "@/components/SearchNotices";
@@ -69,6 +72,29 @@ function cacheSet(key: string, data: SearchResponse) {
   } catch {
     /* storage full or unavailable */
   }
+}
+
+/** "Your saved searches" under the home search box: one click runs a search again. */
+function SavedSearchRow() {
+  const { searches } = useSavedSearches();
+  if (!searches.length) return null;
+  return (
+    <nav aria-label="Your saved searches" className="mt-5 flex flex-wrap items-center gap-2" data-testid="saved-searches-row">
+      <span className="text-[14px] font-semibold text-white">Your saved searches:</span>
+      {searches.slice(0, 4).map((s) => (
+        <Link
+          key={s.id}
+          href={searchHref(s)}
+          className="inline-flex min-h-[36px] max-w-[260px] items-center truncate rounded-full bg-white/10 px-3 text-[14px] text-white hover:bg-white/20"
+        >
+          <span className="truncate">{s.name}</span>
+        </Link>
+      ))}
+      <Link href="/saved?tab=searches" className="inline-flex min-h-[36px] items-center px-1 text-[14px] text-accent-on-ink underline underline-offset-2">
+        Manage
+      </Link>
+    </nav>
+  );
 }
 
 export default function Home() {
@@ -209,6 +235,7 @@ function HomeView({
                 </button>
               ))}
             </div>
+            <SavedSearchRow />
           </div>
           <CheckedCard listing={showcase} lowRisk={!!showcase && risk.get(showcase.id) === "low"} />
         </div>
@@ -285,6 +312,9 @@ function Results({
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const saved = useSaved();
+  const savedSearches = useSavedSearches();
+  const thisSaved = findSearch(savedSearches.searches, params);
+  const [news, setNews] = useState<{ key: string; ids: string[]; since: string } | null>(null);
   // After a search, scroll so "We understood:" sits just under the sticky header and the
   // results follow below it (the chips are never hidden behind the header).
   const chipsRef = useRef<HTMLDivElement>(null);
@@ -332,6 +362,27 @@ function Results({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, params.fair, params.sort]);
+
+  // A saved search ran again: mark what's new since the previous run, then remember this run.
+  useEffect(() => {
+    if (!data) return;
+    const list = readSearches();
+    const hit = findSearch(list, params);
+    if (!hit) return;
+    const ids = (data.results ?? []).map((r) => r.listing.id);
+    const run = recordRun(list, hit.id, ids);
+    if (!run) return;
+    setNews({ key: cacheKey, ids: run.newIds, since: run.previousRunAt });
+    writeSearches(run.searches);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+  const newIds = news?.key === cacheKey ? news.ids : [];
+
+  function toggleSaveSearch() {
+    const ids = results.map((r) => r.listing.id);
+    savedSearches.update((list) => (thisSaved ? removeSearch(list, thisSaved.id) : addSearch(list, params, ids)));
+    if (thisSaved) setNews(null);
+  }
 
   function toggleCompare(id: string) {
     setCompare((prev) => {
@@ -410,6 +461,15 @@ function Results({
             >
               Only fair rents ({fairCount})
             </Button>
+            <Button
+              variant={thisSaved ? "dark" : "outline"}
+              aria-pressed={!!thisSaved}
+              onClick={toggleSaveSearch}
+              disabled={!data}
+              data-testid="save-search"
+            >
+              {thisSaved ? "Search saved" : "Save search"}
+            </Button>
             <Button variant="outline" onClick={share}>
               {copied ? "Link copied" : "Share search"}
             </Button>
@@ -420,6 +480,14 @@ function Results({
         </div>
 
         {error && <p role="alert" className="mb-4 rounded-md bg-warn-bg px-4 py-3 text-[14px] text-warn">{error}</p>}
+        {thisSaved && news?.key === cacheKey && (
+          <p className="mb-4 rounded-md bg-accent-tint px-4 py-3 text-[14px] text-text-body" data-testid="new-since" role="status">
+            {newIds.length === 0
+              ? "No new flats since you last ran this saved search"
+              : `${newIds.length} new flat${newIds.length > 1 ? "s" : ""} since you last ran this saved search`}{" "}
+            ({new Date(news.since).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}).
+          </p>
+        )}
         {data && (
           <SearchNotices
             notices={data.notices ?? []}
@@ -449,6 +517,7 @@ function Results({
                 onToggleSave={saved.toggle}
                 highlighted={highlighted === item.listing.id}
                 onHover={setHighlighted}
+                isNew={newIds.includes(item.listing.id)}
               />
             ))}
             {loading && !data && Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-64 animate-pulse rounded-lg bg-chip" />)}

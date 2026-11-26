@@ -20,6 +20,7 @@ interface Props {
   onToggleSave?: (id: string) => void;
   highlighted?: boolean;
   onHover?: (id: string | null) => void;
+  isNew?: boolean; // new since the last run of this saved search
 }
 
 function AreaBadge({ match }: { match: NonNullable<SearchResultItem["area_match"]> }) {
@@ -64,6 +65,7 @@ export function ResultCard({
   onToggleSave,
   highlighted = false,
   onHover,
+  isNew = false,
 }: Props) {
   const { listing, explanation, commute, risk, area_match } = item;
   const cover = listing.photos[0];
@@ -99,6 +101,11 @@ export function ResultCard({
         <span className="absolute left-3 top-3 rounded-full bg-ink px-2.5 py-1 text-[13px] font-semibold text-white">
           {fit} fit
         </span>
+        {isNew && (
+          <span className="absolute right-3 top-3 rounded-full bg-accent px-2.5 py-1 text-[13px] font-semibold text-white" data-testid="new-badge">
+            New
+          </span>
+        )}
       </Link>
       <div className="flex min-w-0 flex-col gap-2.5 p-5">
         <div className="flex items-start justify-between gap-4">

@@ -117,6 +117,11 @@ Every listing and any Berlin address checked against the Berliner Mietspiegel 20
 - **AC3.** A listing's street, planning area, rent check and profile all come from the same matched address.
 - **AC4.** Right now always lists the six nearest stops with transport types and walking minutes, without a network; with one, live departures at the nearest S/U-Bahn station and bus/tram stop, labelled live.
 
+### F13 — Saved searches, similar flats, compare (T9.7)
+- **AC1.** "Save search" keeps the query, filter, sort and budget in this browser only (ADR-0020); saved searches appear under the home search box and on `/saved` (Flats / Searches tabs: run, rename, delete, delete all); the header count covers flats and searches.
+- **AC2.** Running a saved search again marks flats not seen on the previous run as "New" and says how many since when.
+- **AC3.** "Download my saved items" gives one small file; "Import" adds only what is missing, never overwrites, and refuses files that didn't come from WohnIQ.
+
 ## 6. User flows
 
 **Primary flow**
